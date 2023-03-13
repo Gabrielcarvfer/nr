@@ -212,9 +212,11 @@ class NrGnbPhy : public NrPhy
     /**
      * \brief Set the Tx power spectral density based on the RB index vector
      * \param rbIndexVector vector of the index of the RB (in SpectrumValue array)
-     * in which there is a transmission
+     * in which there is a transmission for the current allocation (towards a specific UE)
+     * \param nTotalAllocRbs total number of RBs which are occupied for any transmission/allocation
+     * (includes allocations towards other UEs in OFDMA DL)
      */
-    void SetSubChannels(const std::vector<int>& rbIndexVector);
+    void SetSubChannels(const std::vector<int>& rbIndexVector, size_t nTotalAllocRbs);
 
     /**
      * \brief Add the UE to the list of this gnb UEs.
@@ -819,6 +821,8 @@ class NrGnbPhy : public NrPhy
 
     SfnSf m_currentSlot;     //!< The current slot number
     bool m_isPrimary{false}; //!< Is this PHY a primary phy?
+
+    Time m_lastBfChange;
 };
 
 } // namespace ns3
