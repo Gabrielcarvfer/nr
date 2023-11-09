@@ -190,8 +190,9 @@ struct DciInfoElementTdma
      * \param format DCI format
      * \param symStart starting symbol index for flexible TTI scheme
      * \param numSym number of symbols for flexible TTI scheme
-     * \param rank the Rank number
      * \param mcs MCS
+     * \param rank the Rank number
+     * \param precMats the precoding matrix
      * \param tbs TB size
      * \param ndi New Data Indicator
      * \param rv Redundancy Version
@@ -202,6 +203,7 @@ struct DciInfoElementTdma
                        uint8_t numSym,
                        uint8_t mcs,
                        uint8_t rank,
+                       Ptr<const ComplexMatrixArray> precMats,
                        uint32_t tbs,
                        uint8_t ndi,
                        uint8_t rv,
@@ -214,6 +216,7 @@ struct DciInfoElementTdma
           m_numSym(numSym),
           m_mcs(mcs),
           m_rank(rank),
+          m_precMats(precMats),
           m_tbSize(tbs),
           m_ndi(ndi),
           m_rv(rv),
@@ -242,6 +245,7 @@ struct DciInfoElementTdma
           m_numSym(numSym),
           m_mcs(o.m_mcs),
           m_rank(o.m_rank),
+          m_precMats(o.m_precMats),
           m_tbSize(o.m_tbSize),
           m_ndi(ndi),
           m_rv(rv),
@@ -259,6 +263,7 @@ struct DciInfoElementTdma
     const uint8_t m_numSym{0};    //!< number of symbols for flexible TTI scheme
     const uint8_t m_mcs{0};       //!< MCS
     const uint8_t m_rank{1};
+    Ptr<const ComplexMatrixArray> m_precMats{nullptr};
     const uint32_t m_tbSize{0};   //!< TB size
     const uint8_t m_ndi{0};       //!< New Data Indicator
     const uint8_t m_rv{0};        //!< Redundancy Version
