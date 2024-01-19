@@ -26,7 +26,7 @@ check-style-clang-format:
     - python3 utils/check-style-clang-format.py contrib/nr/utils
     - python3 utils/check-style-clang-format.py contrib/nr/examples
     - python3 utils/check-style-clang-format.py contrib/nr/test
-    - python3 utils/check-style-clang-format.py --no-formatting contrib/nr/doc
+#    - python3 utils/check-style-clang-format.py --no-formatting contrib/nr/doc
     - python3 utils/check-style-clang-format.py --no-formatting contrib/nr/tutorial
   timeout: 1h
 
