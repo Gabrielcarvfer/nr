@@ -17,7 +17,7 @@ stages:
 .base-build:
   stage: build
   script:
-    - git clone --branch=ns-$NS3_RELEASE_VERSION --depth=1 https://gitlab.com/nsnam/ns-3-dev.git
+    - git clone --depth=1 https://gitlab.com/nsnam/ns-3-dev.git
     - mkdir -p $CCACHE_BASEDIR_VALUE
     - export CCACHE_BASEDIR=${PWD}
     - export CCACHE_DIR=${PWD}/$CCACHE_BASEDIR_VALUE
