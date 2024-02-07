@@ -101,6 +101,8 @@ main(int argc, char* argv[])
      *   UMi_StreetCanyon_nLoS, //!< UMi_StreetCanyon where all the nodes will not be in
      *
      */
+    uint8_t maxPortsSupported = UINT8_MAX;
+
     uint16_t losCondition = 0;
     NrHelper::MimoPmiParams mimoPmiParams;
 
@@ -192,7 +194,26 @@ main(int argc, char* argv[])
     // Parse the command line
     cmd.Parse(argc, argv);
 
-    NS_ABORT_IF(centralFrequency > 100e9);
+    if (TypeId::LookupByName(mimoPmiParams.fullSearchCb) == NrCbTwoPort::GetTypeId())
+    {
+        maxPortsSupported = 2;
+    }
+    NS_ASSERT_MSG((!xPolUe && numVPortsUe * numHPortsUe <= maxPortsSupported) ||
+                      (xPolUe && numVPortsUe * numHPortsUe <= maxPortsSupported / 2),
+                  "total 2 ports for UE is supported");
+    NS_ASSERT_MSG((!xPolGnb && numVPortsGnb * numHPortsGnb <= maxPortsSupported) ||
+                      (xPolGnb && numVPortsGnb * numHPortsGnb <= maxPortsSupported / 2),
+                  "total 2 ports for gNB is supported");
+    NS_ASSERT_MSG(((numColumnsGnb % numHPortsGnb) == 0),
+                  "The number of horizontal ports of gNB must divide number of columns");
+    NS_ASSERT_MSG(((numRowsGnb % numVPortsGnb) == 0),
+                  "The number of vertical ports of gNB must divide number of rows");
+    NS_ASSERT_MSG(((numColumnsUe % numHPortsUe) == 0),
+                  "The number of horizontal ports of UE must divide number of columns");
+    NS_ASSERT_MSG(((numRowsUe % numVPortsUe) == 0),
+                  "The number of vertical ports of UE must divide number of rows");
+    NS_ABORT_IF(!MakeUintegerChecker<uint8_t>(mimoPmiParams.rankLimit));
+    NS_ABORT_IF(centralFrequency < 0.5e9 && centralFrequency > 100e9);
     NS_ABORT_UNLESS(losCondition < 3);
 
     if (logging)
