@@ -132,6 +132,16 @@ NrUePhy::GetTypeId()
                           BooleanValue(false),
                           MakeBooleanAccessor(&NrUePhy::SetEnableUplinkPowerControl),
                           MakeBooleanChecker())
+            .AddAttribute("WbPmiUpdateInterval",
+                          "Wideband PMI update interval",
+                          TimeValue(NR_DEFAULT_PMI_INTERVAL_WB),
+                          MakeTimeAccessor(&NrUePhy::m_wbPmiUpdateInterval),
+                          MakeTimeChecker())
+            .AddAttribute("SbPmiUpdateInterval",
+                          "Subband PMI update interval",
+                          TimeValue(NR_DEFAULT_PMI_INTERVAL_SB),
+                          MakeTimeAccessor(&NrUePhy::m_sbPmiUpdateInterval),
+                          MakeTimeChecker())
             .AddTraceSource("DlDataSinr",
                             "DL DATA SINR statistics.",
                             MakeTraceSourceAccessor(&NrUePhy::m_dlDataSinrTrace),
