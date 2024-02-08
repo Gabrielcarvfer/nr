@@ -49,4 +49,16 @@ NrPmSearch::SetUeParams(size_t numTotalPorts)
     m_nRxPorts = numTotalPorts;
 }
 
+void
+NrPmSearch::SetSubbandSize(size_t subbandSize)
+{
+    m_subbandSize = subbandSize;
+}
+
+size_t
+NrPmSearch::GetSubbandSize() const
+{
+    return m_subbandSize;
+}
+
 } // namespace ns3

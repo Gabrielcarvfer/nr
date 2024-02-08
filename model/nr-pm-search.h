@@ -8,6 +8,7 @@
 #define NR_PM_SEARCH_H
 
 #include "nr-amc.h"
+#include "nr-cb-type-one.h"
 #include "nr-mimo-chunk-processor.h"
 #include "nr-mimo-signal.h"
 
@@ -43,6 +44,13 @@ class NrPmSearch : public Object
     /// \param numTotalPorts Total number of ports in the UE antenna array
     void SetUeParams(size_t numTotalPorts);
 
+    ///\brief Set the subband size (in number of RBs)
+    /// \param subbandSize the subband size (in number of RBs)
+    void SetSubbandSize(size_t subbandSize);
+
+    /// \return The subband size in number of RBs
+    size_t GetSubbandSize() const;
+
     /// \brief Create and initialize the codebook for each rank.
     virtual void InitCodebooks() = 0;
 
@@ -65,6 +73,21 @@ class NrPmSearch : public Object
                                             PmiUpdate pmiUpdate) = 0;
 
   protected:
+    struct PrecMatParams : public SimpleRefCount<PrecMatParams>
+    {
+        size_t wbPmi{};                 ///< Wideband PMI (i1, index of W1 matrix)
+        std::vector<size_t> sbPmis{};   ///< Subband PMI values (i2, indices of W2 matrices)
+        ComplexMatrixArray sbPrecMat{}; ///< Precoding matrix (nGnbPorts * rank * nSubbands)
+        double perfMetric{}; ///< Performance metric for these precoding parameters (e.g., average
+                             ///< capacity / SINR / CQI / TB size) used to find optimal precoding
+    };
+
+    struct RankParams
+    {
+        Ptr<PrecMatParams> precParams; ///< The precoding parameters (WB/SB PMIs)
+        Ptr<NrCbTypeOne> cb;           ///< The codebook
+    };
+
     size_t m_subbandSize{1}; ///< Size of each subband (in number of RBs)
 
     bool m_isGnbDualPol{false}; ///< True when gNB has a dual-polarized antenna array
@@ -75,7 +98,8 @@ class NrPmSearch : public Object
 
     Ptr<const NrAmc> m_amc{nullptr}; ///< The NrAmc to be used for computing TB size and MCS
 
-    uint8_t m_rankLimit{UINT8_MAX}; ///< Limit the UE's maximum supported rank
+    uint8_t m_rankLimit{UINT8_MAX};       ///< Limit the UE's maximum supported rank
+    std::vector<RankParams> m_rankParams; ///< The parameters (PMI values, codebook) for each rank
 };
 
 } // namespace ns3

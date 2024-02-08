@@ -54,21 +54,6 @@ class NrPmSearchFull : public NrPmSearch
     void SetCodebookAttribute(const std::string& attrName, const AttributeValue& attrVal);
 
   protected:
-    struct PrecMatParams : public SimpleRefCount<PrecMatParams>
-    {
-        size_t wbPmi{};                 ///< Wideband PMI (i1, index of W1 matrix)
-        std::vector<size_t> sbPmis{};   ///< Subband PMI values (i2, indices of W2 matrices)
-        ComplexMatrixArray sbPrecMat{}; ///< Precoding matrix (nGnbPorts * rank * nSubbands)
-        double perfMetric{}; ///< Performance metric for these precoding parameters (e.g., average
-                             ///< capacity / SINR / CQI / TB size) used to find optimal precoding
-    };
-
-    struct RankParams
-    {
-        Ptr<PrecMatParams> precParams; ///< The precoding parameters (WB/SB PMIs)
-        Ptr<NrCbTypeOne> cb;           ///< The codebook
-    };
-
     /// \brief Update the WB and/or SB PMI, or neither.
     /// \param rbNormChanMat the interference-normed channel matrix per RB
     /// \param pmiUpdate the struct defining if updates to SB or WB PMI are necessary
@@ -118,8 +103,7 @@ class NrPmSearchFull : public NrPmSearch
         std::vector<ComplexMatrixArray> allPrecMats) const;
 
     std::vector<uint8_t> m_ranks{}; ///< The set of ranks for which to compute precoding matrices
-    std::vector<RankParams> m_rankParams; ///< The parameters (PMI values, codebook) for each rank
-    ObjectFactory m_cbFactory;            ///< The factory used to create the codebooks
+    ObjectFactory m_cbFactory;      ///< The factory used to create the codebooks
 };
 
 } // namespace ns3
