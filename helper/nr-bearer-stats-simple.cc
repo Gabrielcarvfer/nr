@@ -133,10 +133,10 @@ NrBearerStatsSimple::UlTxPdu(uint16_t cellId,
                       << "\t"
                       << "lcid"
                       << "\t"
-                      << "packetSize" << std::endl;
+                      << "packetSize" << "\n";
     }
     m_ulTxOutFile << Simulator::Now().GetSeconds() << "\t" << cellId << "\t" << rnti << "\t"
-                  << (uint32_t)lcid << "\t" << packetSize << std::endl;
+                  << (uint32_t)lcid << "\t" << packetSize << "\n";
 }
 
 void
@@ -159,11 +159,11 @@ NrBearerStatsSimple::DlTxPdu(uint16_t cellId,
                       << "\t"
                       << "lcid"
                       << "\t"
-                      << "packetSize" << std::endl;
+                      << "packetSize" << "\n";
     }
 
     m_dlTxOutFile << Simulator::Now().GetSeconds() << "\t" << cellId << "\t" << rnti << "\t"
-                  << (uint32_t)lcid << "\t" << packetSize << std::endl;
+                  << (uint32_t)lcid << "\t" << packetSize << "\n";
 }
 
 void
@@ -189,11 +189,11 @@ NrBearerStatsSimple::UlRxPdu(uint16_t cellId,
                       << "\t"
                       << "packetSize"
                       << "\t"
-                      << "delay(s)" << std::endl;
+                      << "delay(s)" << "\n";
     }
 
     m_ulRxOutFile << Simulator::Now().GetSeconds() << "\t" << cellId << "\t" << rnti << "\t"
-                  << (uint32_t)lcid << "\t" << packetSize << "\t" << delay * 1e-9 << std::endl;
+                  << (uint32_t)lcid << "\t" << packetSize << "\t" << delay * 1e-9 << "\n";
 }
 
 void
@@ -219,11 +219,11 @@ NrBearerStatsSimple::DlRxPdu(uint16_t cellId,
                       << "\t"
                       << "packetSize"
                       << "\t"
-                      << "delay(s)" << std::endl;
+                      << "delay(s)" << "\n";
     }
 
     m_dlRxOutFile << Simulator::Now().GetSeconds() << "\t" << cellId << "\t" << rnti << "\t"
-                  << (uint32_t)lcid << "\t" << packetSize << "\t" << delay * 1e-9 << std::endl;
+                  << (uint32_t)lcid << "\t" << packetSize << "\t" << delay * 1e-9 << "\n";
 }
 
 std::string
