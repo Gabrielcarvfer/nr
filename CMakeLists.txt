@@ -117,6 +117,7 @@ set(source_files
     model/nr-mimo-matrices.cc
     model/nr-pm-search-fast.cc
     model/nr-pm-search-full.cc
+    model/nr-pm-search-ideal.cc
     model/nr-pm-search.cc
     model/nr-mimo-signal.cc
 )
@@ -243,6 +244,7 @@ set(header_files
     model/nr-mimo-matrices.h
     model/nr-pm-search-fast.h
     model/nr-pm-search-full.h
+    model/nr-pm-search-ideal.h
     model/nr-pm-search.h
     model/nr-mimo-signal.h
 )
