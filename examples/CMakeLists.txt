@@ -18,7 +18,6 @@ set(base_examples
     cttc-channel-randomness
     rem-example
     rem-beam-example
-    cttc-fh-compression
     cttc-nr-notching
     cttc-nr-traffic-ngmn-mixed
     cttc-nr-traffic-3gpp-xr
@@ -36,6 +35,23 @@ foreach(
     SOURCE_FILES ${example}.cc
     LIBRARIES_TO_LINK ${libnr}
                       ${libflow-monitor}
+  )
+endforeach()
+
+set(interop_examples
+    cttc-fh-compression
+)
+foreach(
+  example
+  ${interop_examples}
+)
+  build_lib_example(
+    NAME ${example}
+    SOURCE_FILES ${example}.cc
+    LIBRARIES_TO_LINK
+      ${libnr}
+      ${libflow-monitor}
+      ${liblte}
   )
 endforeach()
 
@@ -73,6 +89,7 @@ else()
         ${libnr}
         ${libflow-monitor}
         ${libstats}
+        ${liblte}
     )
   endforeach()
 
@@ -95,22 +112,15 @@ else()
       ${libnr}
       ${libflow-monitor}
       ${libstats}
+      ${liblte}
   )
 
-  set(example
-      cttc-realistic-beamforming
-  )
-  set(source_files
-      ${example}.cc
-  )
-  set(libraries_to_link
+  build_lib_example(
+    NAME cttc-realistic-beamforming
+    SOURCE_FILES cttc-realistic-beamforming.cc
+    LIBRARIES_TO_LINK
       ${libnr}
       ${libflow-monitor}
       ${SQLite3_LIBRARIES}
-  )
-  build_lib_example(
-    NAME ${example}
-    SOURCE_FILES ${source_files}
-    LIBRARIES_TO_LINK ${libraries_to_link}
   )
 endif()

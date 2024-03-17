@@ -364,7 +364,7 @@
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#ns3::EpcUeNas::DoRecvData()#</dia:string>
+            <dia:string>#ns3::NrEpcUeNas::DoRecvData()#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>

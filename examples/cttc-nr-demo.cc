@@ -182,7 +182,7 @@ main(int argc, char* argv[])
     {
         LogComponentEnable("UdpClient", LOG_LEVEL_INFO);
         LogComponentEnable("UdpServer", LOG_LEVEL_INFO);
-        LogComponentEnable("LtePdcp", LOG_LEVEL_INFO);
+        LogComponentEnable("NrPdcp", LOG_LEVEL_INFO);
     }
 
     /*
@@ -191,7 +191,7 @@ main(int argc, char* argv[])
      * an example: if you want to make the RLC buffer very large, you can pass a very large integer
      * here.
      */
-    Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     /*
      * Create the scenario. In our examples, we heavily use helpers that setup
@@ -246,18 +246,18 @@ main(int argc, char* argv[])
     /*
      * Setup the NR module. We create the various helpers needed for the
      * NR simulation:
-     * - EpcHelper, which will setup the core network
+     * - nrEpcHelper, which will setup the core network
      * - IdealBeamformingHelper, which takes care of the beamforming part
      * - NrHelper, which takes care of creating and connecting the various
      * part of the NR stack
      */
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     // Put the pointers inside nrHelper
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     /*
      * Spectrum division. We create two operational bands, each of them containing
@@ -359,7 +359,7 @@ main(int argc, char* argv[])
                                          TypeIdValue(DirectPathBeamforming::GetTypeId()));
 
     // Core latency
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
+    nrEpcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
 
     // Antennas for all the UEs
     nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(2));
@@ -459,7 +459,7 @@ main(int argc, char* argv[])
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    Ptr<Node> pgw = nrEpcHelper->GetPgwNode();
     NodeContainer remoteHostContainer;
     remoteHostContainer.Create(1);
     Ptr<Node> remoteHost = remoteHostContainer.Get(0);
@@ -482,16 +482,16 @@ main(int argc, char* argv[])
     internet.Install(gridScenario.GetUserTerminals());
 
     Ipv4InterfaceContainer ueLowLatIpIface =
-        epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
+        nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
     Ipv4InterfaceContainer ueVoiceIpIface =
-        epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
+        nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
     {
         Ptr<Ipv4StaticRouting> ueStaticRouting = ipv4RoutingHelper.GetStaticRouting(
             gridScenario.GetUserTerminals().Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+        ueStaticRouting->SetDefaultRoute(nrEpcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
     // attach UEs to the closest eNB
@@ -528,11 +528,11 @@ main(int argc, char* argv[])
     dlClientLowLat.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaULL)));
 
     // The bearer that will carry low latency traffic
-    EpsBearer lowLatBearer(EpsBearer::NGBR_LOW_LAT_EMBB);
+    NrEpsBearer lowLatBearer(NrEpsBearer::NGBR_LOW_LAT_EMBB);
 
     // The filter for the low-latency traffic
-    Ptr<EpcTft> lowLatTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfLowLat;
+    Ptr<NrEpcTft> lowLatTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfLowLat;
     dlpfLowLat.localPortStart = dlPortLowLat;
     dlpfLowLat.localPortEnd = dlPortLowLat;
     lowLatTft->Add(dlpfLowLat);
@@ -545,11 +545,11 @@ main(int argc, char* argv[])
     dlClientVoice.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaBe)));
 
     // The bearer that will carry voice traffic
-    EpsBearer voiceBearer(EpsBearer::GBR_CONV_VOICE);
+    NrEpsBearer voiceBearer(NrEpsBearer::GBR_CONV_VOICE);
 
     // The filter for the voice traffic
-    Ptr<EpcTft> voiceTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfVoice;
+    Ptr<NrEpcTft> voiceTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfVoice;
     dlpfVoice.localPortStart = dlPortVoice;
     dlpfVoice.localPortEnd = dlPortVoice;
     voiceTft->Add(dlpfVoice);

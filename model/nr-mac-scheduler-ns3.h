@@ -831,7 +831,7 @@ class NrMacSchedulerNs3 : public NrMacScheduler
     uint8_t DoScheduleUl(const std::vector<UlHarqInfo>& ulHarqFeedback,
                          const SfnSf& ulSfn,
                          SlotAllocInfo* allocInfo,
-                         LteNrTddSlotType type);
+                         NrTddSlotType type);
     uint8_t DoScheduleSrs(PointInFTPlane* spoint, SlotAllocInfo* allocInfo);
 
     static const unsigned m_macHdrSize = 0; //!< Mac Header size

@@ -133,6 +133,107 @@ set(source_files
     model/nr-pm-search-full.cc
     model/nr-pm-search.cc
     model/nr-mimo-signal.cc
+    model/nr-rrc-sap.cc
+    model/nr-ff-mac-common.cc
+    model/nr-ff-mac-scheduler.cc
+    model/nr-ff-mac-sched-sap.cc
+    model/nr-epc-tft.cc
+    model/nr-eps-bearer.cc
+    model/nr-common.cc
+    helper/nr-stats-calculator.cc
+    model/nr-ue-cphy-sap.cc
+    model/nr-enb-rrc.cc
+    model/nr-ue-rrc.cc
+    model/nr-interference.cc
+    model/nr-epc-x2.cc
+    model/nr-epc-ue-nas.cc
+    model/nr-rrc-sap.cc
+    model/nr-enb-cphy-sap.cc
+    model/nr-ccm-mac-sap.cc
+    model/nr-enb-cmac-sap.cc
+    model/nr-mac-sap.cc
+    model/nr-chunk-processor.cc
+    model/nr-enb-phy-sap.cc
+    model/nr-component-carrier.cc
+    model/nr-ccm-rrc-sap.cc
+    model/nr-rlc.cc
+    model/nr-no-op-component-carrier-manager.cc
+    model/nr-simple-ue-component-carrier-manager.cc
+    model/nr-ue-cmac-sap.cc
+    model/nr-epc-enb-application.cc
+    helper/nr-epc-helper.cc
+    model/nr-epc-x2.cc
+    model/nr-rrc-protocol-real.cc
+    model/nr-interference-base.cc
+    model/nr-ue-component-carrier-manager.cc
+    helper/nr-no-backhaul-epc-helper.cc
+    model/nr-epc-mme-application.cc
+    model/nr-epc-enb-application.cc
+    model/nr-epc-pgw-application.cc
+    model/nr-epc-sgw-application.cc
+    model/nr-enb-component-carrier-manager.cc
+    model/nr-pdcp.cc
+    model/nr-rlc-am.cc
+    model/nr-rlc-am-header.cc
+    model/nr-eps-bearer.cc
+    model/nr-eps-bearer-tag.cc
+    model/nr-epc-x2.cc
+    model/nr-epc-x2-sap.cc
+    model/nr-epc-x2-header.cc
+    model/nr-rlc-um.cc
+    model/nr-rlc-tm.cc
+    model/nr-radio-bearer-info.cc
+    model/nr-radio-bearer-tag.cc
+    model/nr-epc-s1ap-sap.cc
+    model/nr-epc-s11-sap.cc
+    model/nr-epc-enb-s1-sap.cc
+    model/nr-epc-enb-application.cc
+    model/nr-ffr-rrc-sap.cc
+    model/nr-anr-sap.cc
+    model/nr-handover-algorithm.cc
+    model/nr-handover-management-sap.cc
+    model/nr-no-op-handover-algorithm.cc
+    model/nr-a2-a4-rsrq-handover-algorithm.cc
+    model/nr-a3-rsrp-handover-algorithm.cc
+    model/nr-pdcp-sap.cc
+    model/nr-pdcp-tag.cc
+    model/nr-pdcp-header.cc
+    model/nr-pdcp.cc
+    model/nr-ue-ccm-rrc-sap.cc
+    model/nr-ue-component-carrier-manager.cc
+    model/nr-as-sap.cc
+    model/nr-epc-gtpu-header.cc
+    model/nr-epc-gtpc-header.cc
+    model/nr-epc-tft.cc
+    model/nr-epc-tft-classifier.cc
+    model/nr-rlc-tag.cc
+    model/nr-rlc-sdu-status-tag.cc
+    model/nr-rlc-sap.cc
+    model/nr-rrc-protocol-real.cc
+    model/nr-rrc-header.cc
+    model/nr-asn1-header.cc
+    model/nr-rlc-sequence-number.cc
+    model/nr-rlc-header.cc
+    model/nr-component-carrier-enb.cc
+    model/nr-ffr-algorithm.cc
+    model/nr-ffr-distributed-algorithm.cc
+    model/nr-ffr-enhanced-algorithm.cc
+    model/nr-ffr-soft-algorithm.cc
+    model/nr-ffr-sap.cc
+    model/nr-ffr-rrc-sap.cc
+    model/nr-eps-bearer-tag.cc
+    helper/nr-epc-helper.cc
+    helper/nr-no-backhaul-epc-helper.cc
+    helper/nr-point-to-point-epc-helper.cc
+    helper/nr-point-to-point-epc-helper-base.cc
+    helper/nr-global-pathloss-database.cc
+    model/nr-phy-tag.cc
+    helper/nr-bearer-stats-simple.cc
+    helper/nr-mac-stats-calculator.cc
+    helper/nr-phy-stats-calculator.cc
+    helper/nr-phy-rx-stats-calculator.cc
+    helper/nr-phy-tx-stats-calculator.cc
+    model/nr-lte-amc.cc
 )
 
 set(header_files
@@ -174,6 +275,8 @@ set(header_files
     model/nr-mac-header-fs-dl.h
     model/nr-mac-short-bsr-ce.h
     model/nr-phy-mac-common.h
+    model/nr-ff-mac-scheduler.h
+    model/nr-ff-mac-sched-sap.h
     model/nr-mac-scheduler.h
     model/nr-mac-scheduler-tdma-rr.h
     model/nr-mac-scheduler-tdma-pf.h
@@ -258,6 +361,110 @@ set(header_files
     model/nr-pm-search-full.h
     model/nr-pm-search.h
     model/nr-mimo-signal.h
+    model/nr-rrc-sap.h
+    model/nr-ff-mac-common.h
+    model/nr-ff-mac-scheduler.h
+    model/nr-ff-mac-sched-sap.h
+    model/nr-epc-tft.h
+    model/nr-eps-bearer.h
+    model/nr-common.h
+    helper/nr-stats-calculator.h
+    model/nr-ue-cphy-sap.h
+    model/nr-enb-rrc.h
+    model/nr-ue-rrc.h
+    model/nr-interference.h
+    model/nr-epc-x2.h
+    model/nr-epc-ue-nas.h
+    model/nr-rrc-sap.h
+    model/nr-enb-cphy-sap.h
+    model/nr-ccm-mac-sap.h
+    model/nr-enb-cmac-sap.h
+    model/nr-mac-sap.h
+    model/nr-chunk-processor.h
+    model/nr-enb-phy-sap.h
+    model/nr-component-carrier.h
+    model/nr-ccm-rrc-sap.h
+    model/nr-rlc.h
+    model/nr-no-op-component-carrier-manager.h
+    model/nr-simple-ue-component-carrier-manager.h
+    model/nr-ue-cmac-sap.h
+    model/nr-epc-enb-application.h
+    helper/nr-epc-helper.h
+    model/nr-epc-x2.h
+    model/nr-rrc-protocol-real.h
+    model/nr-interference-base.h
+    model/nr-ue-component-carrier-manager.h
+    model/nr-enb-component-carrier-manager.h
+    helper/nr-no-backhaul-epc-helper.h
+    model/nr-epc-mme-application.h
+    model/nr-epc-enb-application.h
+    model/nr-epc-pgw-application.h
+    model/nr-epc-sgw-application.h
+    model/nr-enb-component-carrier-manager.h
+    model/nr-pdcp.h
+    model/nr-rlc-am.h
+    model/nr-rlc-am-header.h
+    model/nr-eps-bearer.h
+    model/nr-eps-bearer-tag.h
+    model/nr-epc-x2.h
+    model/nr-epc-x2-sap.h
+    model/nr-epc-x2-header.h
+    model/nr-rlc-um.h
+    model/nr-rlc-tm.h
+    model/nr-radio-bearer-info.h
+    model/nr-radio-bearer-tag.h
+    model/nr-epc-s1ap-sap.h
+    model/nr-epc-s11-sap.h
+    model/nr-epc-enb-s1-sap.h
+    model/nr-epc-enb-application.h
+    model/nr-ffr-rrc-sap.h
+    model/nr-anr-sap.h
+    model/nr-handover-algorithm.h
+    model/nr-handover-management-sap.h
+    model/nr-no-op-handover-algorithm.h
+    model/nr-a2-a4-rsrq-handover-algorithm.h
+    model/nr-a3-rsrp-handover-algorithm.h
+    model/nr-pdcp-sap.h
+    model/nr-pdcp-tag.h
+    model/nr-pdcp-header.h
+    model/nr-pdcp.h
+    model/nr-ue-ccm-rrc-sap.h
+    model/nr-ue-component-carrier-manager.h
+    model/nr-as-sap.h
+    model/nr-epc-gtpu-header.h
+    model/nr-epc-gtpc-header.h
+    model/nr-epc-tft.h
+    model/nr-epc-tft-classifier.h
+    model/nr-rlc-tag.h
+    model/nr-rlc-sdu-status-tag.h
+    model/nr-rlc-sap.h
+    model/nr-rrc-protocol-real.h
+    model/nr-rrc-header.h
+    model/nr-asn1-header.h
+    model/nr-rlc-sequence-number.h
+    model/nr-rlc-header.h
+    model/nr-component-carrier-enb.h
+    model/nr-ffr-algorithm.h
+    model/nr-ffr-distributed-algorithm.h
+    model/nr-ffr-enhanced-algorithm.h
+    model/nr-ffr-soft-algorithm.h
+    model/nr-eps-bearer-tag.h
+    model/nr-ffr-sap.h
+    model/nr-ffr-rrc-sap.h
+    helper/nr-epc-helper.h
+    helper/nr-no-backhaul-epc-helper.h
+    helper/nr-point-to-point-epc-helper.h
+    helper/nr-point-to-point-epc-helper-base.h
+    helper/nr-global-pathloss-database.h
+    model/nr-phy-tag.h
+    helper/nr-bearer-stats-calculator.h
+    helper/nr-bearer-stats-connector.h
+    helper/nr-bearer-stats-simple.h
+    helper/nr-mac-stats-calculator.h
+    helper/nr-phy-stats-calculator.h
+    helper/nr-phy-rx-stats-calculator.h
+    helper/nr-phy-tx-stats-calculator.h
+    model/nr-lte-amc.h
 )
 
 set(test_sources
@@ -288,6 +495,43 @@ set(test_sources
     test/nr-test-harq.cc
     utils/traffic-generators/test/traffic-generator-test.cc
     test/system-scheduler-test-qos.cc
+    test/nr-test-entities.cc
+    test/nr-epc-test-gtpu.cc
+    test/nr-epc-test-s1u-downlink.cc
+    test/nr-epc-test-s1u-uplink.cc
+    test/nr-test-epc-tft-classifier.cc
+    test/nr-ffr-simple.cc
+    test/nr-simple-helper.cc
+    test/nr-simple-net-device.cc
+    test/nr-simple-spectrum-phy.cc
+    test/nr-test-asn1-encoding.cc
+    test/nr-test-lte-rlc-header.cc
+    test/nr-test-rlc-am-e2e.cc
+    test/nr-test-rlc-am-transmitter.cc
+    test/nr-test-rlc-um-e2e.cc
+    test/nr-test-rlc-um-transmitter.cc
+    test/nr-test-lte-rrc.cc
+    test/nr-test-ipv6-routing.cc
+    test/nr-test-lte-epc-e2e-data.cc
+    # cmake-format: off
+    # todo:
+    # test/nr-test-cell-selection.cc             \
+    # test/nr-test-radio-link-failure.cc          \
+    # test/nr-test-lte-x2-handover.cc              \
+    # test/nr-test-lte-x2-handover-measures.cc      \
+    # test/nr-test-lte-handover-delay.cc             | requires handover
+    # test/nr-test-lte-handover-failure.cc          /
+    # test/nr-test-lte-handover-target.cc          /
+    # test/nr-test-primary-cell-change.cc         /
+    # test/nr-test-secondary-cell-handover.cc    /
+    # test/nr-test-secondary-cell-selection.cc  /
+    #
+    # test/nr-test-ue-measurements.cc     \
+    # test/nr-test-carrier-aggregation.cc  | requires scheduler integration
+    # test/nr-test-cqi-generation.cc      /
+    #
+    # test/nr-test-deactivate-bearer.cc | Requires implementing LC release in NrMacSchedulerNs3::DoCschedLcReleaseReq, NrComponentCarrier, NrMacSchedulerUeInfo, NrMacSchedulerLcg
+    # cmake-format: on
 )
 
 build_lib(
@@ -295,8 +539,14 @@ build_lib(
   SOURCE_FILES ${source_files}
   HEADER_FILES ${header_files}
   LIBRARIES_TO_LINK
-    ${liblte}
     ${libinternet-apps}
     ${libflow-monitor}
+    ${libspectrum}
+    ${libbuildings}
+    ${libvirtual-net-device}
+    ${libpoint-to-point}
+    ${libapplications}
+    ${libcsma}
+    ${libconfig-store}
   TEST_SOURCES ${test_sources}
 )

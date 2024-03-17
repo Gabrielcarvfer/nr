@@ -7,6 +7,7 @@
 #include "nr-gnb-net-device.h"
 #include "nr-gnb-phy.h"
 #include "nr-lte-mi-error-model.h"
+#include "nr-radio-bearer-tag.h"
 #include "nr-ue-net-device.h"
 #include "nr-ue-phy.h"
 
@@ -14,7 +15,6 @@
 #include "ns3/uniform-planar-array.h"
 #include <ns3/boolean.h>
 #include <ns3/double.h>
-#include <ns3/lte-radio-bearer-tag.h>
 #include <ns3/trace-source-accessor.h>
 
 namespace ns3
@@ -741,21 +741,21 @@ NrSpectrumPhy::StartTxUlControlFrames(const std::list<Ptr<NrControlMessage>>& ct
 }
 
 void
-NrSpectrumPhy::AddDataPowerChunkProcessor(const Ptr<LteChunkProcessor>& p)
+NrSpectrumPhy::AddDataPowerChunkProcessor(const Ptr<NrChunkProcessor>& p)
 {
     NS_LOG_FUNCTION(this);
     m_interferenceData->AddRsPowerChunkProcessor(p);
 }
 
 void
-NrSpectrumPhy::AddDataSinrChunkProcessor(const Ptr<LteChunkProcessor>& p)
+NrSpectrumPhy::AddDataSinrChunkProcessor(const Ptr<NrChunkProcessor>& p)
 {
     NS_LOG_FUNCTION(this);
     m_interferenceData->AddSinrChunkProcessor(p);
 }
 
 void
-NrSpectrumPhy::AddSrsSinrChunkProcessor(const Ptr<LteChunkProcessor>& p)
+NrSpectrumPhy::AddSrsSinrChunkProcessor(const Ptr<NrChunkProcessor>& p)
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT_MSG(m_isEnb && m_interferenceSrs,
@@ -802,14 +802,14 @@ NrSpectrumPhy::UpdateSrsSnrPerceived(const double srsSnr)
 }
 
 void
-NrSpectrumPhy::AddRsPowerChunkProcessor(const Ptr<LteChunkProcessor>& p)
+NrSpectrumPhy::AddRsPowerChunkProcessor(const Ptr<NrChunkProcessor>& p)
 {
     NS_LOG_FUNCTION(this);
     m_interferenceCtrl->AddRsPowerChunkProcessor(p);
 }
 
 void
-NrSpectrumPhy::AddDlCtrlSinrChunkProcessor(const Ptr<LteChunkProcessor>& p)
+NrSpectrumPhy::AddDlCtrlSinrChunkProcessor(const Ptr<NrChunkProcessor>& p)
 {
     NS_LOG_FUNCTION(this);
     m_interferenceCtrl->AddSinrChunkProcessor(p);
@@ -1444,7 +1444,7 @@ NrSpectrumPhy::ProcessReceivedPacketBurst()
                 continue;
             }
 
-            LteRadioBearerTag bearerTag;
+            NrRadioBearerTag bearerTag;
             if (!packet->PeekPacketTag(bearerTag))
             {
                 NS_FATAL_ERROR("No radio bearer tag found");
@@ -1555,7 +1555,7 @@ NrSpectrumPhy::EndRxCtrl()
     m_interferenceCtrl->EndRx();
 
     // control error model not supported
-    // forward control messages of this frame to LtePhy
+    // forward control messages of this frame to NrPhy
     if (!m_rxControlMessageList.empty())
     {
         if (m_phyRxCtrlEndOkCallback)

@@ -15,10 +15,10 @@
 #include "nr-mac-header-vs.h"
 #include "nr-mac-short-bsr-ce.h"
 #include "nr-phy-sap.h"
+#include "nr-radio-bearer-tag.h"
 
 #include <ns3/boolean.h>
 #include <ns3/log.h>
-#include <ns3/lte-radio-bearer-tag.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/uinteger.h>
 
@@ -34,20 +34,20 @@ uint8_t NrUeMac::g_raPreambleId = 0;
 // SAP forwarders
 ///////////////////////////////////////////////////////////
 
-class UeMemberNrUeCmacSapProvider : public LteUeCmacSapProvider
+class UeMemberNrUeCmacSapProvider : public NrUeCmacSapProvider
 {
   public:
     UeMemberNrUeCmacSapProvider(NrUeMac* mac);
 
-    // inherited from LteUeCmacSapProvider
+    // inherited from NrUeCmacSapProvider
     void ConfigureRach(RachConfig rc) override;
     void StartContentionBasedRandomAccessProcedure() override;
     void StartNonContentionBasedRandomAccessProcedure(uint16_t rnti,
                                                       uint8_t preambleId,
                                                       uint8_t prachMask) override;
     void AddLc(uint8_t lcId,
-               LteUeCmacSapProvider::LogicalChannelConfig lcConfig,
-               LteMacSapUser* msu) override;
+               NrUeCmacSapProvider::LogicalChannelConfig lcConfig,
+               NrMacSapUser* msu) override;
     void RemoveLc(uint8_t lcId) override;
     void Reset() override;
     void SetRnti(uint16_t rnti) override;
@@ -84,7 +84,7 @@ UeMemberNrUeCmacSapProvider::StartNonContentionBasedRandomAccessProcedure(uint16
 }
 
 void
-UeMemberNrUeCmacSapProvider::AddLc(uint8_t lcId, LogicalChannelConfig lcConfig, LteMacSapUser* msu)
+UeMemberNrUeCmacSapProvider::AddLc(uint8_t lcId, LogicalChannelConfig lcConfig, NrMacSapUser* msu)
 {
     m_mac->AddLc(lcId, lcConfig, msu);
 }
@@ -119,12 +119,12 @@ UeMemberNrUeCmacSapProvider::SetImsi(uint64_t imsi)
     m_mac->DoSetImsi(imsi);
 }
 
-class UeMemberNrMacSapProvider : public LteMacSapProvider
+class UeMemberNrMacSapProvider : public NrMacSapProvider
 {
   public:
     UeMemberNrMacSapProvider(NrUeMac* mac);
 
-    // inherited from LteMacSapProvider
+    // inherited from NrMacSapProvider
     void TransmitPdu(TransmitPduParameters params) override;
     void ReportBufferStatus(ReportBufferStatusParameters params) override;
 
@@ -342,7 +342,7 @@ NrUeMac::GetNumHarqProcess() const
 
 // forwarded from MAC SAP
 void
-NrUeMac::DoTransmitPdu(LteMacSapProvider::TransmitPduParameters params)
+NrUeMac::DoTransmitPdu(NrMacSapProvider::TransmitPduParameters params)
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_ulDci->m_harqProcess == params.harqProcessId);
@@ -355,7 +355,7 @@ NrUeMac::DoTransmitPdu(LteMacSapProvider::TransmitPduParameters params)
 
     params.pdu->AddHeader(header);
 
-    LteRadioBearerTag bearerTag(params.rnti, params.lcid, 0);
+    NrRadioBearerTag bearerTag(params.rnti, params.lcid, 0);
     params.pdu->AddPacketTag(bearerTag);
 
     m_miUlHarqProcessesPacket.at(params.harqProcessId).m_pktBurst->AddPacket(params.pdu);
@@ -370,7 +370,7 @@ NrUeMac::DoTransmitPdu(LteMacSapProvider::TransmitPduParameters params)
 }
 
 void
-NrUeMac::DoReportBufferStatus(LteMacSapProvider::ReportBufferStatusParameters params)
+NrUeMac::DoReportBufferStatus(NrMacSapProvider::ReportBufferStatusParameters params)
 {
     NS_LOG_FUNCTION(this << static_cast<uint32_t>(params.lcid));
 
@@ -416,7 +416,7 @@ NrUeMac::SendReportBufferStatus(const SfnSf& dataSfn, uint8_t symStart)
     bsr.m_macCeType = MacCeElement::BSR;
 
     // BSR is reported for each LCG
-    std::unordered_map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters>::iterator it;
+    std::unordered_map<uint8_t, NrMacSapProvider::ReportBufferStatusParameters>::iterator it;
     std::vector<uint32_t> queue(4, 0); // one value per each of the 4 LCGs, initialized to 0
     for (it = m_ulBsrReceived.begin(); it != m_ulBsrReceived.end(); it++)
     {
@@ -478,7 +478,7 @@ NrUeMac::SendReportBufferStatus(const SfnSf& dataSfn, uint8_t symStart)
 
     p->AddHeader(header);
 
-    LteRadioBearerTag bearerTag(m_rnti, NrMacHeaderFsUl::SHORT_BSR, 0);
+    NrRadioBearerTag bearerTag(m_rnti, NrMacHeaderFsUl::SHORT_BSR, 0);
     p->AddPacketTag(bearerTag);
 
     m_ulDciTotalUsed += p->GetSize();
@@ -489,12 +489,12 @@ NrUeMac::SendReportBufferStatus(const SfnSf& dataSfn, uint8_t symStart)
 }
 
 void
-NrUeMac::SetUeCmacSapUser(LteUeCmacSapUser* s)
+NrUeMac::SetUeCmacSapUser(NrUeCmacSapUser* s)
 {
     m_cmacSapUser = s;
 }
 
-LteUeCmacSapProvider*
+NrUeCmacSapProvider*
 NrUeMac::GetUeCmacSapProvider()
 {
     return m_cmacSapProvider;
@@ -569,7 +569,7 @@ NrUeMac::DoReceivePhyPdu(Ptr<Packet> p)
 {
     NS_LOG_FUNCTION(this);
 
-    LteRadioBearerTag tag;
+    NrRadioBearerTag tag;
     p->RemovePacketTag(tag);
 
     if (tag.GetRnti() != m_rnti) // Packet is for another user
@@ -580,7 +580,7 @@ NrUeMac::DoReceivePhyPdu(Ptr<Packet> p)
     NrMacHeaderVs header;
     p->RemoveHeader(header);
 
-    LteMacSapUser::ReceivePduParameters rxParams;
+    NrMacSapUser::ReceivePduParameters rxParams;
     rxParams.p = p;
     rxParams.rnti = m_rnti;
     rxParams.lcid = header.GetLcId();
@@ -659,7 +659,7 @@ NrUeMac::ProcessUlDci(const Ptr<NrUlDciMessage>& dciMsg)
             {
                 NS_LOG_WARN("No byte used for this UL-DCI, sending empty PDU");
 
-                LteMacSapProvider::TransmitPduParameters txParams;
+                NrMacSapProvider::TransmitPduParameters txParams;
 
                 txParams.pdu = Create<Packet>();
                 txParams.lcid = 3;
@@ -698,7 +698,7 @@ NrUeMac::TransmitRetx()
     for (std::list<Ptr<Packet>>::const_iterator j = pb->Begin(); j != pb->End(); ++j)
     {
         Ptr<Packet> pkt = (*j)->Copy();
-        LteRadioBearerTag bearerTag;
+        NrRadioBearerTag bearerTag;
         if (!pkt->PeekPacketTag(bearerTag))
         {
             NS_FATAL_ERROR("No radio bearer tag");
@@ -727,7 +727,7 @@ NrUeMac::SendRetxData(uint32_t usefulTbs, uint32_t activeLcsRetx)
 
         if (m_ulDciTotalUsed + bytesPerLcId <= usefulTbs)
         {
-            LteMacSapUser::TxOpportunityParameters txParams;
+            NrMacSapUser::TxOpportunityParameters txParams;
             txParams.lcid = bsr.lcid;
             txParams.rnti = m_rnti;
             txParams.bytes = bytesPerLcId;
@@ -779,7 +779,7 @@ NrUeMac::SendTxData(uint32_t usefulTbs, uint32_t activeTx)
 
         if (m_ulDciTotalUsed + bytesPerLcId <= usefulTbs)
         {
-            LteMacSapUser::TxOpportunityParameters txParams;
+            NrMacSapUser::TxOpportunityParameters txParams;
             txParams.lcid = bsr.lcid;
             txParams.rnti = m_rnti;
             txParams.bytes = bytesPerLcId;
@@ -935,7 +935,7 @@ NrUeMac::SendNewStatusData()
             // Check if we have room to transmit the statusPdu
             if (m_ulDciTotalUsed + bsr.statusPduSize <= m_ulDci->m_tbSize)
             {
-                LteMacSapUser::TxOpportunityParameters txParams;
+                NrMacSapUser::TxOpportunityParameters txParams;
                 txParams.lcid = bsr.lcid;
                 txParams.rnti = m_rnti;
                 txParams.bytes = bsr.statusPduSize;
@@ -1019,7 +1019,7 @@ NrUeMac::SetPhySapProvider(NrPhySapProvider* ptr)
 }
 
 void
-NrUeMac::DoConfigureRach([[maybe_unused]] LteUeCmacSapProvider::RachConfig rc)
+NrUeMac::DoConfigureRach([[maybe_unused]] NrUeCmacSapProvider::RachConfig rc)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -1068,9 +1068,7 @@ NrUeMac::DoStartNonContentionBasedRandomAccessProcedure(uint16_t rnti,
 }
 
 void
-NrUeMac::AddLc(uint8_t lcId,
-               LteUeCmacSapProvider::LogicalChannelConfig lcConfig,
-               LteMacSapUser* msu)
+NrUeMac::AddLc(uint8_t lcId, NrUeCmacSapProvider::LogicalChannelConfig lcConfig, NrMacSapUser* msu)
 {
     NS_LOG_FUNCTION(this << " lcId" << (uint32_t)lcId);
     NS_ASSERT_MSG(m_lcInfoMap.find(lcId) == m_lcInfoMap.end(),
@@ -1088,7 +1086,7 @@ NrUeMac::DoRemoveLc(uint8_t lcId)
     NS_LOG_FUNCTION(this << " lcId" << lcId);
 }
 
-LteMacSapProvider*
+NrMacSapProvider*
 NrUeMac::GetUeMacSapProvider()
 {
     return m_macSapProvider;

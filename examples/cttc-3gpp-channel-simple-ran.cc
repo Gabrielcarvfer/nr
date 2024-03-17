@@ -18,13 +18,13 @@
 #include "ns3/antenna-module.h"
 #include "ns3/config-store.h"
 #include "ns3/core-module.h"
-#include "ns3/eps-bearer-tag.h"
 #include "ns3/grid-scenario-helper.h"
 #include "ns3/internet-module.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/log.h"
 #include "ns3/mobility-module.h"
 #include "ns3/network-module.h"
+#include "ns3/nr-eps-bearer-tag.h"
 #include "ns3/nr-helper.h"
 #include "ns3/nr-module.h"
 #include "ns3/nr-point-to-point-epc-helper.h"
@@ -55,7 +55,7 @@ SendPacket(Ptr<NetDevice> device, Address& addr, uint32_t packetSize)
     Ipv4Header ipv4Header;
     ipv4Header.SetProtocol(UdpL4Protocol::PROT_NUMBER);
     pkt->AddHeader(ipv4Header);
-    EpsBearerTag tag(1, 1);
+    NrEpsBearerTag tag(1, 1);
     pkt->AddPacketTag(tag);
     device->Send(pkt, addr, Ipv4L3Protocol::PROT_NUMBER);
 }
@@ -103,10 +103,10 @@ RxRlcPDU(std::string path, uint16_t rnti, uint8_t lcid, uint32_t bytes, uint64_t
 void
 ConnectPdcpRlcTraces()
 {
-    Config::Connect("/NodeList/*/DeviceList/*/LteUeRrc/DataRadioBearerMap/1/LtePdcp/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrUeRrc/DataRadioBearerMap/1/NrPdcp/RxPDU",
                     MakeCallback(&RxPdcpPDU));
 
-    Config::Connect("/NodeList/*/DeviceList/*/LteUeRrc/DataRadioBearerMap/1/LteRlc/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrUeRrc/DataRadioBearerMap/1/NrRlc/RxPDU",
                     MakeCallback(&RxRlcPDU));
 }
 
@@ -116,10 +116,10 @@ ConnectPdcpRlcTraces()
 void
 ConnectUlPdcpRlcTraces()
 {
-    Config::Connect("/NodeList/*/DeviceList/*/LteEnbRrc/UeMap/*/DataRadioBearerMap/*/LtePdcp/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/UeMap/*/DataRadioBearerMap/*/NrPdcp/RxPDU",
                     MakeCallback(&RxPdcpPDU));
 
-    Config::Connect("/NodeList/*/DeviceList/*/LteEnbRrc/UeMap/*/DataRadioBearerMap/*/LteRlc/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/UeMap/*/DataRadioBearerMap/*/NrRlc/RxPDU",
                     MakeCallback(&RxRlcPDU));
 }
 
@@ -163,12 +163,12 @@ main(int argc, char* argv[])
     randomStream += gridScenario.AssignStreams(randomStream);
     gridScenario.CreateScenario();
 
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     // Create one operational band containing one CC with one bandwidth part
     BandwidthPartInfoPtrVector allBwps;
@@ -235,7 +235,7 @@ main(int argc, char* argv[])
     InternetStackHelper internet;
     internet.Install(gridScenario.GetUserTerminals());
     Ipv4InterfaceContainer ueIpIface;
-    ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    ueIpIface = nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
     if (enableUl)
     {

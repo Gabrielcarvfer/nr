@@ -24,8 +24,8 @@ class NrBearerStatsBase;
  * statistics from PDCD and RLC. It automatically connects
  * NrBearerStatsCalculator to appropriate trace sinks.
  * Usually user do not use this class. All he/she needs to
- * to do is to call: LteHelper::EnablePdcpTraces() and/or
- * LteHelper::EnableRlcTraces().
+ * to do is to call: NrHelper::EnablePdcpTraces() and/or
+ * NrHelper::EnableRlcTraces().
  */
 
 class NrBearerStatsConnector

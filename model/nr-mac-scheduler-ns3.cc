@@ -1771,7 +1771,7 @@ NrMacSchedulerNs3::ScheduleDl(const NrMacSchedSapProvider::SchedDlTriggerReqPara
     dlSlot.m_slotAllocInfo.m_numSymAlloc += m_dlCtrlSymbols;
 
     // In case of S slot, add UL CTRL and update the symbol used count
-    if (params.m_slotType == LteNrTddSlotType::S)
+    if (params.m_slotType == NrTddSlotType::S)
     {
         NS_LOG_INFO("S slot, adding UL CTRL");
         AppendCtrlSym(static_cast<uint8_t>(m_macSchedSapUser->GetSymbolsPerSlot() - 1),
@@ -1927,14 +1927,14 @@ uint8_t
 NrMacSchedulerNs3::DoScheduleUl(const std::vector<UlHarqInfo>& ulHarqFeedback,
                                 const SfnSf& ulSfn,
                                 SlotAllocInfo* allocInfo,
-                                LteNrTddSlotType type)
+                                NrTddSlotType type)
 {
     NS_LOG_FUNCTION(this);
 
     NS_ASSERT(allocInfo->m_varTtiAllocInfo.size() == 1); // Just the UL CTRL
 
     uint8_t dataSymPerSlot = m_macSchedSapUser->GetSymbolsPerSlot() - m_ulCtrlSymbols;
-    if (type == LteNrTddSlotType::F)
+    if (type == NrTddSlotType::F)
     { // if it's a type F, we have to consider DL CTRL symbols, otherwise, don't
         dataSymPerSlot -= m_dlCtrlSymbols;
     }
@@ -1951,8 +1951,8 @@ NrMacSchedulerNs3::DoScheduleUl(const std::vector<UlHarqInfo>& ulHarqFeedback,
     // Create the UL allocation map entry
     m_ulAllocationMap.emplace(ulSfn.GetEncoding(), SlotElem(0));
 
-    if ((m_enableSrsInFSlots && type == LteNrTddSlotType::F) ||
-        (m_enableSrsInUlSlots && type == LteNrTddSlotType::UL))
+    if ((m_enableSrsInFSlots && type == NrTddSlotType::F) ||
+        (m_enableSrsInUlSlots && type == NrTddSlotType::UL))
     { // SRS are included in F slots, and in UL slots if m_enableSrsInUlSlots=true
         m_srsSlotCounter++; // It's an uint, don't worry about wrap around
         NS_ASSERT(m_srsCtrlSymbols <= ulSymAvail);

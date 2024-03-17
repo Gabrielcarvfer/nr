@@ -193,10 +193,10 @@ main(int argc, char* argv[])
         LogComponentEnable("Nr3gppChannel", LOG_LEVEL_ALL);
         LogComponentEnable("UdpClient", LOG_LEVEL_INFO);
         LogComponentEnable("UdpServer", LOG_LEVEL_INFO);
-        LogComponentEnable("LtePdcp", LOG_LEVEL_INFO);
+        LogComponentEnable("NrPdcp", LOG_LEVEL_INFO);
     }
 
-    Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     // create base stations and mobile terminals
     NodeContainer gNbNodes;
@@ -259,12 +259,12 @@ main(int argc, char* argv[])
     mobility.Install(ueNodes);
 
     // setup the nr simulation
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     /*
      * Setup the configuration of the spectrum. There is a contiguous and a non-contiguous
@@ -383,7 +383,7 @@ main(int argc, char* argv[])
     // NS_ABORT_MSG_IF (ccId < 1,"No CC created");
 
     nrHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(false));
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
+    nrEpcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
     nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::NrMacSchedulerTdmaRR"));
     // Beamforming method
     if (cellScan)
@@ -508,7 +508,7 @@ main(int argc, char* argv[])
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    Ptr<Node> pgw = nrEpcHelper->GetPgwNode();
     NodeContainer remoteHostContainer;
     remoteHostContainer.Create(1);
     Ptr<Node> remoteHost = remoteHostContainer.Get(0);
@@ -530,7 +530,7 @@ main(int argc, char* argv[])
     remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(ueNodes);
     Ipv4InterfaceContainer ueIpIface;
-    ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    ueIpIface = nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
     Ipv4Address remoteHostAddr = internetIpIfaces.GetAddress(1);
 
@@ -539,7 +539,7 @@ main(int argc, char* argv[])
     {
         Ptr<Ipv4StaticRouting> ueStaticRouting =
             ipv4RoutingHelper.GetStaticRouting(ueNodes.Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+        ueStaticRouting->SetDefaultRoute(nrEpcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
     // attach UEs to the closest eNB before creating the dedicated flows
@@ -568,35 +568,35 @@ main(int argc, char* argv[])
                 dlClient.SetAttribute("MaxPackets", UintegerValue(0xFFFFFFFF));
                 clientApps.Add(dlClient.Install(remoteHost));
 
-                Ptr<EpcTft> tft = Create<EpcTft>();
-                EpcTft::PacketFilter dlpf;
+                Ptr<NrEpcTft> tft = Create<NrEpcTft>();
+                NrEpcTft::PacketFilter dlpf;
                 dlpf.localPortStart = dlPort;
                 dlpf.localPortEnd = dlPort;
                 ++dlPort;
                 tft->Add(dlpf);
 
-                enum EpsBearer::Qci q;
+                enum NrEpsBearer::Qci q;
                 if (flow == 0)
                 {
-                    q = EpsBearer::NGBR_LOW_LAT_EMBB;
+                    q = NrEpsBearer::NGBR_LOW_LAT_EMBB;
                 }
                 else if (flow == 1)
                 {
-                    q = EpsBearer::GBR_CONV_VOICE;
+                    q = NrEpsBearer::GBR_CONV_VOICE;
                 }
                 else if (flow == 2)
                 {
-                    q = EpsBearer::NGBR_VIDEO_TCP_PREMIUM;
+                    q = NrEpsBearer::NGBR_VIDEO_TCP_PREMIUM;
                 }
                 else if (flow == 3)
                 {
-                    q = EpsBearer::NGBR_VOICE_VIDEO_GAMING;
+                    q = NrEpsBearer::NGBR_VOICE_VIDEO_GAMING;
                 }
                 else
                 {
-                    q = EpsBearer::NGBR_VIDEO_TCP_DEFAULT;
+                    q = NrEpsBearer::NGBR_VIDEO_TCP_DEFAULT;
                 }
-                EpsBearer bearer(q);
+                NrEpsBearer bearer(q);
                 nrHelper->ActivateDedicatedEpsBearer(ueNetDev.Get(u), bearer, tft);
             }
 
@@ -613,35 +613,35 @@ main(int argc, char* argv[])
                 ulClient.SetAttribute("MaxPackets", UintegerValue(0xFFFFFFFF));
                 clientApps.Add(ulClient.Install(ueNodes.Get(u)));
 
-                Ptr<EpcTft> tft = Create<EpcTft>();
-                EpcTft::PacketFilter ulpf;
+                Ptr<NrEpcTft> tft = Create<NrEpcTft>();
+                NrEpcTft::PacketFilter ulpf;
                 ulpf.remotePortStart = ulPort;
                 ulpf.remotePortEnd = ulPort;
                 ++ulPort;
                 tft->Add(ulpf);
 
-                enum EpsBearer::Qci q;
+                enum NrEpsBearer::Qci q;
                 if (flow == 0)
                 {
-                    q = EpsBearer::NGBR_LOW_LAT_EMBB;
+                    q = NrEpsBearer::NGBR_LOW_LAT_EMBB;
                 }
                 else if (flow == 1)
                 {
-                    q = EpsBearer::GBR_CONV_VOICE;
+                    q = NrEpsBearer::GBR_CONV_VOICE;
                 }
                 else if (flow == 2)
                 {
-                    q = EpsBearer::NGBR_VIDEO_TCP_PREMIUM;
+                    q = NrEpsBearer::NGBR_VIDEO_TCP_PREMIUM;
                 }
                 else if (flow == 3)
                 {
-                    q = EpsBearer::NGBR_VOICE_VIDEO_GAMING;
+                    q = NrEpsBearer::NGBR_VOICE_VIDEO_GAMING;
                 }
                 else
                 {
-                    q = EpsBearer::NGBR_VIDEO_TCP_DEFAULT;
+                    q = NrEpsBearer::NGBR_VIDEO_TCP_DEFAULT;
                 }
-                EpsBearer bearer(q);
+                NrEpsBearer bearer(q);
                 nrHelper->ActivateDedicatedEpsBearer(ueNetDev.Get(u), bearer, tft);
             }
         }

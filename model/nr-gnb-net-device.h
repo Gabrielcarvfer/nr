@@ -17,9 +17,9 @@ class PacketBurst;
 class Node;
 class NrGnbPhy;
 class NrGnbMac;
-class LteEnbRrc;
+class NrEnbRrc;
 class BandwidthPartGnb;
-class LteEnbComponentCarrierManager;
+class NrEnbComponentCarrierManager;
 class BwpManagerGnb;
 class NrMacScheduler;
 
@@ -66,9 +66,9 @@ class NrGnbNetDevice : public NrNetDevice
 
     uint16_t GetEarfcn(uint8_t index) const;
 
-    void SetRrc(Ptr<LteEnbRrc> rrc);
+    void SetRrc(Ptr<NrEnbRrc> rrc);
 
-    Ptr<LteEnbRrc> GetRrc();
+    Ptr<NrEnbRrc> GetRrc();
 
     void SetCcMap(const std::map<uint8_t, Ptr<BandwidthPartGnb>>& ccm);
 
@@ -101,6 +101,34 @@ class NrGnbNetDevice : public NrNetDevice
      */
     void UpdateConfig();
 
+    /**
+     * \brief Get downlink bandwidth for a given physical cell Id
+     * \param cellId Physical cell Id
+     * \return number of RBs
+     */
+    uint16_t GetCellIdDlBandwidth(uint16_t cellId) const;
+
+    /**
+     * \brief Get uplink bandwidth for a given physical cell Id
+     * \param cellId Physical cell Id
+     * \return number of RBs
+     */
+    uint16_t GetCellIdUlBandwidth(uint16_t cellId) const;
+
+    /**
+     * \brief Get uplink earfcn for a given physical cell Id
+     * \param cellId Physical cell Id
+     * \return downlink earfcn
+     */
+    uint32_t GetCellIdDlEarfcn(uint16_t cellId) const;
+
+    /**
+     * \brief Get uplink earfcn for a given physical cell Id
+     * \param cellId Physical cell Id
+     * \return uplink earfcn
+     */
+    uint32_t GetCellIdUlEarfcn(uint16_t cellId) const;
+
   protected:
     void DoInitialize() override;
 
@@ -108,13 +136,13 @@ class NrGnbNetDevice : public NrNetDevice
     bool DoSend(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) override;
 
   private:
-    Ptr<LteEnbRrc> m_rrc;
+    Ptr<NrEnbRrc> m_rrc;
 
     uint16_t m_cellId; //!< Cell ID. Set by the helper.
 
-    std::map<uint8_t, Ptr<BandwidthPartGnb>> m_ccMap; /**< ComponentCarrier map */
+    std::map<uint8_t, Ptr<BandwidthPartGnb>> m_ccMap; /**< NrComponentCarrier map */
 
-    Ptr<LteEnbComponentCarrierManager>
+    Ptr<NrEnbComponentCarrierManager>
         m_componentCarrierManager; ///< the component carrier manager of this eNb
 };
 

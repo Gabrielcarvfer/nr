@@ -378,7 +378,7 @@ IMSI ..., RNTI ..., BID ...#</dia:string>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#ns3::UeManager::SendData()#</dia:string>
+            <dia:string>#ns3::NrUeManager::SendData()#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -497,7 +497,7 @@ transmission over the air#</dia:string>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#ns3::UeManager::SendPacket()#</dia:string>
+            <dia:string>#ns3::NrUeManager::SendPacket()#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>

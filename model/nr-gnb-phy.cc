@@ -44,7 +44,7 @@ NrGnbPhy::NrGnbPhy()
       m_n1Delay(4)
 {
     NS_LOG_FUNCTION(this);
-    m_enbCphySapProvider = new MemberLteEnbCphySapProvider<NrGnbPhy>(this);
+    m_enbCphySapProvider = new MemberNrEnbCphySapProvider<NrGnbPhy>(this);
 }
 
 NrGnbPhy::~NrGnbPhy()
@@ -225,13 +225,13 @@ modulo(int n, uint32_t m)
  * This tactic is omitted in this implementation.
  */
 static int32_t
-ReturnHarqSlot(const std::vector<LteNrTddSlotType>& pattern, uint32_t pos, uint32_t n1)
+ReturnHarqSlot(const std::vector<NrTddSlotType>& pattern, uint32_t pos, uint32_t n1)
 {
     int32_t k1 = static_cast<int32_t>(n1);
 
     uint32_t index = modulo(static_cast<int>(pos) + k1, static_cast<uint32_t>(pattern.size()));
 
-    while (pattern[index] < LteNrTddSlotType::S)
+    while (pattern[index] < NrTddSlotType::S)
     {
         k1++;
         index = modulo(static_cast<int>(pos) + k1, static_cast<uint32_t>(pattern.size()));
@@ -256,14 +256,14 @@ struct DciKPair
  * position in which the DCI for the position specified should be sent and the k0/k2
  */
 static DciKPair
-ReturnDciSlot(const std::vector<LteNrTddSlotType>& pattern, uint32_t pos, uint32_t n)
+ReturnDciSlot(const std::vector<NrTddSlotType>& pattern, uint32_t pos, uint32_t n)
 {
     DciKPair ret;
     ret.k = n;
     ret.indexDci = modulo(static_cast<int>(pos) - static_cast<int>(ret.k),
                           static_cast<uint32_t>(pattern.size()));
 
-    while (pattern[ret.indexDci] > LteNrTddSlotType::F)
+    while (pattern[ret.indexDci] > NrTddSlotType::F)
     {
         ret.k++;
         ret.indexDci = modulo(static_cast<int>(pos) - static_cast<int>(ret.k),
@@ -285,7 +285,7 @@ ReturnDciSlot(const std::vector<LteNrTddSlotType>& pattern, uint32_t pos, uint32
  * l1l2CtrlLatency L1L2CtrlLatency of the system
  */
 static void
-GenerateDciMaps(const std::vector<LteNrTddSlotType>& pattern,
+GenerateDciMaps(const std::vector<NrTddSlotType>& pattern,
                 std::map<uint32_t, std::vector<uint32_t>>* toSend,
                 std::map<uint32_t, std::vector<uint32_t>>* generate,
                 uint32_t pos,
@@ -303,7 +303,7 @@ GenerateDciMaps(const std::vector<LteNrTddSlotType>& pattern,
 }
 
 void
-NrGnbPhy::GenerateStructuresFromPattern(const std::vector<LteNrTddSlotType>& pattern,
+NrGnbPhy::GenerateStructuresFromPattern(const std::vector<NrTddSlotType>& pattern,
                                         std::map<uint32_t, std::vector<uint32_t>>* toSendDl,
                                         std::map<uint32_t, std::vector<uint32_t>>* toSendUl,
                                         std::map<uint32_t, std::vector<uint32_t>>* generateDl,
@@ -317,8 +317,8 @@ NrGnbPhy::GenerateStructuresFromPattern(const std::vector<LteNrTddSlotType>& pat
     const uint32_t n = static_cast<uint32_t>(pattern.size());
 
     // Create a pattern that is all F.
-    std::vector<LteNrTddSlotType> fddGenerationPattern;
-    fddGenerationPattern.resize(pattern.size(), LteNrTddSlotType::F);
+    std::vector<NrTddSlotType> fddGenerationPattern;
+    fddGenerationPattern.resize(pattern.size(), NrTddSlotType::F);
 
     /* if we have to generate structs for a TDD pattern, then use the input pattern.
      * Otherwise, pass to the gen functions a pattern which is all F (therefore, the
@@ -327,7 +327,7 @@ NrGnbPhy::GenerateStructuresFromPattern(const std::vector<LteNrTddSlotType>& pat
      * another band..
      */
 
-    const std::vector<LteNrTddSlotType>* generationPattern;
+    const std::vector<NrTddSlotType>* generationPattern;
 
     if (IsTdd(pattern))
     {
@@ -340,19 +340,18 @@ NrGnbPhy::GenerateStructuresFromPattern(const std::vector<LteNrTddSlotType>& pat
 
     for (uint32_t i = 0; i < n; i++)
     {
-        if ((*generationPattern)[i] == LteNrTddSlotType::UL)
+        if ((*generationPattern)[i] == NrTddSlotType::UL)
         {
             GenerateDciMaps(*generationPattern, toSendUl, generateUl, i, n2, l1l2CtrlLatency);
         }
-        else if ((*generationPattern)[i] == LteNrTddSlotType::DL ||
-                 pattern[i] == LteNrTddSlotType::S)
+        else if ((*generationPattern)[i] == NrTddSlotType::DL || pattern[i] == NrTddSlotType::S)
         {
             GenerateDciMaps(*generationPattern, toSendDl, generateDl, i, n0, l1l2CtrlLatency);
 
             int32_t k1 = ReturnHarqSlot(*generationPattern, i, n1);
             (*dlHarqfbPosition).insert(std::make_pair(i, k1));
         }
-        else if ((*generationPattern)[i] == LteNrTddSlotType::F)
+        else if ((*generationPattern)[i] == NrTddSlotType::F)
         {
             GenerateDciMaps(*generationPattern, toSendDl, generateDl, i, n0, l1l2CtrlLatency);
             GenerateDciMaps(*generationPattern, toSendUl, generateUl, i, n2, l1l2CtrlLatency);
@@ -431,7 +430,7 @@ NrGnbPhy::PushUlAllocation(const SfnSf& sfnSf) const
 }
 
 void
-NrGnbPhy::SetTddPattern(const std::vector<LteNrTddSlotType>& pattern)
+NrGnbPhy::SetTddPattern(const std::vector<NrTddSlotType>& pattern)
 {
     NS_LOG_FUNCTION(this);
 
@@ -502,13 +501,13 @@ NrGnbPhy::StartEventLoop(uint16_t frame, uint8_t subframe, uint16_t slot)
 }
 
 void
-NrGnbPhy::SetEnbCphySapUser(LteEnbCphySapUser* s)
+NrGnbPhy::SetEnbCphySapUser(NrEnbCphySapUser* s)
 {
     NS_LOG_FUNCTION(this);
     m_enbCphySapUser = s;
 }
 
-LteEnbCphySapProvider*
+NrEnbCphySapProvider*
 NrGnbPhy::GetEnbCphySapProvider()
 {
     NS_LOG_FUNCTION(this);
@@ -633,7 +632,7 @@ void
 NrGnbPhy::QueueMib()
 {
     NS_LOG_FUNCTION(this);
-    LteRrcSap::MasterInformationBlock mib;
+    NrRrcSap::MasterInformationBlock mib;
     mib.dlBandwidth = GetChannelBandwidth() / (1000 * 100);
     mib.systemFrameNumber = 1;
     Ptr<NrMibMessage> mibMsg = Create<NrMibMessage>();
@@ -1584,7 +1583,7 @@ NrGnbPhy::GenerateDataCqiReport(const SpectrumValue& sinr)
         //   double sinrdb = 10 * std::log10 ((*it));
         //       NS_LOG_INFO ("ULCQI RB " << i << " value " << sinrdb);
         // convert from double to fixed point notaltion Sxxxxxxxxxxx.xxx
-        //   int16_t sinrFp = LteFfConverter::double2fpS11dot3 (sinrdb);
+        //   int16_t sinrFp = nr::FfConverter::double2fpS11dot3 (sinrdb);
         ulcqi.m_ulCqi.m_sinr.push_back(
             *it); // will be processed by NrMacSchedulerCQIManagement::UlSBCQIReported, it will look
                   // into a map of assignment
@@ -1709,13 +1708,13 @@ NrGnbPhy::DoSetSrsConfigurationIndex(uint16_t rnti, uint16_t srcCi)
 }
 
 void
-NrGnbPhy::DoSetMasterInformationBlock([[maybe_unused]] LteRrcSap::MasterInformationBlock mib)
+NrGnbPhy::DoSetMasterInformationBlock([[maybe_unused]] NrRrcSap::MasterInformationBlock mib)
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-NrGnbPhy::DoSetSystemInformationBlockType1(LteRrcSap::SystemInformationBlockType1 sib1)
+NrGnbPhy::DoSetSystemInformationBlockType1(NrRrcSap::SystemInformationBlockType1 sib1)
 {
     NS_LOG_FUNCTION(this);
     m_sib1 = sib1;
@@ -1752,14 +1751,14 @@ NrGnbPhy::SetPattern(const std::string& pattern)
 {
     NS_LOG_FUNCTION(this);
 
-    static std::unordered_map<std::string, LteNrTddSlotType> lookupTable = {
-        {"DL", LteNrTddSlotType::DL},
-        {"UL", LteNrTddSlotType::UL},
-        {"S", LteNrTddSlotType::S},
-        {"F", LteNrTddSlotType::F},
+    static std::unordered_map<std::string, NrTddSlotType> lookupTable = {
+        {"DL", NrTddSlotType::DL},
+        {"UL", NrTddSlotType::UL},
+        {"S", NrTddSlotType::S},
+        {"F", NrTddSlotType::F},
     };
 
-    std::vector<LteNrTddSlotType> vector;
+    std::vector<NrTddSlotType> vector;
     std::stringstream ss(pattern);
     std::string token;
     std::vector<std::string> extracted;

@@ -323,38 +323,38 @@ For reference, :numref:`fig-nr-gnb` and :numref:`fig-nr-ue` are also provided as
 packet being processed by each actor of the RAN, i.e., gNB and UE, respectively.
 
 This tutorial will walk through each step of the way, starting with the entry point for these packets in the RAN-- the
-``EpcEnbApplication``.
+``NrEpcEnbApplication``.
 
-EpcEnbApplication
-=================
-The ``EpcEnbApplication`` is installed on the gNB. It is responsible for receiving packets tunneled through the EPC
+NrEpcEnbApplication
+===================
+The ``NrEpcEnbApplication`` is installed on the gNB. It is responsible for receiving packets tunneled through the EPC
 model and sending them into the ``NrGnbNetDevice``.  Conceptually, this is just an application-level relay function.
-It is possible to run the ``cttc-nr-demo`` scenario by enabling the ``EpcEnbApplication`` log component, which can also
+It is possible to run the ``cttc-nr-demo`` scenario by enabling the ``NrEpcEnbApplication`` log component, which can also
 be configured to print messages at INFO level and prefix the message by stating the time of the simulation, the node ID
 of interest, and the routine that prints that message. In this way, with the following command
 
 .. sourcecode:: bash
 
-  $ NS_LOG="EpcEnbApplication=info|prefix_all" ./ns3 run 'cttc-nr-demo' > log.out 2>&1
+  $ NS_LOG="NrEpcEnbApplication=info|prefix_all" ./ns3 run 'cttc-nr-demo' > log.out 2>&1
 
 one can observe this relay function on the first packet, as follows:
 
 .. sourcecode:: text
 
-  +0.400000282s 0 EpcEnbApplication:RecvFromS1uSocket(): [INFO ] Received packet from S1-U interface with GTP TEID: 2
-  +0.400000282s 0 EpcEnbApplication:SendToLteSocket(): [INFO ] Add EpsBearerTag with RNTI 2 and bearer ID 2
-  +0.400000282s 0 EpcEnbApplication:SendToLteSocket(): [INFO ] Forward packet from eNB's S1-U to LTE stack via IPv4 socket.
+  +0.400000282s 0 NrEpcEnbApplication:RecvFromS1uSocket(): [INFO ] Received packet from S1-U interface with GTP TEID: 2
+  +0.400000282s 0 NrEpcEnbApplication:SendToLteSocket(): [INFO ] Add NrEpsBearerTag with RNTI 2 and bearer ID 2
+  +0.400000282s 0 NrEpcEnbApplication:SendToLteSocket(): [INFO ] Forward packet from eNB's S1-U to LTE stack via IPv4 socket.
 
 The file ``src/lte/model/epc-enb-application.cc`` contains the source code.
 
-The ``EpcEnbApplication`` adds the cell-specific UE ID (RNTI) and BID as tags through ``EpsBearerTag``.
+The ``NrEpcEnbApplication`` adds the cell-specific UE ID (RNTI) and BID as tags through ``NrEpsBearerTag``.
 This greatly simplifies packet processing in later sections.
 The application is able to find the right RNTI and BID given the TEID present on the GTP-U header of the received
-packet structure. This process can be found at ``EpcEnbApplication::RecvFromS1uSocket()`` source code:
+packet structure. This process can be found at ``NrEpcEnbApplication::RecvFromS1uSocket()`` source code:
 
 .. sourcecode:: cpp
 
-  GtpuHeader gtpu;
+  NrGtpuHeader gtpu;
   packet->RemoveHeader(gtpu);
   uint32_t teid = gtpu.GetTeid();
   std::map<uint32_t, EpsFlowId_t>::iterator it = m_teidRbidMap.find(teid);
@@ -371,7 +371,7 @@ packet structure. This process can be found at ``EpcEnbApplication::RecvFromS1uS
 
 .. TODO:
 
-  Add to EpcEnbApplication:
+  Add to NrEpcEnbApplication:
   NS_LOG_INFO("Mapped TEID "<< teid << " to RNTI "<< it->second.m_rnti << " and BID " << it->second.m_bid << " and sent to LTE socket");
   so that the code listing here can be removed and the description can be greatly simplified.
 
@@ -387,13 +387,13 @@ whereas green ones are the added portions.
    :align: center
    :scale: 100%
 
-   Structure of the packet handled by ``EpcEnbApplication``
+   Structure of the packet handled by ``NrEpcEnbApplication``
 
 There is also a byte tag to trace the packet for flow statistics, which are bound to `Flow Monitor`_ and are relevant to the final results that are printed by the scenario.
 
 .. TODO  This byte tag is linked to the packet byte range ``[32-140]``. It is possible to see that such range changes at the second inspection, as the packet structure is modified, i.e., GTP-U header is removed.
 
-The new modified packet is finally sent to ``EpcEnbApplication::SendToLteSocket()``, which distinguishes the packet to
+The new modified packet is finally sent to ``NrEpcEnbApplication::SendToLteSocket()``, which distinguishes the packet to
 be sent according to its L3 type, in this case IPv4.
 
 As a final remark, the following traces can be used to track incoming and outgoing packets from this application:
@@ -419,7 +419,7 @@ Packets can be dropped if there is no association between GTP-U TEID and gNB-UE 
 NrGnbNetDevice
 ==============
 
-After the ``EpcEnbApplication`` sends a packet, it is immediately received on the ``NrGnbNetDevice::DoSend()`` method.
+After the ``NrEpcEnbApplication`` sends a packet, it is immediately received on the ``NrGnbNetDevice::DoSend()`` method.
 We can observe this in the logs:
 
 .. sourcecode:: bash
@@ -431,7 +431,7 @@ We can observe this in the logs:
   +0.400000282s 0 NrGnbNetDevice:DoSend(): [INFO ] Forward received packet to RRC Layer
 
 The source code for this method is in the file ``contrib/nr/model/nr-gnb-net-device.cc``.  As an aside, notice how we
-are bouncing back and forth between the source code directories ``src/lte/`` (for the previous ``EpcEnbApplication``)
+are bouncing back and forth between the source code directories ``src/lte/`` (for the previous ``NrEpcEnbApplication``)
 and ``contrib/nr/`` (for this object); this is true for the upper layers of the current ``nr`` module, which reuse
 pieces originally implemented for LTE.
 
@@ -451,9 +451,9 @@ Packets cannot be dropped in the ``NrGnbNetDevice``.
 
 LteEnbRrc
 =========
-The RRC layer of the gNB is handled by ``LteEnbRrc`` and its companion ``UeManager``, both available in
+The RRC layer of the gNB is handled by ``LteEnbRrc`` and its companion ``NrUeManager``, both available in
 ``lte/model/lte-enb-rrc.cc``. While packets incoming from the upper layers are processed by ``LteEnbRrc::SendData()``,
-packets to be sent to UEs are handled by ``UeManager::SendPacket()``.
+packets to be sent to UEs are handled by ``NrUeManager::SendPacket()``.
 Indeed, if the simulation is started with the following command
 
 .. sourcecode:: bash
@@ -469,17 +469,17 @@ it produces the following log messages:
   +0.400000282s 0 LteEnbRrc:SendPacket(): [INFO ] Send packet to PDCP layer
 
 By taking a look at the source code, the RRC layer starts by extracting the RNTI, which is handled by the
-``EpsBearerTag`` data structure. Thanks to the RNTI, it is possible to retrieve the corresponding ``UeManager``
+``NrEpsBearerTag`` data structure. Thanks to the RNTI, it is possible to retrieve the corresponding ``NrUeManager``
 instance, which keeps track of the gNB-UE link state through a FSM. The search is done by ``LteEnbRrc``, which uses a
-hashmap that links each RNTI to a pointer of the ``UeManager`` of interest.
+hashmap that links each RNTI to a pointer of the ``NrUeManager`` of interest.
 Once found, the matching ``SendData()`` method is called with the packet's BID of reference.
 
 .. sourcecode:: cpp
 
-  EpsBearerTag tag;
+  NrEpsBearerTag tag;
   bool found = packet->RemovePacketTag(tag);
-  NS_ASSERT_MSG(found, "no EpsBearerTag found in packet to be sent");
-  Ptr<UeManager> ueManager = GetUeManager(tag.GetRnti());
+  NS_ASSERT_MSG(found, "no NrEpsBearerTag found in packet to be sent");
+  Ptr<NrUeManager> ueManager = GetUeManager(tag.GetRnti());
 
   ueManager->SendData(tag.GetBid(), packet);
 
@@ -557,7 +557,7 @@ Packet drops
 ############
 There may be a chance that the UE is still asking for resources on the RACH, i.e., ``INITIAL_RANDOM_ACCESS``, or there
 is still pending set up, i.e., ``CONNECTION_SETUP``. In that case, the packet cannot be transmitted. To this end, it is
-placed in the ``UeManager/Drop`` trace source and discarded.
+placed in the ``NrUeManager/Drop`` trace source and discarded.
 
 .. TODO: how to reproduce a packet drop here?
 
@@ -585,7 +585,7 @@ layers is called ``DoTransmitPdcpSdu()``, which in this case is defined as the f
     Ptr<Packet> p = params.pdcpSdu;
 
     // Sender timestamp
-    PdcpTag pdcpTag(Simulator::Now());
+    NrPdcpTag pdcpTag(Simulator::Now());
 
     LtePdcpHeader pdcpHeader;
     pdcpHeader.SetSequenceNumber(m_txSequenceNumber);
@@ -611,7 +611,7 @@ layers is called ``DoTransmitPdcpSdu()``, which in this case is defined as the f
 
     m_rlcSapProvider->TransmitPdcpPdu(txParams);
 
-As it can be observed, a PDCP packet tag, identified by ``PdcpTag``, and its header, represented by ``LtePdcpHeader``,
+As it can be observed, a PDCP packet tag, identified by ``NrPdcpTag``, and its header, represented by ``LtePdcpHeader``,
 are created and attached to the SDU. The former stores the current simulation time and the latter is set with a
 specified sequence number and a D/C bit. While the sequence number is locally tracked through the ``m_txSequenceNumber``
 property, the D/C bit is set to ``DATA_PDU`` to indicate that this is a data packet and not a control one.
@@ -814,7 +814,7 @@ where the "Hdr" that precedes the MAC SDU fragment is the subheader according to
 
 After the fragmentation procedure, the RLC header, handled by ``LteRlcHeader`` data structure, is set up. The sequence
 number is set and kept track via the local property ``m_sequenceNumber``. Moreover, the framing information is set to
-declare if the last byte of the segment corresponds or not to the end of a RLC SDU. Finally, a ``RlcTag`` byte tag is
+declare if the last byte of the segment corresponds or not to the end of a RLC SDU. Finally, a ``NrRlcTag`` byte tag is
 added and linked to the RLC header, which saves the current simulation time.
 
 It is possible to enable INFO log messages to understand when the packet is sent to the MAC:
@@ -1256,13 +1256,13 @@ LtePdcp - UE Side
 
 Like what we have seen at RLC layer, the incoming PDCP PDUs are received at ``LtePdcp::DoReceivePdu()`` method. The
 header is removed and the packet is then transmitted to the ``LteUeRrc``, which straightly pass the packet to
-``EpcUeNas`` and then ``NrUeNetDevice``.
+``NrEpcUeNas`` and then ``NrUeNetDevice``.
 
 Packet latency
 ##############
 
 Latency can be evaluated with the same method used for :numref:`LteRlcUm-UESide-packetlatency`.
-``LteUeRrc`` and ``EpcUeNas`` acts transparently and do not add any additional latency.
+``LteUeRrc`` and ``NrEpcUeNas`` acts transparently and do not add any additional latency.
 
 Packet drops
 ############
@@ -1272,7 +1272,7 @@ Packets cannot be dropped at this layer, neither at RRC and UE NAS.
 NrUeNetDevice
 =============
 
-The packet is received by the ``EpcUeNas`` to ``NrUeNetDevice::DoRecvData()`` which does an up-callback to
+The packet is received by the ``NrEpcUeNas`` to ``NrUeNetDevice::DoRecvData()`` which does an up-callback to
 ``NrUeNetDevice::Receive()``. The implementation of such callback is the same for both UE and gNB, and thus it can be
 found in ``NrNetDevice``, i.e., ``contrib/nr/model/nr-net-device.cc``.
 

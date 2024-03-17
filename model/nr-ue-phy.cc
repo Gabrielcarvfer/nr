@@ -14,6 +14,7 @@
 
 #include "beam-manager.h"
 #include "nr-ch-access-manager.h"
+#include "nr-radio-bearer-tag.h"
 #include "nr-ue-net-device.h"
 #include "nr-ue-power-control.h"
 
@@ -21,7 +22,6 @@
 #include <ns3/double.h>
 #include <ns3/enum.h>
 #include <ns3/log.h>
-#include <ns3/lte-radio-bearer-tag.h>
 #include <ns3/node.h>
 #include <ns3/pointer.h>
 #include <ns3/simulator.h>
@@ -42,7 +42,7 @@ NrUePhy::NrUePhy()
 {
     NS_LOG_FUNCTION(this);
     m_wbCqiLast = Simulator::Now();
-    m_ueCphySapProvider = new MemberLteUeCphySapProvider<NrUePhy>(this);
+    m_ueCphySapProvider = new MemberNrUeCphySapProvider<NrUePhy>(this);
     m_powerControl = CreateObject<NrUePowerControl>(this);
 
     Simulator::Schedule(m_ueMeasurementsFilterPeriod, &NrUePhy::ReportUeMeasurements, this);
@@ -208,13 +208,13 @@ NrUePhy::ChannelAccessDenied()
 }
 
 void
-NrUePhy::SetUeCphySapUser(LteUeCphySapUser* s)
+NrUePhy::SetUeCphySapUser(NrUeCphySapUser* s)
 {
     NS_LOG_FUNCTION(this);
     m_ueCphySapUser = s;
 }
 
-LteUeCphySapProvider*
+NrUeCphySapProvider*
 NrUePhy::GetUeCphySapProvider()
 {
     NS_LOG_FUNCTION(this);
@@ -370,14 +370,14 @@ NrUePhy::SetPattern(const std::string& pattern)
 {
     NS_LOG_FUNCTION(this);
 
-    static std::unordered_map<std::string, LteNrTddSlotType> lookupTable = {
-        {"DL", LteNrTddSlotType::DL},
-        {"UL", LteNrTddSlotType::UL},
-        {"S", LteNrTddSlotType::S},
-        {"F", LteNrTddSlotType::F},
+    static std::unordered_map<std::string, NrTddSlotType> lookupTable = {
+        {"DL", NrTddSlotType::DL},
+        {"UL", NrTddSlotType::UL},
+        {"S", NrTddSlotType::S},
+        {"F", NrTddSlotType::F},
     };
 
-    std::vector<LteNrTddSlotType> vector;
+    std::vector<NrTddSlotType> vector;
     std::stringstream ss(pattern);
     std::string token;
     std::vector<std::string> extracted;
@@ -691,7 +691,7 @@ NrUePhy::PushCtrlAllocations(const SfnSf currentSfnSf)
 
     uint64_t currentSlotN = currentSfnSf.Normalize() % m_tddPattern.size();
 
-    if (m_tddPattern[currentSlotN] < LteNrTddSlotType::UL)
+    if (m_tddPattern[currentSlotN] < NrTddSlotType::UL)
     {
         NS_LOG_DEBUG("The current TDD pattern indicates that we are in a "
                      << m_tddPattern[currentSlotN]
@@ -703,7 +703,7 @@ NrUePhy::PushCtrlAllocations(const SfnSf currentSfnSf)
                                                                         rbgBitmask));
         m_currSlotAllocInfo.m_varTtiAllocInfo.push_front(dlCtrlSlot);
     }
-    if (m_tddPattern[currentSlotN] > LteNrTddSlotType::DL)
+    if (m_tddPattern[currentSlotN] > NrTddSlotType::DL)
     {
         NS_LOG_DEBUG("The current TDD pattern indicates that we are in a "
                      << m_tddPattern[currentSlotN]
@@ -973,7 +973,7 @@ NrUePhy::UlData(const std::shared_ptr<DciInfoElementTdma>& dci)
     if (pktBurst && pktBurst->GetNPackets() > 0)
     {
         std::list<Ptr<Packet>> pkts = pktBurst->GetPackets();
-        LteRadioBearerTag bearerTag;
+        NrRadioBearerTag bearerTag;
         if (!pkts.front()->PeekPacketTag(bearerTag))
         {
             NS_FATAL_ERROR("No radio bearer tag");
@@ -1094,7 +1094,7 @@ NrUePhy::SendDataChannels(const Ptr<PacketBurst>& pb,
 {
     if (pb->GetNPackets() > 0)
     {
-        LteRadioBearerTag tag;
+        NrRadioBearerTag tag;
         if (!pb->GetPackets().front()->PeekPacketTag(tag))
         {
             NS_FATAL_ERROR("No radio bearer tag");
@@ -1161,7 +1161,7 @@ NrUePhy::EnqueueDlHarqFeedback(const DlHarqInfo& m)
 
     auto k1It = m_harqIdToK1Map.find(m.m_harqProcessId);
 
-    NS_LOG_DEBUG("ReceiveLteDlHarqFeedback"
+    NS_LOG_DEBUG("ReceiveNrDlHarqFeedback"
                  << " Harq Process " << static_cast<uint32_t>(k1It->first)
                  << " K1: " << k1It->second << " Frame " << m_currentSlot);
 
@@ -1335,7 +1335,7 @@ NrUePhy::ReportUeMeasurements()
 {
     NS_LOG_FUNCTION(this);
 
-    // LteUeCphySapUser::UeMeasurementsParameters ret;
+    // NrUeCphySapUser::UeMeasurementsParameters ret;
 
     std::map<uint16_t, UeMeasurementsElement>::iterator it;
     for (it = m_ueMeasurementsMap.begin(); it != m_ueMeasurementsMap.end(); it++)
@@ -1359,7 +1359,7 @@ NrUePhy::ReportUeMeasurements()
 
         m_reportRsrpTrace(GetCellId(), m_imsi, m_rnti, avg_rsrp, GetBwpId());
 
-        /*LteUeCphySapUser::UeMeasurementsElement newEl;
+        /*NrUeCphySapUser::UeMeasurementsElement newEl;
         newEl.m_cellId = (*it).first;
         newEl.m_rsrp = avg_rsrp;
         newEl.m_rsrq = avg_rsrq;  //LEAVE IT 0 FOR THE MOMENT
@@ -1437,7 +1437,7 @@ void
 NrUePhy::DoSetInitialBandwidth()
 {
     NS_LOG_FUNCTION(this);
-    // configure initial bandwidth to 6 RBs
+    // configure initial bandwidth to 6 RBs, numerology 0
     double initialBandwidthHz =
         6 * GetSubcarrierSpacing() * NrSpectrumValueHelper::SUBCARRIERS_PER_RB;
     // divided by 100*1000 because the parameter should be in 100KHz

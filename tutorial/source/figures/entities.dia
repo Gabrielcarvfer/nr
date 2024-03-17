@@ -484,7 +484,7 @@ ns3::NrGnbPhy#</dia:string>
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#UE NAS
-ns3::EpcUeNas#</dia:string>
+ns3::NrEpcUeNas#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>

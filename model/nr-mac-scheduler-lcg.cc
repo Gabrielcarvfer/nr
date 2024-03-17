@@ -4,7 +4,8 @@
 
 #include "nr-mac-scheduler-lcg.h"
 
-#include <ns3/eps-bearer.h>
+#include "nr-eps-bearer.h"
+
 #include <ns3/log.h>
 
 namespace ns3
@@ -15,7 +16,7 @@ NS_LOG_COMPONENT_DEFINE("NrMacSchedulerLCG");
 NrMacSchedulerLC::NrMacSchedulerLC(const LogicalChannelConfigListElement_s& conf)
     : m_id(conf.m_logicalChannelIdentity)
 {
-    EpsBearer bearer(static_cast<EpsBearer::Qci>(conf.m_qci));
+    NrEpsBearer bearer(static_cast<NrEpsBearer::Qci>(conf.m_qci));
 
     m_delayBudget = MilliSeconds(bearer.GetPacketDelayBudgetMs());
     m_resourceType = bearer.GetResourceType();
@@ -220,7 +221,7 @@ NrMacSchedulerLCG::AssignedData(uint8_t lcId, uint32_t size, std::string type)
         }
 
         // If there are 5 bytes the RLC TX queue info at MAC, MAC will assign 5 bytes Tx
-        // opportunity, but LteRlcAm will complain that the minimum TX opportunity should be at
+        // opportunity, but NrRlcAm will complain that the minimum TX opportunity should be at
         // least 7 bytes. To be sure that the MAC scheduler will assign at least 7 bytes (so that 5
         // bytes can be transmitted), we tell here to MAC that there are 7 bytes in the queue
         // instead of e.g. 5 bytes. Yeah, this is a workaround, because MAC and RLC have to be "on

@@ -6,6 +6,8 @@
 
 #include "bandwidth-part-gnb.h"
 #include "bwp-manager-gnb.h"
+#include "nr-enb-component-carrier-manager.h"
+#include "nr-enb-rrc.h"
 #include "nr-gnb-mac.h"
 #include "nr-gnb-phy.h"
 
@@ -13,8 +15,6 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/ipv6-l3-protocol.h>
 #include <ns3/log.h>
-#include <ns3/lte-enb-component-carrier-manager.h>
-#include <ns3/lte-enb-rrc.h>
 #include <ns3/object-map.h>
 #include <ns3/pointer.h>
 
@@ -32,21 +32,21 @@ NrGnbNetDevice::GetTypeId()
         TypeId("ns3::NrGnbNetDevice")
             .SetParent<NrNetDevice>()
             .AddConstructor<NrGnbNetDevice>()
-            .AddAttribute("LteEnbComponentCarrierManager",
+            .AddAttribute("NrEnbComponentCarrierManager",
                           "The component carrier manager associated to this EnbNetDevice",
                           PointerValue(),
                           MakePointerAccessor(&NrGnbNetDevice::m_componentCarrierManager),
-                          MakePointerChecker<LteEnbComponentCarrierManager>())
+                          MakePointerChecker<NrEnbComponentCarrierManager>())
             .AddAttribute("BandwidthPartMap",
                           "List of Bandwidth Part container.",
                           ObjectMapValue(),
                           MakeObjectMapAccessor(&NrGnbNetDevice::m_ccMap),
                           MakeObjectMapChecker<BandwidthPartGnb>())
-            .AddAttribute("LteEnbRrc",
+            .AddAttribute("NrEnbRrc",
                           "The RRC layer associated with the ENB",
                           PointerValue(),
                           MakePointerAccessor(&NrGnbNetDevice::m_rrc),
-                          MakePointerChecker<LteEnbRrc>());
+                          MakePointerChecker<NrEnbRrc>());
     return tid;
 }
 
@@ -203,12 +203,12 @@ NrGnbNetDevice::GetEarfcn(uint8_t index) const
 }
 
 void
-NrGnbNetDevice::SetRrc(Ptr<LteEnbRrc> rrc)
+NrGnbNetDevice::SetRrc(Ptr<NrEnbRrc> rrc)
 {
     m_rrc = rrc;
 }
 
-Ptr<LteEnbRrc>
+Ptr<NrEnbRrc>
 NrGnbNetDevice::GetRrc()
 {
     return m_rrc;
@@ -236,14 +236,82 @@ NrGnbNetDevice::UpdateConfig()
 
     NS_ASSERT(!m_ccMap.empty());
 
-    std::map<uint8_t, Ptr<ComponentCarrierBaseStation>> ccPhyConfMap;
+    std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConfMap;
     for (const auto& i : m_ccMap)
     {
-        Ptr<ComponentCarrierBaseStation> c = i.second;
-        ccPhyConfMap.insert(std::pair<uint8_t, Ptr<ComponentCarrierBaseStation>>(i.first, c));
+        Ptr<NrComponentCarrierBaseStation> c = i.second;
+        ccPhyConfMap.insert(std::pair<uint8_t, Ptr<NrComponentCarrierBaseStation>>(i.first, c));
     }
 
     m_rrc->ConfigureCell(ccPhyConfMap);
+}
+
+uint16_t
+NrGnbNetDevice::GetCellIdDlBandwidth(uint16_t cellId) const
+{
+    NS_ASSERT_MSG(m_rrc->HasCellId(cellId), "Unknown cellId");
+    if (m_rrc->HasCellId(cellId))
+    {
+        for (const auto& [key, cc] : m_ccMap)
+        {
+            if (cc->GetCellId() == cellId)
+            {
+                return cc->GetDlBandwidth();
+            }
+        }
+    }
+    return 0;
+}
+
+uint16_t
+NrGnbNetDevice::GetCellIdUlBandwidth(uint16_t cellId) const
+{
+    NS_ASSERT_MSG(m_rrc->HasCellId(cellId), "Unknown cellId");
+    if (m_rrc->HasCellId(cellId))
+    {
+        for (const auto& [key, cc] : m_ccMap)
+        {
+            if (cc->GetCellId() == cellId)
+            {
+                return cc->GetUlBandwidth();
+            }
+        }
+    }
+    return 0;
+}
+
+uint32_t
+NrGnbNetDevice::GetCellIdDlEarfcn(uint16_t cellId) const
+{
+    NS_ASSERT_MSG(m_rrc->HasCellId(cellId), "Unknown cellId");
+    if (m_rrc->HasCellId(cellId))
+    {
+        for (const auto& [key, cc] : m_ccMap)
+        {
+            if (cc->GetCellId() == cellId)
+            {
+                return cc->GetDlEarfcn();
+            }
+        }
+    }
+    return 0;
+}
+
+uint32_t
+NrGnbNetDevice::GetCellIdUlEarfcn(uint16_t cellId) const
+{
+    NS_ASSERT_MSG(m_rrc->HasCellId(cellId), "Unknown cellId");
+    if (m_rrc->HasCellId(cellId))
+    {
+        for (const auto& [key, cc] : m_ccMap)
+        {
+            if (cc->GetCellId() == cellId)
+            {
+                return cc->GetUlEarfcn();
+            }
+        }
+    }
+    return 0;
 }
 
 } // namespace ns3

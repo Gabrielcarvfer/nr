@@ -188,6 +188,7 @@ NrPhy::NrPhy()
 {
     NS_LOG_FUNCTION(this);
     m_phySapProvider = new NrMemberPhySapProvider(this);
+    SetNumerology(0); // Initialize sub-carrier spacing assuming numerology 0
 }
 
 NrPhy::~NrPhy()
@@ -405,13 +406,13 @@ NrPhy::GetCentralFrequency() const
 }
 
 std::string
-NrPhy::GetPattern(const std::vector<LteNrTddSlotType>& pattern)
+NrPhy::GetPattern(const std::vector<NrTddSlotType>& pattern)
 {
-    static std::unordered_map<LteNrTddSlotType, std::string, std::hash<int>> lookupTable = {
-        {LteNrTddSlotType::DL, "DL"},
-        {LteNrTddSlotType::UL, "UL"},
-        {LteNrTddSlotType::S, "S"},
-        {LteNrTddSlotType::F, "F"}};
+    static std::unordered_map<NrTddSlotType, std::string, std::hash<int>> lookupTable = {
+        {NrTddSlotType::DL, "DL"},
+        {NrTddSlotType::UL, "UL"},
+        {NrTddSlotType::S, "S"},
+        {NrTddSlotType::F, "F"}};
 
     std::stringstream ss;
 
@@ -480,11 +481,11 @@ NrPhy::HasUlSlot() const
 }
 
 bool
-NrPhy::HasDlSlot(const std::vector<LteNrTddSlotType>& pattern)
+NrPhy::HasDlSlot(const std::vector<NrTddSlotType>& pattern)
 {
     for (const auto& v : pattern)
     {
-        if (v == LteNrTddSlotType::F || v == LteNrTddSlotType::DL || v == LteNrTddSlotType::S)
+        if (v == NrTddSlotType::F || v == NrTddSlotType::DL || v == NrTddSlotType::S)
         {
             return true;
         }
@@ -493,11 +494,11 @@ NrPhy::HasDlSlot(const std::vector<LteNrTddSlotType>& pattern)
 }
 
 bool
-NrPhy::HasUlSlot(const std::vector<LteNrTddSlotType>& pattern)
+NrPhy::HasUlSlot(const std::vector<NrTddSlotType>& pattern)
 {
     for (const auto& v : pattern)
     {
-        if (v == LteNrTddSlotType::F || v == LteNrTddSlotType::UL || v == LteNrTddSlotType::S)
+        if (v == NrTddSlotType::F || v == NrTddSlotType::UL || v == NrTddSlotType::S)
         {
             return true;
         }
@@ -563,7 +564,7 @@ NrPhy::DoUpdateRbNum()
 }
 
 bool
-NrPhy::IsTdd(const std::vector<LteNrTddSlotType>& pattern)
+NrPhy::IsTdd(const std::vector<NrTddSlotType>& pattern)
 {
     bool anUl = false;
     bool aDl = false;
@@ -571,16 +572,16 @@ NrPhy::IsTdd(const std::vector<LteNrTddSlotType>& pattern)
     for (const auto& v : pattern)
     {
         // An F slot: we are TDD
-        if (v == LteNrTddSlotType::F)
+        if (v == NrTddSlotType::F)
         {
             return true;
         }
 
-        if (v == LteNrTddSlotType::UL)
+        if (v == NrTddSlotType::UL)
         {
             anUl = true;
         }
-        else if (v == LteNrTddSlotType::DL)
+        else if (v == NrTddSlotType::DL)
         {
             aDl = true;
         }

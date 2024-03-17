@@ -4,12 +4,12 @@
 
 #include "bandwidth-part-gnb.h"
 
+#include "nr-ff-mac-scheduler.h"
 #include "nr-gnb-mac.h"
 #include "nr-gnb-phy.h"
 
 #include <ns3/abort.h>
 #include <ns3/boolean.h>
-#include <ns3/ff-mac-scheduler.h>
 #include <ns3/log.h>
 #include <ns3/pointer.h>
 
@@ -23,7 +23,7 @@ TypeId
 BandwidthPartGnb::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::BandwidthPartGnb")
-                            .SetParent<ComponentCarrierBaseStation>()
+                            .SetParent<NrComponentCarrierBaseStation>()
                             .AddConstructor<BandwidthPartGnb>()
                             .AddAttribute("NrGnbPhy",
                                           "The PHY associated to this EnbNetDevice",
@@ -35,16 +35,16 @@ BandwidthPartGnb::GetTypeId()
                                           PointerValue(),
                                           MakePointerAccessor(&BandwidthPartGnb::m_mac),
                                           MakePointerChecker<NrGnbMac>())
-                            .AddAttribute("FfMacScheduler",
+                            .AddAttribute("NrFfMacScheduler",
                                           "The scheduler associated to this EnbNetDevice",
                                           PointerValue(),
                                           MakePointerAccessor(&BandwidthPartGnb::m_scheduler),
-                                          MakePointerChecker<FfMacScheduler>());
+                                          MakePointerChecker<NrFfMacScheduler>());
     return tid;
 }
 
 BandwidthPartGnb::BandwidthPartGnb()
-    : ComponentCarrierBaseStation()
+    : NrComponentCarrierBaseStation()
 {
     NS_LOG_FUNCTION(this);
     m_phy = nullptr;

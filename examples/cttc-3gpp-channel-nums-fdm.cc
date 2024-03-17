@@ -114,7 +114,7 @@ main(int argc, char* argv[])
     NS_ABORT_IF(centralFrequencyBand1 > 100e9);
     NS_ABORT_IF(centralFrequencyBand2 > 100e9);
 
-    Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     int64_t randomStream = 1;
 
@@ -137,13 +137,13 @@ main(int argc, char* argv[])
      * TODO: Add a print, or a plot, that shows the scenario.
      */
 
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     // Put the pointers inside nrHelper
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     BandwidthPartInfoPtrVector allBwps;
     CcBwpCreator ccBwpCreator;
@@ -190,7 +190,7 @@ main(int argc, char* argv[])
                                          TypeIdValue(DirectPathBeamforming::GetTypeId()));
 
     // Core latency
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
+    nrEpcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
 
     // Antennas for all the UEs
     nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(2));
@@ -344,7 +344,7 @@ main(int argc, char* argv[])
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    Ptr<Node> pgw = nrEpcHelper->GetPgwNode();
     NodeContainer remoteHostContainer;
     remoteHostContainer.Create(1);
     Ptr<Node> remoteHost = remoteHostContainer.Get(0);
@@ -366,14 +366,15 @@ main(int argc, char* argv[])
     remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(gridScenario.GetUserTerminals());
 
-    Ipv4InterfaceContainer ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    Ipv4InterfaceContainer ueIpIface =
+        nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
     {
         Ptr<Ipv4StaticRouting> ueStaticRouting = ipv4RoutingHelper.GetStaticRouting(
             gridScenario.GetUserTerminals().Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+        ueStaticRouting->SetDefaultRoute(nrEpcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
     // Fix the attachment of the UEs: UE_i attached to GNB_i
@@ -420,11 +421,11 @@ main(int argc, char* argv[])
     dlClientVideo.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaVideo)));
 
     // The bearer that will carry low latency traffic
-    EpsBearer videoBearer(EpsBearer::GBR_CONV_VIDEO);
+    NrEpsBearer videoBearer(NrEpsBearer::GBR_CONV_VIDEO);
 
     // The filter for the low-latency traffic
-    Ptr<EpcTft> videoTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfVideo;
+    Ptr<NrEpcTft> videoTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfVideo;
     dlpfVideo.localPortStart = dlPortVideo;
     dlpfVideo.localPortEnd = dlPortVideo;
     videoTft->Add(dlpfVideo);
@@ -437,11 +438,11 @@ main(int argc, char* argv[])
     dlClientVoice.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaVoice)));
 
     // The bearer that will carry voice traffic
-    EpsBearer voiceBearer(EpsBearer::GBR_CONV_VOICE);
+    NrEpsBearer voiceBearer(NrEpsBearer::GBR_CONV_VOICE);
 
     // The filter for the voice traffic
-    Ptr<EpcTft> voiceTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfVoice;
+    Ptr<NrEpcTft> voiceTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfVoice;
     dlpfVoice.localPortStart = dlPortVoice;
     dlpfVoice.localPortEnd = dlPortVoice;
     voiceTft->Add(dlpfVoice);
@@ -454,14 +455,14 @@ main(int argc, char* argv[])
     ulClientGaming.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaGaming)));
 
     // The bearer that will carry gaming traffic
-    EpsBearer gamingBearer(EpsBearer::GBR_GAMING);
+    NrEpsBearer gamingBearer(NrEpsBearer::GBR_GAMING);
 
     // The filter for the gaming traffic
-    Ptr<EpcTft> gamingTft = Create<EpcTft>();
-    EpcTft::PacketFilter ulpfGaming;
+    Ptr<NrEpcTft> gamingTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter ulpfGaming;
     ulpfGaming.remotePortStart = ulPortGaming;
     ulpfGaming.remotePortEnd = ulPortGaming;
-    ulpfGaming.direction = EpcTft::UPLINK;
+    ulpfGaming.direction = NrEpcTft::UPLINK;
     gamingTft->Add(ulpfGaming);
 
     /*

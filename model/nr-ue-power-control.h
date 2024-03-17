@@ -23,7 +23,7 @@ namespace ns3
  * NrUePowerControl entity is responsible for calculating total
  * power that will be used to transmit PUSCH, PUCCH and SRS.
  *
- * NrUePowerControl functionality is inspired by LteUePowerControl,
+ * NrUePowerControl functionality is inspired by NrUePowerControl,
  * but it does not inherits it because almost all of its functions needed to be
  * overridden and extended in order to support different specifications, i.e., to be
  * compatible with both LTE and NR standard (e.g. support different numerologies).

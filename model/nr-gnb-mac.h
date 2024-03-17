@@ -5,15 +5,15 @@
 #ifndef NR_ENB_MAC_H
 #define NR_ENB_MAC_H
 
+#include "nr-ccm-mac-sap.h"
+#include "nr-enb-cmac-sap.h"
 #include "nr-mac-pdu-info.h"
+#include "nr-mac-sap.h"
 #include "nr-mac-sched-sap.h"
 #include "nr-mac-scheduler.h"
 #include "nr-phy-mac-common.h"
 #include "nr-phy-sap.h"
 
-#include <ns3/lte-ccm-mac-sap.h>
-#include <ns3/lte-enb-cmac-sap.h>
-#include <ns3/lte-mac-sap.h>
 #include <ns3/traced-callback.h>
 
 namespace ns3
@@ -50,8 +50,8 @@ class NrGnbMac : public Object
     friend class NrMacEnbMemberPhySapUser;
     friend class NrMacMemberMacCschedSapUser;
     friend class NrMacMemberMacSchedSapUser;
-    friend class EnbMacMemberLteMacSapProvider<NrGnbMac>;
-    friend class MemberLteCcmMacSapProvider<NrGnbMac>;
+    friend class EnbMacMemberNrMacSapProvider<NrGnbMac>;
+    friend class MemberNrCcmMacSapProvider<NrGnbMac>;
 
   public:
     /**
@@ -119,7 +119,7 @@ class NrGnbMac : public Object
      * Please note that what is decided in this slot will reach the air later
      * (depending on the L1L2CTRL latency parameter).
      */
-    virtual void DoSlotDlIndication(const SfnSf& sfnSf, LteNrTddSlotType type);
+    virtual void DoSlotDlIndication(const SfnSf& sfnSf, NrTddSlotType type);
 
     /**
      * \brief Perform UL scheduling decision for the indicated slot
@@ -130,7 +130,7 @@ class NrGnbMac : public Object
      * Please note that what is decided in this slot will reach the air later
      * (depending on the L1L2CTRL latency and the UL Sched delay (K2) parameters).
      */
-    virtual void DoSlotUlIndication(const SfnSf& sfnSf, LteNrTddSlotType type);
+    virtual void DoSlotUlIndication(const SfnSf& sfnSf, NrTddSlotType type);
 
     /**
      * \brief Set the current sfn
@@ -149,22 +149,22 @@ class NrGnbMac : public Object
     NrMacCschedSapUser* GetNrMacCschedSapUser();
     void SetNrMacCschedSapProvider(NrMacCschedSapProvider* ptr);
 
-    LteMacSapProvider* GetMacSapProvider();
-    LteEnbCmacSapProvider* GetEnbCmacSapProvider();
+    NrMacSapProvider* GetMacSapProvider();
+    NrEnbCmacSapProvider* GetEnbCmacSapProvider();
 
-    void SetEnbCmacSapUser(LteEnbCmacSapUser* s);
+    void SetEnbCmacSapUser(NrEnbCmacSapUser* s);
 
     /**
      * \brief Get the gNB-ComponentCarrierManager SAP User
      * \return a pointer to the SAP User of the ComponentCarrierManager
      */
-    LteCcmMacSapProvider* GetLteCcmMacSapProvider();
+    NrCcmMacSapProvider* GetNrCcmMacSapProvider();
 
     /**
      * \brief Set the ComponentCarrierManager SAP user
      * \param s a pointer to the ComponentCarrierManager provider
      */
-    void SetLteCcmMacSapUser(LteCcmMacSapUser* s);
+    void SetNrCcmMacSapUser(NrCcmMacSapUser* s);
 
     /**
      * \brief A Beam for a user has changed
@@ -283,9 +283,9 @@ class NrGnbMac : public Object
     void DoReceivePhyPdu(Ptr<Packet> p);
     void DoReceiveControlMessage(Ptr<NrControlMessage> msg);
     virtual void DoSchedConfigIndication(NrMacSchedSapUser::SchedConfigIndParameters ind);
-    // forwarded from LteMacSapProvider
-    void DoTransmitPdu(LteMacSapProvider::TransmitPduParameters);
-    void DoReportBufferStatus(LteMacSapProvider::ReportBufferStatusParameters);
+    // forwarded from NrMacSapProvider
+    void DoTransmitPdu(NrMacSapProvider::TransmitPduParameters);
+    void DoReportBufferStatus(NrMacSapProvider::ReportBufferStatusParameters);
     void DoUlCqiReport(NrMacSchedSapProvider::SchedUlCqiInfoReqParameters ulcqi);
     // forwarded from NrMacCchedSapUser
     void DoCschedCellConfigCnf(NrMacCschedSapUser::CschedCellConfigCnfParameters params);
@@ -296,16 +296,16 @@ class NrGnbMac : public Object
     void DoCschedUeConfigUpdateInd(NrMacCschedSapUser::CschedUeConfigUpdateIndParameters params);
     void DoCschedCellConfigUpdateInd(
         NrMacCschedSapUser::CschedCellConfigUpdateIndParameters params);
-    // forwarded from LteEnbCmacSapProvider
+    // forwarded from NrEnbCmacSapProvider
     void DoConfigureMac(uint16_t ulBandwidth, uint16_t dlBandwidth);
     void DoAddUe(uint16_t rnti);
     void DoRemoveUe(uint16_t rnti);
-    void DoAddLc(LteEnbCmacSapProvider::LcInfo lcinfo, LteMacSapUser* msu);
-    void DoReconfigureLc(LteEnbCmacSapProvider::LcInfo lcinfo);
+    void DoAddLc(NrEnbCmacSapProvider::LcInfo lcinfo, NrMacSapUser* msu);
+    void DoReconfigureLc(NrEnbCmacSapProvider::LcInfo lcinfo);
     void DoReleaseLc(uint16_t rnti, uint8_t lcid);
-    void UeUpdateConfigurationReq(LteEnbCmacSapProvider::UeConfig params);
-    LteEnbCmacSapProvider::RachConfig DoGetRachConfig();
-    LteEnbCmacSapProvider::AllocateNcRaPreambleReturnValue DoAllocateNcRaPreamble(uint16_t rnti);
+    void UeUpdateConfigurationReq(NrEnbCmacSapProvider::UeConfig params);
+    NrEnbCmacSapProvider::RachConfig DoGetRachConfig();
+    NrEnbCmacSapProvider::AllocateNcRaPreambleReturnValue DoAllocateNcRaPreamble(uint16_t rnti);
 
     /**
      * \brief Process the newly received DL HARQ feedback
@@ -337,9 +337,9 @@ class NrGnbMac : public Object
 
     typedef std::vector<NrDlHarqProcessInfo> NrDlHarqProcessesBuffer_t;
 
-    LteMacSapProvider* m_macSapProvider;
-    LteEnbCmacSapProvider* m_cmacSapProvider;
-    LteEnbCmacSapUser* m_cmacSapUser;
+    NrMacSapProvider* m_macSapProvider;
+    NrEnbCmacSapProvider* m_cmacSapProvider;
+    NrEnbCmacSapUser* m_cmacSapUser;
     NrPhySapProvider* m_phySapProvider{nullptr};
     NrGnbPhySapUser* m_phySapUser;
 
@@ -349,8 +349,8 @@ class NrGnbMac : public Object
     NrMacCschedSapUser* m_macCschedSapUser;
 
     // Sap For ComponentCarrierManager 'Uplink case'
-    LteCcmMacSapProvider* m_ccmMacSapProvider; ///< CCM MAC SAP provider
-    LteCcmMacSapUser* m_ccmMacSapUser;         ///< CCM MAC SAP user
+    NrCcmMacSapProvider* m_ccmMacSapProvider; ///< CCM MAC SAP provider
+    NrCcmMacSapUser* m_ccmMacSapUser;         ///< CCM MAC SAP user
 
     int32_t m_numRbPerRbg{-1}; //!< number of resource blocks within the channel bandwidth
 
@@ -366,7 +366,7 @@ class NrGnbMac : public Object
 
     std::unordered_map<uint8_t, uint32_t> m_receivedRachPreambleCount;
 
-    std::unordered_map<uint16_t, std::unordered_map<uint8_t, LteMacSapUser*>> m_rlcAttached;
+    std::unordered_map<uint16_t, std::unordered_map<uint8_t, NrMacSapUser*>> m_rlcAttached;
 
     std::vector<DlHarqInfo> m_dlHarqInfoReceived; // DL HARQ feedback received
     std::vector<UlHarqInfo> m_ulHarqInfoReceived; // UL HARQ feedback received

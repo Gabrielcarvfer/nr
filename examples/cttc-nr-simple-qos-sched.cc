@@ -117,7 +117,7 @@ main(int argc, char* argv[])
         LogComponentEnable("NrMacSchedulerTdma", logLevel1);
     }
 
-    Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     /*
      * Create the scenario. In our examples, we heavily use helpers that setup
@@ -185,16 +185,16 @@ main(int argc, char* argv[])
     }
 
     // setup the nr simulation
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     // Put the pointers inside nrHelper
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     nrHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(false));
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
+    nrEpcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
     Config::SetDefault("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue(MilliSeconds(0)));
     nrHelper->SetChannelConditionModelAttribute("UpdatePeriod", TimeValue(MilliSeconds(0)));
 
@@ -314,7 +314,7 @@ main(int argc, char* argv[])
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    Ptr<Node> pgw = nrEpcHelper->GetPgwNode();
     NodeContainer remoteHostContainer;
     remoteHostContainer.Create(1);
     Ptr<Node> remoteHost = remoteHostContainer.Get(0);
@@ -338,15 +338,15 @@ main(int argc, char* argv[])
 
     Ipv4InterfaceContainer ueLowLatIpIface;
     Ipv4InterfaceContainer ueVoiceIpIface;
-    ueLowLatIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
-    ueVoiceIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
+    ueLowLatIpIface = nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueLowLatNetDev));
+    ueVoiceIpIface = nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueVoiceNetDev));
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
     {
         Ptr<Ipv4StaticRouting> ueStaticRouting = ipv4RoutingHelper.GetStaticRouting(
             gridScenario.GetUserTerminals().Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+        ueStaticRouting->SetDefaultRoute(nrEpcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
     // attach UEs to the closest gNB
@@ -383,11 +383,11 @@ main(int argc, char* argv[])
     dlClientLowLat.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaULL)));
 
     // The bearer that will carry low latency traffic
-    EpsBearer lowLatBearer(EpsBearer::NGBR_LOW_LAT_EMBB);
+    NrEpsBearer lowLatBearer(NrEpsBearer::NGBR_LOW_LAT_EMBB);
 
     // The filter for the low-latency traffic
-    Ptr<EpcTft> lowLatTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfLowLat;
+    Ptr<NrEpcTft> lowLatTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfLowLat;
     dlpfLowLat.localPortStart = dlPortLowLat;
     dlpfLowLat.localPortEnd = dlPortLowLat;
     lowLatTft->Add(dlpfLowLat);
@@ -400,11 +400,11 @@ main(int argc, char* argv[])
     dlClientVoice.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaBe)));
 
     // The bearer that will carry voice traffic
-    EpsBearer voiceBearer(EpsBearer::GBR_CONV_VOICE);
+    NrEpsBearer voiceBearer(NrEpsBearer::GBR_CONV_VOICE);
 
     // The filter for the voice traffic
-    Ptr<EpcTft> voiceTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfVoice;
+    Ptr<NrEpcTft> voiceTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfVoice;
     dlpfVoice.localPortStart = dlPortVoice;
     dlpfVoice.localPortEnd = dlPortVoice;
     voiceTft->Add(dlpfVoice);

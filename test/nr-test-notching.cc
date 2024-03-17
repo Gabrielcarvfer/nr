@@ -410,7 +410,7 @@ NrNotchingTestCase::DoRun()
     // Call scheduling
     NrMacSchedSapProvider::SchedDlTriggerReqParameters paramsDlTrigger;
     paramsDlTrigger.m_snfSf = SfnSf(0, 0, 0, 0);
-    paramsDlTrigger.m_slotType = LteNrTddSlotType::DL;
+    paramsDlTrigger.m_slotType = NrTddSlotType::DL;
     sched->DoSchedDlTriggerReq(paramsDlTrigger);
 
     delete m_phySapProvider;

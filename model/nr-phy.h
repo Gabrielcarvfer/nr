@@ -352,7 +352,7 @@ class NrPhy : public Object
      * \param pattern Pattern to check
      * \return true if at least one slot is DL, F or S.
      */
-    static bool HasDlSlot(const std::vector<LteNrTddSlotType>& pattern);
+    static bool HasDlSlot(const std::vector<NrTddSlotType>& pattern);
 
     /**
      * \brief See if at least one slot is UL, F or S.
@@ -360,7 +360,7 @@ class NrPhy : public Object
      * \param pattern Pattern to check
      * \return true if at least one slot is UL, F or S.
      */
-    static bool HasUlSlot(const std::vector<LteNrTddSlotType>& pattern);
+    static bool HasUlSlot(const std::vector<NrTddSlotType>& pattern);
 
     /**
      * \brief Retrieve the frequency (in Hz) of this PHY's channel
@@ -381,7 +381,7 @@ class NrPhy : public Object
      * \param pattern the TDD pattern
      * \return a string representation of the pattern, such as "F|F|F|F|..."
      */
-    static std::string GetPattern(const std::vector<LteNrTddSlotType>& pattern);
+    static std::string GetPattern(const std::vector<NrTddSlotType>& pattern);
 
     /**
      * \brief Set power allocation type. There are currently supported two types:
@@ -423,7 +423,7 @@ class NrPhy : public Object
      * \param pattern the pattern to check
      * \return true if the pattern has at least one mixed DL/UL
      */
-    static bool IsTdd(const std::vector<LteNrTddSlotType>& pattern);
+    static bool IsTdd(const std::vector<NrTddSlotType>& pattern);
 
     /**
      * \brief Transform a MAC-made vector of RBG to a PHY-ready vector of SINR indices
@@ -566,7 +566,7 @@ class NrPhy : public Object
     uint32_t m_raPreambleId{0};                  //!< Preamble ID
     std::list<Ptr<NrControlMessage>> m_ctrlMsgs; //!< CTRL messages to be sent
 
-    std::vector<LteNrTddSlotType> m_tddPattern = {F, F, F, F, F, F, F, F, F, F}; //!< Pattern
+    std::vector<NrTddSlotType> m_tddPattern = {F, F, F, F, F, F, F, F, F, F}; //!< Pattern
 
   private:
     std::list<SlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list

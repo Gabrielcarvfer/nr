@@ -5,6 +5,7 @@
 #include "nr-helper.h"
 
 #include "nr-bearer-stats-calculator.h"
+#include "nr-epc-helper.h"
 #include "nr-mac-rx-trace.h"
 #include "nr-phy-rx-trace.h"
 
@@ -16,26 +17,24 @@
 #include <ns3/bwp-manager-gnb.h>
 #include <ns3/bwp-manager-ue.h>
 #include <ns3/config.h>
-#include <ns3/epc-enb-application.h>
-#include <ns3/epc-helper.h>
-#include <ns3/epc-ue-nas.h>
-#include <ns3/epc-x2.h>
-#include <ns3/lte-chunk-processor.h>
-#include <ns3/lte-rrc-protocol-ideal.h>
-#include <ns3/lte-rrc-protocol-real.h>
-#include <ns3/lte-ue-rrc.h>
 #include <ns3/multi-model-spectrum-channel.h>
 #include <ns3/names.h>
 #include <ns3/nr-ch-access-manager.h>
+#include <ns3/nr-chunk-processor.h>
+#include <ns3/nr-epc-enb-application.h>
+#include <ns3/nr-epc-ue-nas.h>
+#include <ns3/nr-epc-x2.h>
 #include <ns3/nr-gnb-mac.h>
 #include <ns3/nr-gnb-net-device.h>
 #include <ns3/nr-gnb-phy.h>
 #include <ns3/nr-mac-scheduler-tdma-rr.h>
 #include <ns3/nr-pm-search-full.h>
 #include <ns3/nr-rrc-protocol-ideal.h>
+#include <ns3/nr-rrc-protocol-real.h>
 #include <ns3/nr-ue-mac.h>
 #include <ns3/nr-ue-net-device.h>
 #include <ns3/nr-ue-phy.h>
+#include <ns3/nr-ue-rrc.h>
 #include <ns3/pointer.h>
 #include <ns3/three-gpp-channel-model.h>
 #include <ns3/three-gpp-propagation-loss-model.h>
@@ -85,7 +84,7 @@ NrHelper::NrHelper()
     m_pathlossModelFactory.SetTypeId(ThreeGppPropagationLossModel::GetTypeId());
     m_channelConditionModelFactory.SetTypeId(ThreeGppChannelConditionModel::GetTypeId());
 
-    Config::SetDefault("ns3::EpsBearer::Release", UintegerValue(18));
+    Config::SetDefault("ns3::NrEpsBearer::Release", UintegerValue(18));
 
     m_phyStats = CreateObject<NrPhyRxTrace>();
     m_macSchedStats = CreateObject<NrMacSchedulingStats>();
@@ -104,24 +103,31 @@ NrHelper::~NrHelper()
 TypeId
 NrHelper::GetTypeId()
 {
-    static TypeId tid = TypeId("ns3::NrHelper")
-                            .SetParent<Object>()
-                            .AddConstructor<NrHelper>()
-                            .AddAttribute("EnableMimoFeedback",
-                                          "Generate CQI feedback with RI and PMI for MIMO support",
-                                          BooleanValue(false),
-                                          MakeBooleanAccessor(&NrHelper::m_enableMimoFeedback),
-                                          MakeBooleanChecker())
-                            .AddAttribute("PmSearchMethod",
-                                          "Type of the precoding matrix search method.",
-                                          TypeIdValue(NrPmSearchFull::GetTypeId()),
-                                          MakeTypeIdAccessor(&NrHelper::SetPmSearchTypeId),
-                                          MakeTypeIdChecker())
-                            .AddAttribute("HarqEnabled",
-                                          "Enable Hybrid ARQ",
-                                          BooleanValue(true),
-                                          MakeBooleanAccessor(&NrHelper::m_harqEnabled),
-                                          MakeBooleanChecker());
+    static TypeId tid =
+        TypeId("ns3::NrHelper")
+            .SetParent<Object>()
+            .AddConstructor<NrHelper>()
+            .AddAttribute("EnableMimoFeedback",
+                          "Generate CQI feedback with RI and PMI for MIMO support",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&NrHelper::m_enableMimoFeedback),
+                          MakeBooleanChecker())
+            .AddAttribute("PmSearchMethod",
+                          "Type of the precoding matrix search method.",
+                          TypeIdValue(NrPmSearchFull::GetTypeId()),
+                          MakeTypeIdAccessor(&NrHelper::SetPmSearchTypeId),
+                          MakeTypeIdChecker())
+            .AddAttribute("HarqEnabled",
+                          "Enable Hybrid ARQ",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&NrHelper::m_harqEnabled),
+                          MakeBooleanChecker())
+            .AddAttribute("UseIdealRrc",
+                          "If true, NrRrcProtocolIdeal will be used for RRC signaling. "
+                          "If false, NrRrcProtocolReal will be used.",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&NrHelper::m_useIdealRrc),
+                          MakeBooleanChecker());
     return tid;
 }
 
@@ -358,6 +364,24 @@ NrHelper::InitializeOperationBand(OperationBandInfo* band, uint8_t flags)
     }
 }
 
+std::pair<double, BandwidthPartInfoPtrVector>
+NrHelper::CreateBandwidthParts(std::vector<CcBwpCreator::SimpleOperationBandConf> bandConfs)
+{
+    CcBwpCreator ccBwpCreator;
+    double totalBandwidth = 0.0;
+    for (auto& bandConf : bandConfs)
+    {
+        m_bands.push_back(ccBwpCreator.CreateOperationBandContiguousCc(bandConf));
+        InitializeOperationBand(&m_bands.back());
+        totalBandwidth += bandConf.m_channelBandwidth;
+    }
+    std::vector<std::reference_wrapper<OperationBandInfo>> bandsRefs(m_bands.rbegin(),
+                                                                     m_bands.rbegin() +
+                                                                         bandConfs.size());
+
+    return std::make_pair(totalBandwidth, CcBwpCreator::GetAllBwps(bandsRefs));
+}
+
 uint32_t
 NrHelper::GetNumberBwp(const Ptr<const NetDevice>& gnbDevice)
 {
@@ -522,6 +546,24 @@ NrHelper::InstallGnbDevice(const NodeContainer& c,
     return devices;
 }
 
+void
+NrHelper::UpdateDeviceConfigs(const NetDeviceContainer& netDevs)
+{
+    for (uint32_t i = 0; i < netDevs.GetN(); i++)
+    {
+        auto ueNetDev = DynamicCast<NrUeNetDevice>(netDevs.Get(i));
+        auto gnbNetDev = DynamicCast<NrGnbNetDevice>(netDevs.Get(i));
+        if (ueNetDev)
+        {
+            ueNetDev->UpdateConfig();
+        }
+        if (gnbNetDev)
+        {
+            gnbNetDev->UpdateConfig();
+        }
+    }
+}
+
 Ptr<NrUeMac>
 NrHelper::CreateUeMac() const
 {
@@ -577,7 +619,7 @@ NrHelper::CreateUePhy(const Ptr<Node>& n,
 
     cam->SetNrSpectrumPhy(channelPhy); // connect CAM
 
-    Ptr<LteChunkProcessor> pData = Create<LteChunkProcessor>();
+    Ptr<NrChunkProcessor> pData = Create<NrChunkProcessor>();
     pData->AddCallback(MakeCallback(&NrSpectrumPhy::UpdateSinrPerceived, channelPhy));
     channelPhy->AddDataSinrChunkProcessor(pData);
 
@@ -599,11 +641,11 @@ NrHelper::CreateUePhy(const Ptr<Node>& n,
         pData->AddCallback(MakeCallback(&NrUePhy::GenerateDlCqiReport, phy));
     }
 
-    Ptr<LteChunkProcessor> pRs = Create<LteChunkProcessor>();
+    Ptr<NrChunkProcessor> pRs = Create<NrChunkProcessor>();
     pRs->AddCallback(MakeCallback(&NrUePhy::ReportRsReceivedPower, phy));
     channelPhy->AddRsPowerChunkProcessor(pRs);
 
-    Ptr<LteChunkProcessor> pSinr = Create<LteChunkProcessor>();
+    Ptr<NrChunkProcessor> pSinr = Create<NrChunkProcessor>();
     pSinr->AddCallback(MakeCallback(&NrSpectrumPhy::ReportDlCtrlSinr, channelPhy));
     channelPhy->AddDlCtrlSinrChunkProcessor(pSinr);
 
@@ -669,19 +711,19 @@ NrHelper::InstallSingleUeDevice(
         ueCcMap.insert(std::make_pair(bwpId, cc));
     }
 
-    Ptr<LteUeComponentCarrierManager> ccmUe =
-        DynamicCast<LteUeComponentCarrierManager>(CreateObject<BwpManagerUe>());
+    Ptr<NrUeComponentCarrierManager> ccmUe =
+        DynamicCast<NrUeComponentCarrierManager>(CreateObject<BwpManagerUe>());
     DynamicCast<BwpManagerUe>(ccmUe)->SetBwpManagerAlgorithm(
         m_ueBwpManagerAlgoFactory.Create<BwpManagerAlgorithm>());
 
-    Ptr<LteUeRrc> rrc = CreateObject<LteUeRrc>();
+    Ptr<NrUeRrc> rrc = CreateObject<NrUeRrc>();
     rrc->m_numberOfComponentCarriers = ueCcMap.size();
     // run InitializeSap to create the proper number of sap provider/users
     rrc->InitializeSap();
-    rrc->SetLteMacSapProvider(ccmUe->GetLteMacSapProvider());
+    rrc->SetNrMacSapProvider(ccmUe->GetNrMacSapProvider());
     // setting ComponentCarrierManager SAP
-    rrc->SetLteCcmRrcSapProvider(ccmUe->GetLteCcmRrcSapProvider());
-    ccmUe->SetLteCcmRrcSapUser(rrc->GetLteCcmRrcSapUser());
+    rrc->SetNrCcmRrcSapProvider(ccmUe->GetNrCcmRrcSapProvider());
+    ccmUe->SetNrCcmRrcSapUser(rrc->GetNrCcmRrcSapUser());
     ccmUe->SetNumberOfComponentCarriers(ueCcMap.size());
 
     bool useIdealRrc = true;
@@ -690,19 +732,19 @@ NrHelper::InstallSingleUeDevice(
         Ptr<nrUeRrcProtocolIdeal> rrcProtocol = CreateObject<nrUeRrcProtocolIdeal>();
         rrcProtocol->SetUeRrc(rrc);
         rrc->AggregateObject(rrcProtocol);
-        rrcProtocol->SetLteUeRrcSapProvider(rrc->GetLteUeRrcSapProvider());
-        rrc->SetLteUeRrcSapUser(rrcProtocol->GetLteUeRrcSapUser());
+        rrcProtocol->SetNrUeRrcSapProvider(rrc->GetNrUeRrcSapProvider());
+        rrc->SetNrUeRrcSapUser(rrcProtocol->GetNrUeRrcSapUser());
     }
     else
     {
-        Ptr<LteUeRrcProtocolReal> rrcProtocol = CreateObject<LteUeRrcProtocolReal>();
+        Ptr<nr::UeRrcProtocolReal> rrcProtocol = CreateObject<nr::UeRrcProtocolReal>();
         rrcProtocol->SetUeRrc(rrc);
         rrc->AggregateObject(rrcProtocol);
-        rrcProtocol->SetLteUeRrcSapProvider(rrc->GetLteUeRrcSapProvider());
-        rrc->SetLteUeRrcSapUser(rrcProtocol->GetLteUeRrcSapUser());
+        rrcProtocol->SetNrUeRrcSapProvider(rrc->GetNrUeRrcSapProvider());
+        rrc->SetNrUeRrcSapUser(rrcProtocol->GetNrUeRrcSapUser());
     }
 
-    if (m_epcHelper != nullptr)
+    if (m_nrEpcHelper != nullptr)
     {
         rrc->SetUseRlcSm(false);
     }
@@ -710,7 +752,7 @@ NrHelper::InstallSingleUeDevice(
     {
         rrc->SetUseRlcSm(true);
     }
-    Ptr<EpcUeNas> nas = CreateObject<EpcUeNas>();
+    Ptr<NrEpcUeNas> nas = CreateObject<NrEpcUeNas>();
 
     nas->SetAsSapProvider(rrc->GetAsSapProvider());
     nas->SetDevice(dev);
@@ -720,11 +762,11 @@ NrHelper::InstallSingleUeDevice(
 
     for (auto& it : ueCcMap)
     {
-        rrc->SetLteUeCmacSapProvider(it.second->GetMac()->GetUeCmacSapProvider(), it.first);
-        it.second->GetMac()->SetUeCmacSapUser(rrc->GetLteUeCmacSapUser(it.first));
+        rrc->SetNrUeCmacSapProvider(it.second->GetMac()->GetUeCmacSapProvider(), it.first);
+        it.second->GetMac()->SetUeCmacSapUser(rrc->GetNrUeCmacSapUser(it.first));
 
-        it.second->GetPhy()->SetUeCphySapUser(rrc->GetLteUeCphySapUser());
-        rrc->SetLteUeCphySapProvider(it.second->GetPhy()->GetUeCphySapProvider(), it.first);
+        it.second->GetPhy()->SetUeCphySapUser(rrc->GetNrUeCphySapUser());
+        rrc->SetNrUeCphySapProvider(it.second->GetPhy()->GetUeCphySapProvider(), it.first);
 
         it.second->GetPhy()->SetPhySapUser(it.second->GetMac()->GetPhySapUser());
         it.second->GetMac()->SetPhySapProvider(it.second->GetPhy()->GetPhySapProvider());
@@ -745,18 +787,17 @@ NrHelper::InstallSingleUeDevice(
     dev->SetAttribute("Imsi", UintegerValue(imsi));
     dev->SetCcMap(ueCcMap);
     dev->SetAttribute("nrUeRrc", PointerValue(rrc));
-    dev->SetAttribute("EpcUeNas", PointerValue(nas));
-    dev->SetAttribute("LteUeComponentCarrierManager", PointerValue(ccmUe));
+    dev->SetAttribute("NrEpcUeNas", PointerValue(nas));
+    dev->SetAttribute("NrUeComponentCarrierManager", PointerValue(ccmUe));
 
     n->AddDevice(dev);
 
-    if (m_epcHelper != nullptr)
+    if (m_nrEpcHelper != nullptr)
     {
-        m_epcHelper->AddUe(dev, dev->GetImsi());
+        m_nrEpcHelper->AddUe(dev, dev->GetImsi());
     }
 
     dev->Initialize();
-
     return dev;
 }
 
@@ -800,10 +841,10 @@ NrHelper::CreateGnbPhy(const Ptr<Node>& n,
     // object of the corresponding spectrum part
     channelPhy->InstallPhy(phy); // each NrSpectrumPhy should have a pointer to its NrPhy
 
-    Ptr<LteChunkProcessor> pData =
-        Create<LteChunkProcessor>(); // create pData chunk processor per NrSpectrumPhy
-    Ptr<LteChunkProcessor> pSrs =
-        Create<LteChunkProcessor>(); // create pSrs per processor per NrSpectrumPhy
+    Ptr<NrChunkProcessor> pData =
+        Create<NrChunkProcessor>(); // create pData chunk processor per NrSpectrumPhy
+    Ptr<NrChunkProcessor> pSrs =
+        Create<NrChunkProcessor>(); // create pSrs per processor per NrSpectrumPhy
     if (!m_snrTest)
     {
         // TODO: rename to GeneratePuschCqiReport, replace when enabling uplink MIMO
@@ -925,25 +966,25 @@ NrHelper::InstallSingleGnbDevice(
         ccMap.insert(std::make_pair(bwpId, cc));
     }
 
-    Ptr<LteEnbRrc> rrc = CreateObject<LteEnbRrc>();
-    Ptr<LteEnbComponentCarrierManager> ccmEnbManager =
-        DynamicCast<LteEnbComponentCarrierManager>(CreateObject<BwpManagerGnb>());
+    Ptr<NrEnbRrc> rrc = CreateObject<NrEnbRrc>();
+    Ptr<NrEnbComponentCarrierManager> ccmEnbManager =
+        DynamicCast<NrEnbComponentCarrierManager>(CreateObject<BwpManagerGnb>());
     DynamicCast<BwpManagerGnb>(ccmEnbManager)
         ->SetBwpManagerAlgorithm(m_gnbBwpManagerAlgoFactory.Create<BwpManagerAlgorithm>());
 
     // Convert Enb carrier map to only PhyConf map
     // we want to make RRC to be generic, to be able to work with any type of carriers, not only
     // strictly LTE carriers
-    std::map<uint8_t, Ptr<ComponentCarrierBaseStation>> ccPhyConfMap;
+    std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConfMap;
     for (const auto& i : ccMap)
     {
-        Ptr<ComponentCarrierBaseStation> c = i.second;
+        Ptr<NrComponentCarrierBaseStation> c = i.second;
         ccPhyConfMap.insert(std::make_pair(i.first, c));
     }
 
     // ComponentCarrierManager SAP
-    rrc->SetLteCcmRrcSapProvider(ccmEnbManager->GetLteCcmRrcSapProvider());
-    ccmEnbManager->SetLteCcmRrcSapUser(rrc->GetLteCcmRrcSapUser());
+    rrc->SetNrCcmRrcSapProvider(ccmEnbManager->GetNrCcmRrcSapProvider());
+    ccmEnbManager->SetNrCcmRrcSapUser(rrc->GetNrCcmRrcSapUser());
     // Set number of component carriers. Note: eNB CCM would also set the
     // number of component carriers in eNB RRC
 
@@ -956,48 +997,48 @@ NrHelper::InstallSingleGnbDevice(
     if (useIdealRrc)
     {
         Ptr<NrGnbRrcProtocolIdeal> rrcProtocol = CreateObject<NrGnbRrcProtocolIdeal>();
-        rrcProtocol->SetLteEnbRrcSapProvider(rrc->GetLteEnbRrcSapProvider());
-        rrc->SetLteEnbRrcSapUser(rrcProtocol->GetLteEnbRrcSapUser());
+        rrcProtocol->SetNrEnbRrcSapProvider(rrc->GetNrEnbRrcSapProvider());
+        rrc->SetNrEnbRrcSapUser(rrcProtocol->GetNrEnbRrcSapUser());
         rrc->AggregateObject(rrcProtocol);
     }
     else
     {
-        Ptr<LteEnbRrcProtocolReal> rrcProtocol = CreateObject<LteEnbRrcProtocolReal>();
-        rrcProtocol->SetLteEnbRrcSapProvider(rrc->GetLteEnbRrcSapProvider());
-        rrc->SetLteEnbRrcSapUser(rrcProtocol->GetLteEnbRrcSapUser());
+        Ptr<nr::NrEnbRrcProtocolReal> rrcProtocol = CreateObject<nr::NrEnbRrcProtocolReal>();
+        rrcProtocol->SetNrEnbRrcSapProvider(rrc->GetNrEnbRrcSapProvider());
+        rrc->SetNrEnbRrcSapUser(rrcProtocol->GetNrEnbRrcSapUser());
         rrc->AggregateObject(rrcProtocol);
     }
 
-    if (m_epcHelper != nullptr)
+    if (m_nrEpcHelper != nullptr)
     {
-        EnumValue<LteEnbRrc::LteEpsBearerToRlcMapping_t> epsBearerToRlcMapping;
+        EnumValue<NrEnbRrc::NrEpsBearerToRlcMapping_t> epsBearerToRlcMapping;
         rrc->GetAttribute("EpsBearerToRlcMapping", epsBearerToRlcMapping);
         // it does not make sense to use RLC/SM when also using the EPC
-        if (epsBearerToRlcMapping.Get() == LteEnbRrc::RLC_SM_ALWAYS)
+        if (epsBearerToRlcMapping.Get() == NrEnbRrc::RLC_SM_ALWAYS)
         {
-            rrc->SetAttribute("EpsBearerToRlcMapping", EnumValue(LteEnbRrc::RLC_UM_ALWAYS));
+            rrc->SetAttribute("EpsBearerToRlcMapping", EnumValue(NrEnbRrc::RLC_UM_ALWAYS));
         }
     }
 
     // This RRC attribute is used to connect each new RLC instance with the MAC layer
     // (for function such as TransmitPdu, ReportBufferStatusReport).
     // Since in this new architecture, the component carrier manager acts a proxy, it
-    // will have its own LteMacSapProvider interface, RLC will see it as through original MAC
-    // interface LteMacSapProvider, but the function call will go now through
-    // LteEnbComponentCarrierManager instance that needs to implement functions of this interface,
+    // will have its own NrMacSapProvider interface, RLC will see it as through original MAC
+    // interface NrMacSapProvider, but the function call will go now through
+    // NrEnbComponentCarrierManager instance that needs to implement functions of this interface,
     // and its task will be to forward these calls to the specific MAC of some of the instances of
     // component carriers. This decision will depend on the specific implementation of the component
     // carrier manager.
-    rrc->SetLteMacSapProvider(ccmEnbManager->GetLteMacSapProvider());
+    rrc->SetNrMacSapProvider(ccmEnbManager->GetNrMacSapProvider());
     rrc->SetForwardUpCallback(MakeCallback(&NrGnbNetDevice::Receive, dev));
 
     for (auto& it : ccMap)
     {
-        it.second->GetPhy()->SetEnbCphySapUser(rrc->GetLteEnbCphySapUser(it.first));
-        rrc->SetLteEnbCphySapProvider(it.second->GetPhy()->GetEnbCphySapProvider(), it.first);
+        it.second->GetPhy()->SetEnbCphySapUser(rrc->GetNrEnbCphySapUser(it.first));
+        rrc->SetNrEnbCphySapProvider(it.second->GetPhy()->GetEnbCphySapProvider(), it.first);
 
-        rrc->SetLteEnbCmacSapProvider(it.second->GetMac()->GetEnbCmacSapProvider(), it.first);
-        it.second->GetMac()->SetEnbCmacSapUser(rrc->GetLteEnbCmacSapUser(it.first));
+        rrc->SetNrEnbCmacSapProvider(it.second->GetMac()->GetEnbCmacSapProvider(), it.first);
+        it.second->GetMac()->SetEnbCmacSapUser(rrc->GetNrEnbCmacSapUser(it.first));
 
         // PHY <--> MAC SAP
         it.second->GetPhy()->SetPhySapUser(it.second->GetMac()->GetPhySapUser());
@@ -1015,39 +1056,38 @@ NrHelper::InstallSingleGnbDevice(
             it.second->GetMac()->GetNrMacCschedSapUser());
         // Scheduler SAP END
 
-        it.second->GetMac()->SetLteCcmMacSapUser(ccmEnbManager->GetLteCcmMacSapUser());
+        it.second->GetMac()->SetNrCcmMacSapUser(ccmEnbManager->GetNrCcmMacSapUser());
         ccmEnbManager->SetCcmMacSapProviders(it.first,
-                                             it.second->GetMac()->GetLteCcmMacSapProvider());
+                                             it.second->GetMac()->GetNrCcmMacSapProvider());
 
-        // insert the pointer to the LteMacSapProvider interface of the MAC layer of the specific
+        // insert the pointer to the NrMacSapProvider interface of the MAC layer of the specific
         // component carrier
         ccmEnbManager->SetMacSapProvider(it.first, it.second->GetMac()->GetMacSapProvider());
     }
 
-    dev->SetAttribute("LteEnbComponentCarrierManager", PointerValue(ccmEnbManager));
+    dev->SetAttribute("NrEnbComponentCarrierManager", PointerValue(ccmEnbManager));
     dev->SetCcMap(ccMap);
-    dev->SetAttribute("LteEnbRrc", PointerValue(rrc));
+    dev->SetAttribute("NrEnbRrc", PointerValue(rrc));
     dev->Initialize();
 
     n->AddDevice(dev);
 
-    if (m_epcHelper != nullptr)
+    if (m_nrEpcHelper != nullptr)
     {
         NS_LOG_INFO("adding this eNB to the EPC");
-        m_epcHelper->AddEnb(n, dev, dev->GetCellIds());
-        Ptr<EpcEnbApplication> enbApp = n->GetApplication(0)->GetObject<EpcEnbApplication>();
-        NS_ASSERT_MSG(enbApp != nullptr, "cannot retrieve EpcEnbApplication");
+        m_nrEpcHelper->AddEnb(n, dev, dev->GetCellIds());
+        Ptr<NrEpcEnbApplication> enbApp = n->GetApplication(0)->GetObject<NrEpcEnbApplication>();
+        NS_ASSERT_MSG(enbApp != nullptr, "cannot retrieve NrEpcEnbApplication");
 
         // S1 SAPs
         rrc->SetS1SapProvider(enbApp->GetS1SapProvider());
         enbApp->SetS1SapUser(rrc->GetS1SapUser());
 
         // X2 SAPs
-        Ptr<EpcX2> x2 = n->GetObject<EpcX2>();
+        Ptr<NrEpcX2> x2 = n->GetObject<NrEpcX2>();
         x2->SetEpcX2SapUser(rrc->GetEpcX2SapUser());
         rrc->SetEpcX2SapProvider(x2->GetEpcX2SapProvider());
     }
-
     return dev;
 }
 
@@ -1106,7 +1146,7 @@ NrHelper::AttachToEnb(const Ptr<NetDevice>& ueDevice, const Ptr<NetDevice>& gnbD
         ueNetDev->GetPhy(i)->SetSymbolsPerSlot(enbNetDev->GetPhy(i)->GetSymbolsPerSlot());
         ueNetDev->GetPhy(i)->SetNumerology(enbNetDev->GetPhy(i)->GetNumerology());
         ueNetDev->GetPhy(i)->SetPattern(enbNetDev->GetPhy(i)->GetPattern());
-        Ptr<EpcUeNas> ueNas = ueNetDev->GetNas();
+        Ptr<NrEpcUeNas> ueNas = ueNetDev->GetNas();
         ueNas->Connect(enbNetDev->GetBwpId(i), enbNetDev->GetEarfcn(i));
 
         if (m_enableMimoFeedback)
@@ -1126,17 +1166,17 @@ NrHelper::AttachToEnb(const Ptr<NetDevice>& ueDevice, const Ptr<NetDevice>& gnbD
         }
     }
 
-    if (m_epcHelper)
+    if (m_nrEpcHelper)
     {
         // activate default EPS bearer
-        m_epcHelper->ActivateEpsBearer(ueDevice,
-                                       ueNetDev->GetImsi(),
-                                       EpcTft::Default(),
-                                       EpsBearer(EpsBearer::NGBR_VIDEO_TCP_DEFAULT));
+        m_nrEpcHelper->ActivateEpsBearer(ueDevice,
+                                         ueNetDev->GetImsi(),
+                                         NrEpcTft::Default(),
+                                         NrEpsBearer(NrEpsBearer::NGBR_VIDEO_TCP_DEFAULT));
     }
 
     // tricks needed for the simplified LTE-only simulations
-    // if (m_epcHelper == 0)
+    // if (m_nrEpcHelper == 0)
     //{
     ueNetDev->SetTargetEnb(enbNetDev);
     //}
@@ -1149,8 +1189,8 @@ NrHelper::AttachToEnb(const Ptr<NetDevice>& ueDevice, const Ptr<NetDevice>& gnbD
 
 uint8_t
 NrHelper::ActivateDedicatedEpsBearer(NetDeviceContainer ueDevices,
-                                     EpsBearer bearer,
-                                     Ptr<EpcTft> tft)
+                                     NrEpsBearer bearer,
+                                     Ptr<NrEpcTft> tft)
 {
     NS_LOG_FUNCTION(this);
     for (NetDeviceContainer::Iterator i = ueDevices.Begin(); i != ueDevices.End(); ++i)
@@ -1162,14 +1202,14 @@ NrHelper::ActivateDedicatedEpsBearer(NetDeviceContainer ueDevices,
 }
 
 uint8_t
-NrHelper::ActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice, EpsBearer bearer, Ptr<EpcTft> tft)
+NrHelper::ActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice, NrEpsBearer bearer, Ptr<NrEpcTft> tft)
 {
     NS_LOG_FUNCTION(this);
 
-    NS_ASSERT_MSG(m_epcHelper, "dedicated EPS bearers cannot be set up when the EPC is not used");
+    NS_ASSERT_MSG(m_nrEpcHelper, "dedicated EPS bearers cannot be set up when the EPC is not used");
 
     uint64_t imsi = ueDevice->GetObject<NrUeNetDevice>()->GetImsi();
-    uint8_t bearerId = m_epcHelper->ActivateEpsBearer(ueDevice, imsi, tft, bearer);
+    uint8_t bearerId = m_nrEpcHelper->ActivateEpsBearer(ueDevice, imsi, tft, bearer);
     return bearerId;
 }
 
@@ -1179,7 +1219,7 @@ NrHelper::DeActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice,
                                        uint8_t bearerId)
 {
     NS_LOG_FUNCTION(this << ueDevice << bearerId);
-    NS_ASSERT_MSG(m_epcHelper != nullptr,
+    NS_ASSERT_MSG(m_nrEpcHelper != nullptr,
                   "Dedicated EPS bearers cannot be de-activated when the EPC is not used");
     NS_ASSERT_MSG(bearerId != 1,
                   "Default bearer cannot be de-activated until and unless and UE is released");
@@ -1491,15 +1531,15 @@ NrHelper::DoDeActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice,
     uint64_t imsi = ueDevice->GetObject<NrUeNetDevice>()->GetImsi();
     uint16_t rnti = ueDevice->GetObject<NrUeNetDevice>()->GetRrc()->GetRnti();
 
-    Ptr<LteEnbRrc> enbRrc = enbDevice->GetObject<NrGnbNetDevice>()->GetRrc();
+    Ptr<NrEnbRrc> enbRrc = enbDevice->GetObject<NrGnbNetDevice>()->GetRrc();
 
     enbRrc->DoSendReleaseDataRadioBearer(imsi, rnti, bearerId);
 }
 
 void
-NrHelper::SetEpcHelper(Ptr<EpcHelper> epcHelper)
+NrHelper::SetEpcHelper(Ptr<NrEpcHelper> NrEpcHelper)
 {
-    m_epcHelper = epcHelper;
+    m_nrEpcHelper = NrEpcHelper;
 }
 
 void
@@ -1512,7 +1552,7 @@ NrHelper::SetBeamformingHelper(Ptr<BeamformingHelperBase> beamformingHelper)
 class NrDrbActivator : public SimpleRefCount<NrDrbActivator>
 {
   public:
-    NrDrbActivator(Ptr<NetDevice> ueDevice, EpsBearer bearer);
+    NrDrbActivator(Ptr<NetDevice> ueDevice, NrEpsBearer bearer);
     static void ActivateCallback(Ptr<NrDrbActivator> a,
                                  std::string context,
                                  uint64_t imsi,
@@ -1523,11 +1563,11 @@ class NrDrbActivator : public SimpleRefCount<NrDrbActivator>
   private:
     bool m_active;
     Ptr<NetDevice> m_ueDevice;
-    EpsBearer m_bearer;
+    NrEpsBearer m_bearer;
     uint64_t m_imsi;
 };
 
-NrDrbActivator::NrDrbActivator(Ptr<NetDevice> ueDevice, EpsBearer bearer)
+NrDrbActivator::NrDrbActivator(Ptr<NetDevice> ueDevice, NrEpsBearer bearer)
     : m_active(false),
       m_ueDevice(ueDevice),
       m_bearer(bearer),
@@ -1552,17 +1592,17 @@ NrDrbActivator::ActivateDrb(uint64_t imsi, uint16_t cellId, uint16_t rnti)
     NS_LOG_FUNCTION(this << imsi << cellId << rnti << m_active);
     if ((!m_active) && (imsi == m_imsi))
     {
-        Ptr<LteUeRrc> ueRrc = m_ueDevice->GetObject<NrUeNetDevice>()->GetRrc();
-        NS_ASSERT(ueRrc->GetState() == LteUeRrc::CONNECTED_NORMALLY);
+        Ptr<NrUeRrc> ueRrc = m_ueDevice->GetObject<NrUeNetDevice>()->GetRrc();
+        NS_ASSERT(ueRrc->GetState() == NrUeRrc::CONNECTED_NORMALLY);
         uint16_t rnti = ueRrc->GetRnti();
-        Ptr<const NrGnbNetDevice> enbLteDevice =
+        Ptr<const NrGnbNetDevice> enbNrDevice =
             m_ueDevice->GetObject<NrUeNetDevice>()->GetTargetEnb();
-        Ptr<LteEnbRrc> enbRrc = enbLteDevice->GetObject<NrGnbNetDevice>()->GetRrc();
-        NS_ASSERT(ueRrc->GetCellId() == enbLteDevice->GetCellId());
-        Ptr<UeManager> ueManager = enbRrc->GetUeManager(rnti);
-        NS_ASSERT(ueManager->GetState() == UeManager::CONNECTED_NORMALLY ||
-                  ueManager->GetState() == UeManager::CONNECTION_RECONFIGURATION);
-        EpcEnbS1SapUser::DataRadioBearerSetupRequestParameters params;
+        Ptr<NrEnbRrc> enbRrc = enbNrDevice->GetObject<NrGnbNetDevice>()->GetRrc();
+        NS_ASSERT(enbRrc->HasCellId(ueRrc->GetCellId()));
+        Ptr<NrUeManager> ueManager = enbRrc->GetUeManager(rnti);
+        NS_ASSERT(ueManager->GetState() == NrUeManager::CONNECTED_NORMALLY ||
+                  ueManager->GetState() == NrUeManager::CONNECTION_RECONFIGURATION);
+        NrEpcEnbS1SapUser::DataRadioBearerSetupRequestParameters params;
         params.rnti = rnti;
         params.bearer = m_bearer;
         params.bearerId = 0;
@@ -1573,7 +1613,7 @@ NrDrbActivator::ActivateDrb(uint64_t imsi, uint16_t cellId, uint16_t rnti)
 }
 
 void
-NrHelper::ActivateDataRadioBearer(NetDeviceContainer ueDevices, EpsBearer bearer)
+NrHelper::ActivateDataRadioBearer(NetDeviceContainer ueDevices, NrEpsBearer bearer)
 {
     NS_LOG_FUNCTION(this);
     for (NetDeviceContainer::Iterator i = ueDevices.Begin(); i != ueDevices.End(); ++i)
@@ -1583,10 +1623,10 @@ NrHelper::ActivateDataRadioBearer(NetDeviceContainer ueDevices, EpsBearer bearer
 }
 
 void
-NrHelper::ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, EpsBearer bearer)
+NrHelper::ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, NrEpsBearer bearer)
 {
     NS_LOG_FUNCTION(this << ueDevice);
-    NS_ASSERT_MSG(!m_epcHelper, "this method must not be used when the EPC is being used");
+    NS_ASSERT_MSG(!m_nrEpcHelper, "this method must not be used when the EPC is being used");
 
     // Normally it is the EPC that takes care of activating DRBs
     // when the UE gets connected. When the EPC is not used, we achieve
@@ -1597,7 +1637,7 @@ NrHelper::ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, EpsBearer bearer)
 
     std::ostringstream path;
     path << "/NodeList/" << enbnrDevice->GetNode()->GetId() << "/DeviceList/"
-         << enbnrDevice->GetIfIndex() << "/LteEnbRrc/ConnectionEstablished";
+         << enbnrDevice->GetIfIndex() << "/NrEnbRrc/ConnectionEstablished";
     Ptr<NrDrbActivator> arg = Create<NrDrbActivator>(ueDevice, bearer);
     Config::Connect(path.str(), MakeBoundCallback(&NrDrbActivator::ActivateCallback, arg));
 }

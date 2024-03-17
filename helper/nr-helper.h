@@ -10,10 +10,11 @@
 #include "nr-bearer-stats-connector.h"
 #include "nr-mac-scheduling-stats.h"
 
-#include <ns3/eps-bearer.h>
+#include "ns3/nr-component-carrier.h"
 #include <ns3/net-device-container.h>
 #include <ns3/node-container.h>
 #include <ns3/nr-control-messages.h>
+#include <ns3/nr-eps-bearer.h>
 #include <ns3/nr-spectrum-phy.h>
 #include <ns3/object-factory.h>
 
@@ -25,13 +26,12 @@ class NrGnbPhy;
 class SpectrumChannel;
 class NrSpectrumValueHelper;
 class NrGnbMac;
-class EpcHelper;
-class EpcTft;
+class NrEpcHelper;
+class NrEpcTft;
 class NrBearerStatsCalculator;
 class NrMacRxTrace;
 class NrPhyRxTrace;
-class ComponentCarrierEnb;
-class ComponentCarrier;
+class NrComponentCarrierEnb;
 class NrMacScheduler;
 class NrGnbNetDevice;
 class NrUeNetDevice;
@@ -62,12 +62,12 @@ class BwpManagerUe;
  * of the simulation program:
  *
 \verbatim
-  Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper> ();
+  Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper> ();
   Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
   Ptr<NrHelper> nrHelper = CreateObject<NrHelper> ();
 
   nrHelper->SetBeamformingHelper (idealBeamformingHelper);
-  nrHelper->SetEpcHelper (epcHelper);
+  nrHelper->SetEpcHelper (nrEpcHelper);
 \endverbatim
  *
  * As you can see, we have created two other object that can help this class:
@@ -236,6 +236,12 @@ class NrHelper : public Object
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps);
 
     /**
+     * \brief Update netdevice configuration of one or more UEs and/or gNBs
+     * \param netDevs NetDevice container with the UEs and GNBs
+     */
+    void UpdateDeviceConfigs(const NetDeviceContainer& netDevs);
+
+    /**
      * \brief Get the number of configured BWP for a specific GNB NetDevice
      * \param gnbDevice The GNB NetDevice, obtained from InstallGnbDevice()
      * \return the number of BWP installed, or 0 if there are errors
@@ -318,7 +324,7 @@ class NrHelper : public Object
      * \param ueDevices the set of UE devices
      * \param bearer the characteristics of the bearer to be activated
      */
-    void ActivateDataRadioBearer(NetDeviceContainer ueDevices, EpsBearer bearer);
+    void ActivateDataRadioBearer(NetDeviceContainer ueDevices, NrEpsBearer bearer);
     /**
      * \brief Activate a Data Radio Bearer on a UE device.
      *
@@ -328,21 +334,21 @@ class NrHelper : public Object
      * \param ueDevice the UE device
      * \param bearer the characteristics of the bearer to be activated
      */
-    void ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, EpsBearer bearer);
+    void ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, NrEpsBearer bearer);
     /**
-     * Set the EpcHelper to be used to setup the EPC network in
+     * Set the NrEpcHelper to be used to setup the EPC network in
      * conjunction with the setup of the LTE radio access network.
      *
-     * \note if no EpcHelper is ever set, then LteHelper will default
-     * to creating a simulation with no EPC, using LteRlcSm as
+     * \note if no NrEpcHelper is ever set, then NrHelper will default
+     * to creating a simulation with no EPC, using NrRlcSm as
      * the RLC model, and without supporting any IP networking. In other
      * words, it will be a radio-level simulation involving only LTE PHY
      * and MAC and the Scheduler, with a saturation traffic model for
      * the RLC.
      *
-     * \param epcHelper a pointer to the EpcHelper to be used
+     * \param NrEpcHelper a pointer to the NrEpcHelper to be used
      */
-    void SetEpcHelper(Ptr<EpcHelper> epcHelper);
+    void SetEpcHelper(Ptr<NrEpcHelper> NrEpcHelper);
 
     /**
      * \brief Set an ideal beamforming helper
@@ -408,8 +414,8 @@ class NrHelper : public Object
      * \returns bearer ID
      */
     uint8_t ActivateDedicatedEpsBearer(NetDeviceContainer ueDevices,
-                                       EpsBearer bearer,
-                                       Ptr<EpcTft> tft);
+                                       NrEpsBearer bearer,
+                                       Ptr<NrEpcTft> tft);
 
     /**
      * Activate a dedicated EPS bearer on a given UE device.
@@ -419,12 +425,14 @@ class NrHelper : public Object
      * \param tft the Traffic Flow Template that identifies the traffic to go on this bearer.
      * \returns bearer ID
      */
-    uint8_t ActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice, EpsBearer bearer, Ptr<EpcTft> tft);
+    uint8_t ActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice,
+                                       NrEpsBearer bearer,
+                                       Ptr<NrEpcTft> tft);
 
     /**
      *  \brief Manually trigger dedicated bearer de-activation at specific simulation time
      *  \param ueDevice the UE on which dedicated bearer to be de-activated must be of the type
-     * LteUeNetDevice \param enbDevice eNB, must be of the type LteEnbNetDevice \param bearerId
+     * NrUeNetDevice \param enbDevice eNB, must be of the type NrGnbNetDevice \param bearerId
      * Bearer Identity which is to be de-activated
      *
      *  \warning Requires the use of EPC mode. See SetEpcHelper() method.
@@ -843,7 +851,7 @@ class NrHelper : public Object
      *
      *
      * \param c NetDeviceContainer of the set of net devices for which the
-     *          LteNetDevice should be modified to use a fixed stream
+     *          NrNetDevice should be modified to use a fixed stream
      * \param stream first stream index to use
      * \return the number of stream indices (possibly zero) that have been assigned
      */
@@ -893,6 +901,12 @@ class NrHelper : public Object
     /// \param mp the struct with MIMO PMI parameters
     void SetupMimoPmi(const MimoPmiParams& mp);
 
+    /// \brief Create BandwidthParts from a vector of band configurations
+    /// \param bandConfs the vector with operation band configurations
+    /// \return a pair with total bandwidth and vector of bandwidth parts
+    std::pair<double, BandwidthPartInfoPtrVector> CreateBandwidthParts(
+        std::vector<CcBwpCreator::SimpleOperationBandConf> bandConfs);
+
   private:
     bool m_enableMimoFeedback{false}; ///< Let UE compute MIMO feedback with PMI and RI
     ObjectFactory m_pmSearchFactory;  ///< Factory for precoding matrix search algorithm
@@ -908,7 +922,7 @@ class NrHelper : public Object
      *
      *
      * \param c NetDeviceContainer of the set of net devices for which the
-     *          LteNetDevice should be modified to use a fixed stream
+     *          NrNetDevice should be modified to use a fixed stream
      * \param stream first stream index to use
      * \return the number of stream indices (possibly zero) that have been assigned
      */
@@ -916,8 +930,8 @@ class NrHelper : public Object
 
     /**
      *  \brief The actual function to trigger a manual bearer de-activation
-     *  \param ueDevice the UE on which bearer to be de-activated must be of the type LteUeNetDevice
-     *  \param enbDevice eNB, must be of the type LteEnbNetDevice
+     *  \param ueDevice the UE on which bearer to be de-activated must be of the type NrUeNetDevice
+     *  \param enbDevice eNB, must be of the type NrGnbNetDevice
      *  \param bearerId Bearer Identity which is to be de-activated
      *
      *  This method is normally scheduled by DeActivateDedicatedEpsBearer() to run at a specific
@@ -976,7 +990,7 @@ class NrHelper : public Object
     uint64_t m_imsiCounter{0};   //!< Imsi counter
     uint16_t m_cellIdCounter{1}; //!< CellId Counter
 
-    Ptr<EpcHelper> m_epcHelper{nullptr};                     //!< Ptr to the EPC helper (optional)
+    Ptr<NrEpcHelper> m_nrEpcHelper{nullptr};                 //!< Ptr to the EPC helper (optional)
     Ptr<BeamformingHelperBase> m_beamformingHelper{nullptr}; //!< Ptr to the beamforming helper
 
     bool m_harqEnabled{false};
@@ -992,12 +1006,14 @@ class NrHelper : public Object
         m_radioBearerStatsConnectorCalculator; //!< RLC and PDCP statistics connector for complex
                                                //!< calculator statistics
 
-    std::map<uint8_t, ComponentCarrier> m_componentCarrierPhyParams; //!< component carrier map
+    std::map<uint8_t, NrComponentCarrier> m_componentCarrierPhyParams; //!< component carrier map
     std::vector<Ptr<Object>>
         m_channelObjectsWithAssignedStreams; //!< channel and propagation objects to which NrHelper
     //!< has assigned streams in order to avoid double
     //!< assignments
     Ptr<NrMacSchedulingStats> m_macSchedStats; //!<< Pointer to NrMacStatsCalculator
+    bool m_useIdealRrc;
+    std::vector<OperationBandInfo> m_bands;
 };
 
 } // namespace ns3

@@ -29,12 +29,12 @@ class TestGnbMac : public NrGnbMac
     static TypeId GetTypeId();
     TestGnbMac(const std::string& pattern);
     ~TestGnbMac() override;
-    void DoSlotDlIndication(const SfnSf& sfnSf, LteNrTddSlotType type) override;
-    void DoSlotUlIndication(const SfnSf& sfnSf, LteNrTddSlotType type) override;
+    void DoSlotDlIndication(const SfnSf& sfnSf, NrTddSlotType type) override;
+    void DoSlotUlIndication(const SfnSf& sfnSf, NrTddSlotType type) override;
     void SetCurrentSfn(const SfnSf& sfn) override;
 
   private:
-    std::vector<LteNrTddSlotType> m_pattern;
+    std::vector<NrTddSlotType> m_pattern;
     std::set<uint32_t> m_slotCreated;
     uint32_t m_totalSlotToCreate{0};
 };
@@ -52,11 +52,11 @@ TestGnbMac::GetTypeId()
 
 TestGnbMac::TestGnbMac(const std::string& pattern)
 {
-    static std::unordered_map<std::string, LteNrTddSlotType> lookupTable = {
-        {"DL", LteNrTddSlotType::DL},
-        {"UL", LteNrTddSlotType::UL},
-        {"S", LteNrTddSlotType::S},
-        {"F", LteNrTddSlotType::F},
+    static std::unordered_map<std::string, NrTddSlotType> lookupTable = {
+        {"DL", NrTddSlotType::DL},
+        {"UL", NrTddSlotType::UL},
+        {"S", NrTddSlotType::S},
+        {"F", NrTddSlotType::F},
     };
 
     std::stringstream ss(pattern);
@@ -81,13 +81,13 @@ TestGnbMac::TestGnbMac(const std::string& pattern)
     {
         switch (v)
         {
-        case LteNrTddSlotType::F:
+        case NrTddSlotType::F:
             m_totalSlotToCreate += 2; // But since we are using std::set,
                                       // duplicated slots will not be counted
             break;
-        case LteNrTddSlotType::DL:
-        case LteNrTddSlotType::UL:
-        case LteNrTddSlotType::S:
+        case NrTddSlotType::DL:
+        case NrTddSlotType::UL:
+        case NrTddSlotType::S:
             m_totalSlotToCreate += 1;
             break;
         }
@@ -104,15 +104,14 @@ TestGnbMac::~TestGnbMac()
 }
 
 void
-TestGnbMac::DoSlotDlIndication(const SfnSf& sfnSf, LteNrTddSlotType type)
+TestGnbMac::DoSlotDlIndication(const SfnSf& sfnSf, NrTddSlotType type)
 {
     uint32_t pos = sfnSf.Normalize();
     pos = pos % m_pattern.size();
 
-    NS_ASSERT(type == LteNrTddSlotType::DL || type == LteNrTddSlotType::S ||
-              type == LteNrTddSlotType::F);
-    NS_ASSERT_MSG(m_pattern[pos] == LteNrTddSlotType::DL || m_pattern[pos] == LteNrTddSlotType::S ||
-                      m_pattern[pos] == LteNrTddSlotType::F,
+    NS_ASSERT(type == NrTddSlotType::DL || type == NrTddSlotType::S || type == NrTddSlotType::F);
+    NS_ASSERT_MSG(m_pattern[pos] == NrTddSlotType::DL || m_pattern[pos] == NrTddSlotType::S ||
+                      m_pattern[pos] == NrTddSlotType::F,
                   "MAC called to generate a DL slot, but in the pattern there is "
                       << m_pattern[pos]);
 
@@ -122,14 +121,13 @@ TestGnbMac::DoSlotDlIndication(const SfnSf& sfnSf, LteNrTddSlotType type)
 }
 
 void
-TestGnbMac::DoSlotUlIndication(const SfnSf& sfnSf, LteNrTddSlotType type)
+TestGnbMac::DoSlotUlIndication(const SfnSf& sfnSf, NrTddSlotType type)
 {
     uint32_t pos = sfnSf.Normalize();
     pos = pos % m_pattern.size();
 
-    NS_ASSERT(type == LteNrTddSlotType::UL || type == LteNrTddSlotType::S ||
-              type == LteNrTddSlotType::F);
-    NS_ASSERT_MSG(m_pattern[pos] == LteNrTddSlotType::UL || m_pattern[pos] == LteNrTddSlotType::F,
+    NS_ASSERT(type == NrTddSlotType::UL || type == NrTddSlotType::S || type == NrTddSlotType::F);
+    NS_ASSERT_MSG(m_pattern[pos] == NrTddSlotType::UL || m_pattern[pos] == NrTddSlotType::F,
                   "MAC called to generate a UL slot, but in the pattern there is "
                       << m_pattern[pos]);
 
@@ -147,20 +145,20 @@ TestGnbMac::SetCurrentSfn(const SfnSf& sfnSf)
 /**
  * \brief TestCase for the PHY TDD Patterns
  */
-class LtePhyPatternTestCase : public TestCase
+class NrPhyPatternTestCase : public TestCase
 {
   public:
     /**
-     * \brief Create LtePatternTestCase
+     * \brief Create NrPatternTestCase
      * \param name Name of the test
      */
-    LtePhyPatternTestCase(const std::string& pattern, const std::string& name)
+    NrPhyPatternTestCase(const std::string& pattern, const std::string& name)
         : TestCase(name),
           m_pattern(pattern)
     {
     }
 
-    ~LtePhyPatternTestCase() override;
+    ~NrPhyPatternTestCase() override;
 
   private:
     void DoRun() override;
@@ -175,7 +173,7 @@ class LtePhyPatternTestCase : public TestCase
     std::string m_pattern;
 };
 
-LtePhyPatternTestCase::~LtePhyPatternTestCase()
+NrPhyPatternTestCase::~NrPhyPatternTestCase()
 {
     if (m_phy)
     {
@@ -185,7 +183,7 @@ LtePhyPatternTestCase::~LtePhyPatternTestCase()
 }
 
 void
-LtePhyPatternTestCase::DoRun()
+NrPhyPatternTestCase::DoRun()
 {
     ObjectFactory schedFactory;
     schedFactory.SetTypeId(NrMacSchedulerTdmaRR::GetTypeId());
@@ -206,7 +204,7 @@ LtePhyPatternTestCase::DoRun()
 }
 
 void
-LtePhyPatternTestCase::StartSimu()
+NrPhyPatternTestCase::StartSimu()
 {
     Simulator::Stop(MilliSeconds(200));
     Simulator::Run();
@@ -214,7 +212,7 @@ LtePhyPatternTestCase::StartSimu()
 }
 
 Ptr<NrGnbPhy>
-LtePhyPatternTestCase::CreatePhy(const Ptr<NrGnbMac>& mac) const
+NrPhyPatternTestCase::CreatePhy(const Ptr<NrGnbMac>& mac) const
 {
     Ptr<NrSpectrumPhy> channelPhy = CreateObject<NrSpectrumPhy>();
     Ptr<NrGnbPhy> phy = CreateObject<NrGnbPhy>();
@@ -234,7 +232,7 @@ LtePhyPatternTestCase::CreatePhy(const Ptr<NrGnbMac>& mac) const
     Ptr<NrHarqPhy> harq = Create<NrHarqPhy>();
     channelPhy->InstallHarqPhyModule(harq);
 
-    Ptr<LteChunkProcessor> pData = Create<LteChunkProcessor>();
+    Ptr<NrChunkProcessor> pData = Create<NrChunkProcessor>();
     channelPhy->AddDataSinrChunkProcessor(pData);
 
     channelPhy->InstallPhy(phy);
@@ -247,7 +245,7 @@ LtePhyPatternTestCase::CreatePhy(const Ptr<NrGnbMac>& mac) const
 }
 
 Ptr<NrGnbMac>
-LtePhyPatternTestCase::CreateMac(const Ptr<NrMacScheduler>& sched) const
+NrPhyPatternTestCase::CreateMac(const Ptr<NrMacScheduler>& sched) const
 {
     Ptr<NrGnbMac> mac = CreateObject<TestGnbMac>(m_pattern);
 
@@ -261,9 +259,9 @@ LtePhyPatternTestCase::CreateMac(const Ptr<NrMacScheduler>& sched) const
 }
 
 void
-LtePhyPatternTestCase::Print(const std::string& msg1,
-                             const std::string& msg2,
-                             const std::map<uint32_t, std::vector<uint32_t>>& str)
+NrPhyPatternTestCase::Print(const std::string& msg1,
+                            const std::string& msg2,
+                            const std::map<uint32_t, std::vector<uint32_t>>& str)
 {
     for (const auto& v : str)
     {
@@ -274,46 +272,46 @@ LtePhyPatternTestCase::Print(const std::string& msg1,
     }
 }
 
-class NrLtePatternsTestSuite : public TestSuite
+class NrPatternsTestSuite : public TestSuite
 {
   public:
-    NrLtePatternsTestSuite()
+    NrPatternsTestSuite()
         : TestSuite("nr-phy-patterns", Type::UNIT)
     {
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|UL|DL|DL|S|UL|UL|DL|", "LTE TDD Pattern 1 test"),
+            new NrPhyPatternTestCase("DL|S|UL|UL|DL|DL|S|UL|UL|DL|", "LTE TDD Pattern 1 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|DL|DL|DL|S|UL|DL|DL|", "LTE TDD Pattern 2 test"),
+            new NrPhyPatternTestCase("DL|S|UL|DL|DL|DL|S|UL|DL|DL|", "LTE TDD Pattern 2 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|UL|UL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 3 test"),
+            new NrPhyPatternTestCase("DL|S|UL|UL|UL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 3 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|UL|DL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 4 test"),
+            new NrPhyPatternTestCase("DL|S|UL|UL|DL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 4 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|DL|DL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 5 test"),
+            new NrPhyPatternTestCase("DL|S|UL|DL|DL|DL|DL|DL|DL|DL|", "LTE TDD Pattern 5 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|UL|UL|DL|S|UL|UL|DL|", "LTE TDD Pattern 6 test"),
+            new NrPhyPatternTestCase("DL|S|UL|UL|UL|DL|S|UL|UL|DL|", "LTE TDD Pattern 6 test"),
             Duration::QUICK);
 
         AddTestCase(
-            new LtePhyPatternTestCase("DL|S|UL|UL|UL|DL|S|UL|UL|UL|", "LTE TDD Pattern 0 test"),
+            new NrPhyPatternTestCase("DL|S|UL|UL|UL|DL|S|UL|UL|UL|", "LTE TDD Pattern 0 test"),
             Duration::QUICK);
 
-        AddTestCase(new LtePhyPatternTestCase("F|F|F|F|F|F|F|F|F|F|", "LTE TDD Pattern NR test"),
+        AddTestCase(new NrPhyPatternTestCase("F|F|F|F|F|F|F|F|F|F|", "LTE TDD Pattern NR test"),
                     Duration::QUICK);
     }
 };
 
-static NrLtePatternsTestSuite nrLtePatternsTestSuite;
+static NrPatternsTestSuite nrNrPatternsTestSuite;
 
 //!< Pattern test suite
 

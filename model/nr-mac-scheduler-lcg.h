@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "nr-ff-mac-common.h"
 #include "nr-mac-sched-sap.h"
 
-#include <ns3/ff-mac-common.h>
 #include <ns3/nstime.h>
 
 #include <memory>

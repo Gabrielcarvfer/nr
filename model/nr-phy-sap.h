@@ -48,7 +48,7 @@ class NrPhySapProvider
      * \param rnti the RNTI of the receiving or transmitting UE, to map PDU to each UE's PHY signal
      *
      * The MAC sends to the PHY a MAC PDU, represented by the packet p. The PDU
-     * MUST have a LteRadioBearerTag and a NrMacPduHeader.
+     * MUST have a NrRadioBearerTag and a NrMacPduHeader.
      */
     virtual void SendMacPdu(const Ptr<Packet>& p,
                             const SfnSf& sfn,
@@ -169,7 +169,7 @@ class NrGnbPhySapUser
     virtual void ReceivePhyPdu(Ptr<Packet> p) = 0;
 
     /**
-     * \brief Receive SendLteControlMessage (PDCCH map, CQI feedbacks) using the ideal control
+     * \brief Receive SendNrControlMessage (PDCCH map, CQI feedbacks) using the ideal control
      * channel \param msg the Ideal Control Message to receive
      */
     virtual void ReceiveControlMessage(Ptr<NrControlMessage> msg) = 0;
@@ -185,14 +185,14 @@ class NrGnbPhySapUser
      * \param sfn Slot to fill with DL scheduling decisions
      * \param slotType Slot type requested (DL, S, F)
      */
-    virtual void SlotDlIndication(const SfnSf& sfn, LteNrTddSlotType slotType) = 0;
+    virtual void SlotDlIndication(const SfnSf& sfn, NrTddSlotType slotType) = 0;
 
     /**
      * \brief Trigger MAC layer to generate an UL slot for the SfnSf indicated
      * \param sfn Slot to fill with UL scheduling decisions
      * \param slotType Slot type requested (UL, S, F)
      */
-    virtual void SlotUlIndication(const SfnSf& sfn, LteNrTddSlotType slotType) = 0;
+    virtual void SlotUlIndication(const SfnSf& sfn, NrTddSlotType slotType) = 0;
 
     // We do a DL and then manually add an UL CTRL if it's an S slot.
     // virtual void SlotSIndication (const SfnSf &sfn) = 0;
@@ -280,7 +280,7 @@ class NrUePhySapUser
     virtual void ReceivePhyPdu(Ptr<Packet> p) = 0;
 
     /**
-     * \brief Receive SendLteControlMessage (PDCCH map, CQI feedbacks) using the ideal control
+     * \brief Receive SendNrControlMessage (PDCCH map, CQI feedbacks) using the ideal control
      * channel \param msg the Ideal Control Message to receive
      */
     virtual void ReceiveControlMessage(Ptr<NrControlMessage> msg) = 0;

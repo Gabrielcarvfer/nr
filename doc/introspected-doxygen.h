@@ -40,15 +40,15 @@ ns3::BandwidthPartGnb is accessible through the following paths with Config::Set
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
-<li><b>FfMacScheduler</b>: The scheduler associated to this EnbNetDevice
+<li><b>NrFfMacScheduler</b>: The scheduler associated to this EnbNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
-    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::FfMacScheduler></li>
+    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrFfMacScheduler></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
 </ul>
-\section attr_parent_485 Attributes defined in parent class ns3::ComponentCarrier
+\section attr_parent_485 Attributes defined in parent class ns3::NrComponentCarrier
 <ul>
 <li><b>UlBandwidth</b>: Uplink Transmission Bandwidth Configuration in number of Resource Blocks
   <ul>
@@ -132,7 +132,7 @@ ns3::BandwidthPartUe is accessible through the following paths with Config::Set 
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
 </ul>
-\section attr_parent_486 Attributes defined in parent class ns3::ComponentCarrier
+\section attr_parent_486 Attributes defined in parent class ns3::NrComponentCarrier
 <ul>
 <li><b>UlBandwidth</b>: Uplink Transmission Bandwidth Configuration in number of Resource Blocks
   <ul>
@@ -206,21 +206,21 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerAlgorithm is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 </ul>
 No Attributes are defined for this type.<br>
@@ -236,21 +236,21 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerAlgorithmStatic is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 </ul>
 \section attr_490 Attributes
@@ -415,13 +415,13 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerGnb is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 </ul>
 \section attr_487 Attributes
@@ -446,13 +446,13 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerUe is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::SimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe`</li>
 </ul>
 \section attr_488 Attributes
@@ -1794,10 +1794,10 @@ ns3::NrUeNetDevice is accessible through the following paths with Config::Set an
 </ul>
 \section attr_462 Attributes
 <ul>
-<li><b>EpcUeNas</b>: The NAS associated to this UeNetDevice
+<li><b>NrEpcUeNas</b>: The NAS associated to this UeNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
-    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::EpcUeNas></li>
+    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrEpcUeNas></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
@@ -1990,7 +1990,7 @@ This is a list of all \ref attribute by class.  For more information see the \re
 <ul>
 <li><b>NrGnbPhy</b>: The PHY associated to this EnbNetDevice</li>
 <li><b>NrGnbMac</b>: The MAC associated to this EnbNetDevice</li>
-<li><b>FfMacScheduler</b>: The scheduler associated to this EnbNetDevice</li>
+<li><b>NrFfMacScheduler</b>: The scheduler associated to this EnbNetDevice</li>
 </ul>
 <b>ns3::BandwidthPartUe</b><br>
 <ul>
@@ -2113,7 +2113,7 @@ This is a list of all \ref attribute by class.  For more information see the \re
 </ul>
 <b>ns3::NrUeNetDevice</b><br>
 <ul>
-<li><b>EpcUeNas</b>: The NAS associated to this UeNetDevice</li>
+<li><b>NrEpcUeNas</b>: The NAS associated to this UeNetDevice</li>
 <li><b>nrUeRrc</b>: The RRC associated to this UeNetDevice</li>
 <li><b>Imsi</b>: International Mobile Subscriber Identity assigned to this UE</li>
 <li><b>LteUeRrc</b>: The RRC layer associated with the ENB</li>
@@ -2151,8 +2151,8 @@ This is a list of all \ref ns3::LogComponent instances.
 
 Log Component                               | File
 :------------------------------------------ | :---------------------------------------------------------------------------
-A2A4RsrqHandoverAlgorithm                   | src/lte/model/a2-a4-rsrq-handover-algorithm.cc
-A3RsrpHandoverAlgorithm                     | src/lte/model/a3-rsrp-handover-algorithm.cc
+NrA2A4RsrqHandoverAlgorithm                   | src/lte/model/a2-a4-rsrq-handover-algorithm.cc
+NrA3RsrpHandoverAlgorithm                     | src/lte/model/a3-rsrp-handover-algorithm.cc
 Address                                     | src/network/model/address.cc
 AddressUtils                                | src/network/utils/address-utils.cc
 AdhocAlohaNoackIdealPhyHelper               | src/spectrum/helper/adhoc-aloha-noack-ideal-phy-helper.cc
@@ -2167,7 +2167,7 @@ ArpCache                                    | src/internet/model/arp-cache.cc
 ArpHeader                                   | src/internet/model/arp-header.cc
 ArpL3Protocol                               | src/internet/model/arp-l3-protocol.cc
 ArpQueueDiscItem                            | src/internet/model/arp-queue-disc-item.cc
-Asn1Header                                  | src/lte/model/lte-asn1-header.cc
+NrAsn1Header                                  | src/lte/model/lte-asn1-header.cc
 AttributeConstructionList                   | src/core/model/attribute-construction-list.cc
 AttributeIterator                           | src/config-store/model/attribute-iterator.cc
 AttributeValue                              | src/core/model/attribute.cc
@@ -2205,8 +2205,8 @@ ChannelList                                 | src/network/model/channel-list.cc
 CoDelQueueDisc                              | src/traffic-control/model/codel-queue-disc.cc
 CobaltQueueDisc                             | src/traffic-control/model/cobalt-queue-disc.cc
 CommandLine                                 | src/core/model/command-line.cc
-ComponentCarrier                            | src/lte/model/component-carrier.cc
-ComponentCarrierEnb                         | src/lte/model/component-carrier-enb.cc
+NrComponentCarrier                            | src/lte/model/component-carrier.cc
+NrComponentCarrierEnb                         | src/lte/model/component-carrier-enb.cc
 ComponentCarrierUe                          | src/lte/model/component-carrier-ue.cc
 Config                                      | src/core/model/config.cc
 ConfigStore                                 | src/config-store/model/config-store.cc
@@ -2231,16 +2231,16 @@ DynamicQueueLimits                          | src/network/utils/dynamic-queue-li
 EmuEpcHelper                                | src/lte/helper/emu-epc-helper.cc
 EmuFdNetDeviceHelper                        | src/fd-net-device/helper/emu-fd-net-device-helper.cc
 Enum                                        | src/core/model/enum.cc
-EpcEnbApplication                           | src/lte/model/epc-enb-application.cc
+NrEpcEnbApplication                           | src/lte/model/epc-enb-application.cc
 EpcHelper                                   | src/lte/helper/epc-helper.cc
-EpcMmeApplication                           | src/lte/model/epc-mme-application.cc
-EpcPgwApplication                           | src/lte/model/epc-pgw-application.cc
-EpcSgwApplication                           | src/lte/model/epc-sgw-application.cc
-EpcTft                                      | src/lte/model/epc-tft.cc
-EpcTftClassifier                            | src/lte/model/epc-tft-classifier.cc
-EpcUeNas                                    | src/lte/model/epc-ue-nas.cc
-EpcX2                                       | src/lte/model/epc-x2.cc
-EpcX2Header                                 | src/lte/model/epc-x2-header.cc
+NrEpcMmeApplication                           | src/lte/model/epc-mme-application.cc
+NrEpcPgwApplication                           | src/lte/model/epc-pgw-application.cc
+NrEpcSgwApplication                           | src/lte/model/epc-sgw-application.cc
+NrEpcTft                                      | src/lte/model/epc-tft.cc
+NrEpcTftClassifier                            | src/lte/model/epc-tft-classifier.cc
+NrEpcUeNas                                    | src/lte/model/epc-ue-nas.cc
+NrEpcX2                                       | src/lte/model/epc-x2.cc
+NrEpcX2Header                                 | src/lte/model/epc-x2-header.cc
 ErrorChannel                                | src/network/utils/error-channel.cc
 ErrorModel                                  | src/network/utils/error-model.cc
 EthernetHeader                              | src/network/utils/ethernet-header.cc
@@ -2254,7 +2254,7 @@ FdNetDevice                                 | src/fd-net-device/model/fd-net-dev
 FdNetDeviceHelper                           | src/fd-net-device/helper/fd-net-device-helper.cc
 FdReader                                    | src/core/model/unix-fd-reader.cc
 FdTbfqFfMacScheduler                        | src/lte/model/fdtbfq-ff-mac-scheduler.cc
-FfMacScheduler                              | src/lte/model/ff-mac-scheduler.cc
+NrFfMacScheduler                              | src/lte/model/ff-mac-scheduler.cc
 FifoQueueDisc                               | src/traffic-control/model/fifo-queue-disc.cc
 FileAggregator                              | src/stats/model/file-aggregator.cc
 FileHelper                                  | src/stats/helper/file-helper.cc
@@ -2269,8 +2269,8 @@ GlobalValue                                 | src/core/model/global-value.cc
 GnuplotAggregator                           | src/stats/model/gnuplot-aggregator.cc
 GnuplotHelper                               | src/stats/helper/gnuplot-helper.cc
 GridScenarioHelper                          | src/nr/helper/grid-scenario-helper.cc
-GtpcHeader                                  | src/lte/model/epc-gtpc-header.cc
-GtpuHeader                                  | src/lte/model/epc-gtpu-header.cc
+NrGtpcHeader                                  | src/lte/model/epc-gtpc-header.cc
+NrGtpuHeader                                  | src/lte/model/epc-gtpu-header.cc
 HalfDuplexIdealPhy                          | src/spectrum/model/half-duplex-ideal-phy.cc
 HalfDuplexIdealPhySignalParameters          | src/spectrum/model/half-duplex-ideal-phy-signal-parameters.cc
 Hash                                        | src/core/model/hash.cc
@@ -2349,7 +2349,7 @@ LenaErrorModel                              | src/nr/model/lena-error-model.cc
 ListScheduler                               | src/core/model/list-scheduler.cc
 LlcSnalHeader                               | src/network/utils/llc-snap-header.cc
 LoopbackNetDevice                           | src/internet/model/loopback-net-device.cc
-LteAmc                                      | src/lte/model/lte-amc.cc
+NrLteAmc                                      | src/lte/model/lte-amc.cc
 LteAnr                                      | src/lte/model/lte-anr.cc
 LteChunkProcessor                           | src/lte/model/lte-chunk-processor.cc
 LteCommon                                   | src/lte/model/lte-common.cc
@@ -2373,7 +2373,7 @@ LteHarqPhy                                  | src/lte/model/lte-harq-phy.cc
 LteHelper                                   | src/lte/helper/lte-helper.cc
 LteHexGridEnbTopologyHelper                 | src/lte/helper/lte-hex-grid-enb-topology-helper.cc
 LteInterference                             | src/lte/model/lte-interference.cc
-LteMiErrorModel                             | src/lte/model/lte-mi-error-model.cc
+NrLteMiErrorModel                             | src/lte/model/lte-mi-error-model.cc
 LteNetDevice                                | src/lte/model/lte-net-device.cc
 LtePdcp                                     | src/lte/model/lte-pdcp.cc
 LtePdcpHeader                               | src/lte/model/lte-pdcp-header.cc
@@ -2414,7 +2414,7 @@ NetDevice                                   | src/network/model/net-device.cc
 NetDeviceQueueInterface                     | src/network/utils/net-device-queue-interface.cc
 NixVector                                   | src/network/model/nix-vector.cc
 NoBackhaulEpcHelper                         | src/lte/helper/no-backhaul-epc-helper.cc
-NoOpComponentCarrierManager                 | src/lte/model/no-op-component-carrier-manager.cc
+NrNoOpComponentCarrierManager                 | src/lte/model/no-op-component-carrier-manager.cc
 NoOpHandoverAlgorithm                       | src/lte/model/no-op-handover-algorithm.cc
 Node                                        | src/network/model/node.cc
 NodeList                                    | src/network/model/node-list.cc
@@ -2547,7 +2547,7 @@ ShowProgress                                | src/core/model/show-progress.cc
 SimpleChannel                               | src/network/utils/simple-channel.cc
 SimpleNetDevice                             | src/network/utils/simple-net-device.cc
 SimpleNetDeviceHelper                       | src/network/helper/simple-net-device-helper.cc
-SimpleUeComponentCarrierManager             | src/lte/model/simple-ue-component-carrier-manager.cc
+NrSimpleUeComponentCarrierManager             | src/lte/model/simple-ue-component-carrier-manager.cc
 Simulator                                   | src/core/model/simulator.cc
 SimulatorImpl                               | src/core/model/simulator-impl.cc
 SingleModelSpectrumChannel                  | src/spectrum/model/single-model-spectrum-channel.cc

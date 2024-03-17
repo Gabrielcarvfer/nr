@@ -5,7 +5,8 @@
 #ifndef NR_INTERFERENCE_H
 #define NR_INTERFERENCE_H
 
-#include <ns3/lte-interference.h>
+#include "nr-interference-base.h"
+
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/spectrum-signal-parameters.h>
@@ -16,7 +17,7 @@
 namespace ns3
 {
 
-// Signal ID increment used in LteInterference
+// Signal ID increment used in NrInterferenceBase
 static constexpr uint32_t NR_LTE_SIGNALID_INCR = 0x10000000;
 
 class NrCovMat;
@@ -27,14 +28,14 @@ class NrMimoChunkProcessor;
 /**
  * \ingroup spectrum
  *
- * \brief The NrInterference class inherits LteInterference which
+ * \brief The NrInterference class inherits NrInterferenceBase which
  * implements a gaussian interference model, i.e., all
  * incoming signals are added to the total interference.
  * NrInterference class extends this functionality to support
  * energy detection functionality.
  *
  */
-class NrInterference : public LteInterference
+class NrInterference : public NrInterferenceBase
 {
   public:
     /**
@@ -90,27 +91,27 @@ class NrInterference : public LteInterference
      */
     void EraseEvents();
 
-    // inherited from LteInterference
+    // inherited from NrInterferenceBase
     void EndRx() override;
 
     /// \brief Notify that a new signal is being perceived in the medium.
     /// This method is to be called for all incoming signals, including interference.
-    /// This method handles MIMO signals and also calls LteInterference to cover SISO signals.
+    /// This method handles MIMO signals and also calls NrInterferenceBase to cover SISO signals.
     /// \param params The spectrum signal parameters of the new signal
     /// \param duration The duration of the new signal
     virtual void AddSignalMimo(Ptr<const SpectrumSignalParameters> params, const Time& duration);
 
     /// \brief Notify the intended receiver that a new signal is being received.
     /// This method is to be called only for the useful signal-of-interest.
-    /// This method handles MIMO signals and also calls LteInterference to cover SISO signals.
+    /// This method handles MIMO signals and also calls NrInterferenceBase to cover SISO signals.
     /// \param params The spectrum signal parameters of the new signal
     virtual void StartRxMimo(Ptr<const SpectrumSignalParameters> params);
 
     /// \brief Notify that a signals transmission is ending.
     /// This means that the signal will be removed from the lists of RX and interfering signals.
-    /// This method handles MIMO signals and also calls LteInterference to cover SISO signals.
+    /// This method handles MIMO signals and also calls NrInterferenceBase to cover SISO signals.
     /// \param params The spectrum signal parameters of the ending signal
-    /// \param signalId The LteInterference signalId
+    /// \param signalId The NrInterferenceBase signalId
     virtual void DoSubtractSignalMimo(Ptr<const SpectrumSignalParameters> params,
                                       uint32_t signalId);
 
@@ -210,7 +211,7 @@ class NrInterference : public LteInterference
      */
     NrInterference::NiChanges::iterator GetPosition(Time moment);
 
-    // inherited from LteInterference
+    // inherited from NrInterferenceBase
     void ConditionallyEvaluateChunk() override;
 
     /**

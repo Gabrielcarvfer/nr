@@ -49,7 +49,7 @@ $ ./ns3 run "cttc-lte-ca-demo --PrintHelp"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("3gppChannelFdmLteComponentCarriersExample");
+NS_LOG_COMPONENT_DEFINE("3gppChannelFdmNrComponentCarriersExample");
 
 int
 main(int argc, char* argv[])
@@ -179,7 +179,7 @@ main(int argc, char* argv[])
         //      LogComponentEnable ("Nr3gppChannel", LOG_LEVEL_ALL);
         //      LogComponentEnable ("UdpClient", LOG_LEVEL_INFO);
         //      LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
-        //      LogComponentEnable ("LtePdcp", LOG_LEVEL_INFO);
+        //      LogComponentEnable ("NrPdcp", LOG_LEVEL_INFO);
         //      LogComponentEnable ("BwpManagerGnb", LOG_LEVEL_INFO);
         //      LogComponentEnable ("BwpManagerAlgorithm", LOG_LEVEL_INFO);
         LogComponentEnable("NrGnbPhy", LOG_LEVEL_INFO);
@@ -248,15 +248,15 @@ main(int argc, char* argv[])
     mobility.SetPositionAllocator(staPositionAlloc);
     mobility.Install(ueNodes);
 
-    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrPointToPointEpcHelper> nrEpcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
 
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
-    nrHelper->SetEpcHelper(epcHelper);
+    nrHelper->SetEpcHelper(nrEpcHelper);
 
     nrHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(false));
-    epcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
+    nrEpcHelper->SetAttribute("S1uLinkDelay", TimeValue(MilliSeconds(0)));
     if (cellScan)
     {
         idealBeamformingHelper->SetAttribute("BeamformingMethod",
@@ -270,7 +270,7 @@ main(int argc, char* argv[])
             "BeamformingMethod",
             TypeIdValue(QuasiOmniDirectPathBeamforming::GetTypeId()));
     }
-    Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
 
     std::string errorModel = "ns3::NrLteMiErrorModel";
     // Scheduler
@@ -562,7 +562,7 @@ main(int argc, char* argv[])
 
     // create the internet and install the IP stack on the UEs
     // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    Ptr<Node> pgw = nrEpcHelper->GetPgwNode();
     NodeContainer remoteHostContainer;
     remoteHostContainer.Create(1);
     Ptr<Node> remoteHost = remoteHostContainer.Get(0);
@@ -584,14 +584,14 @@ main(int argc, char* argv[])
     remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(ueNodes);
     Ipv4InterfaceContainer ueIpIface;
-    ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    ueIpIface = nrEpcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
     // Set the default gateway for the UEs
     for (uint32_t j = 0; j < ueNodes.GetN(); ++j)
     {
         Ptr<Ipv4StaticRouting> ueStaticRouting =
             ipv4RoutingHelper.GetStaticRouting(ueNodes.Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+        ueStaticRouting->SetDefaultRoute(nrEpcHelper->GetUeDefaultGatewayAddress(), 1);
     }
 
     // attach UEs to the closest eNB
@@ -631,11 +631,11 @@ main(int argc, char* argv[])
     dlClientLowLat.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaBe)));
 
     // The bearer that will carry low latency traffic
-    EpsBearer lowLatBearer(EpsBearer::NGBR_LOW_LAT_EMBB);
+    NrEpsBearer lowLatBearer(NrEpsBearer::NGBR_LOW_LAT_EMBB);
 
     // The filter for the low-latency traffic
-    Ptr<EpcTft> lowLatTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfLowLat;
+    Ptr<NrEpcTft> lowLatTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfLowLat;
     dlpfLowLat.localPortStart = dlPortLowLat;
     dlpfLowLat.localPortEnd = dlPortLowLat;
     lowLatTft->Add(dlpfLowLat);
@@ -648,14 +648,14 @@ main(int argc, char* argv[])
     ulClientVoice.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaBe)));
 
     // The bearer that will carry voice traffic
-    EpsBearer voiceBearer(EpsBearer::GBR_CONV_VOICE);
+    NrEpsBearer voiceBearer(NrEpsBearer::GBR_CONV_VOICE);
 
     // The filter for the voice traffic
-    Ptr<EpcTft> voiceTft = Create<EpcTft>();
-    EpcTft::PacketFilter ulpfVoice;
+    Ptr<NrEpcTft> voiceTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter ulpfVoice;
     ulpfVoice.localPortStart = ulPortVoice;
     ulpfVoice.localPortEnd = ulPortVoice;
-    ulpfVoice.direction = EpcTft::UPLINK;
+    ulpfVoice.direction = NrEpcTft::UPLINK;
     voiceTft->Add(ulpfVoice);
 
     // Video configuration and object creation:
@@ -666,11 +666,11 @@ main(int argc, char* argv[])
     dlClientVideo.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaUll)));
 
     // The bearer that will carry video traffic
-    EpsBearer videoBearer(EpsBearer::NGBR_VIDEO_TCP_PREMIUM);
+    NrEpsBearer videoBearer(NrEpsBearer::NGBR_VIDEO_TCP_PREMIUM);
 
     // The filter for the video traffic
-    Ptr<EpcTft> videoTft = Create<EpcTft>();
-    EpcTft::PacketFilter dlpfVideo;
+    Ptr<NrEpcTft> videoTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter dlpfVideo;
     dlpfVideo.localPortStart = dlPortVideo;
     dlpfVideo.localPortEnd = dlPortVideo;
     videoTft->Add(dlpfVideo);
@@ -683,14 +683,14 @@ main(int argc, char* argv[])
     ulClientGaming.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaUll)));
 
     // The bearer that will carry gaming traffic
-    EpsBearer gamingBearer(EpsBearer::NGBR_VOICE_VIDEO_GAMING);
+    NrEpsBearer gamingBearer(NrEpsBearer::NGBR_VOICE_VIDEO_GAMING);
 
     // The filter for the gaming traffic
-    Ptr<EpcTft> gamingTft = Create<EpcTft>();
-    EpcTft::PacketFilter ulpfGaming;
+    Ptr<NrEpcTft> gamingTft = Create<NrEpcTft>();
+    NrEpcTft::PacketFilter ulpfGaming;
     ulpfGaming.remotePortStart = ulPortGaming;
     ulpfGaming.remotePortEnd = ulPortGaming;
-    ulpfGaming.direction = EpcTft::UPLINK;
+    ulpfGaming.direction = NrEpcTft::UPLINK;
     gamingTft->Add(ulpfGaming);
 
     //  Install the applications

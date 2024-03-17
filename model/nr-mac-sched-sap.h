@@ -86,7 +86,7 @@ class NrMacSchedSapProvider
     {
         SfnSf m_snfSf;                                   //!< SfnSf
         std::vector<struct UlHarqInfo> m_ulHarqInfoList; //!< UL HARQ info list
-        LteNrTddSlotType m_slotType{F};                  //!< Indicate the type of slot requested
+        NrTddSlotType m_slotType{F};                     //!< Indicate the type of slot requested
     };
 
     /**
@@ -96,7 +96,7 @@ class NrMacSchedSapProvider
     {
         SfnSf m_snfSf;                                   //!< SfnSf
         std::vector<struct DlHarqInfo> m_dlHarqInfoList; //!< DL HARQ info list
-        LteNrTddSlotType m_slotType{F};                  //!< Indicate the type of slot requested
+        NrTddSlotType m_slotType{F};                     //!< Indicate the type of slot requested
     };
 
     /**

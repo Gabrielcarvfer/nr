@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
-#ifndef SRC_NR_HELPER_NR_PHY_RX_TRACE_H_
-#define SRC_NR_HELPER_NR_PHY_RX_TRACE_H_
+#ifndef NR_PHY_RX_TRACE_H_
+#define NR_PHY_RX_TRACE_H_
 
 #include <ns3/nr-control-messages.h>
 #include <ns3/nr-phy-mac-common.h>
@@ -322,4 +322,4 @@ class NrPhyRxTrace : public Object
 
 } /* namespace ns3 */
 
-#endif /* SRC_NR_HELPER_NR_PHY_RX_TRACE_H_ */
+#endif /* NR_PHY_RX_TRACE_H_ */
