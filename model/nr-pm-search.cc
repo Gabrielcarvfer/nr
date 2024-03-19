@@ -6,6 +6,11 @@
 
 #include "nr-pm-search.h"
 
+#include "ns3/double.h"
+#include "ns3/enum.h"
+
+#include <numeric>
+
 namespace ns3
 {
 
@@ -22,7 +27,20 @@ NrPmSearch::GetTypeId()
                           "Max MIMO rank is minimum of num UE ports, num gNB ports, and RankLimit",
                           UintegerValue(UINT8_MAX),
                           MakeUintegerAccessor(&NrPmSearch::m_rankLimit),
-                          MakeUintegerChecker<uint8_t>());
+                          MakeUintegerChecker<uint8_t>())
+            .AddAttribute("RankAlgorithm",
+                          "Algorithm used to determine the MIMO Rank",
+                          EnumValue(NrPmSearch::RankAlgorithm::SVD),
+                          MakeEnumAccessor<RankAlgorithm>(&NrPmSearch::m_rankAlgorithm),
+                          MakeEnumChecker(RankAlgorithm::SVD,
+                                          "SVD",
+                                          RankAlgorithm::WaterFilling,
+                                          "WaterFilling"))
+            .AddAttribute("RankThreshold",
+                          "Rank threshold for SVD selection",
+                          DoubleValue(std::numeric_limits<double>::epsilon()),
+                          MakeDoubleAccessor(&NrPmSearch::m_rankThreshold),
+                          MakeDoubleChecker<double>());
     return tid;
 }
 
@@ -57,6 +75,33 @@ size_t
 NrPmSearch::GetSubbandSize() const
 {
     return m_subbandSize;
+}
+
+uint8_t
+NrPmSearch::SelectRank(NrIntfNormChanMat& channelMatrix) const
+{
+    uint8_t maxRank = 0;
+
+    // First determine the maximum supported rank
+    switch (m_rankAlgorithm)
+    {
+    case RankAlgorithm::SVD:
+        maxRank = channelMatrix.GetEigenWidebandRank(m_rankThreshold);
+        break;
+    case RankAlgorithm::WaterFilling:
+        maxRank = channelMatrix.GetWaterfillingWidebandRank(*m_ranks.rbegin());
+        break;
+    default:
+        NS_ABORT_MSG("Unknown rank algorithm");
+    }
+
+    // If our maxRank is not supported, then take the maximum supported
+    // todo: find nearest rank, rounding downwards
+    if (std::lower_bound(m_ranks.begin(), m_ranks.end(), maxRank) == m_ranks.end())
+    {
+        maxRank = *m_ranks.rbegin();
+    }
+    return maxRank;
 }
 
 } // namespace ns3

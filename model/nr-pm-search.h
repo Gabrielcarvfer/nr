@@ -71,6 +71,17 @@ class NrPmSearch : public Object
     virtual PmCqiInfo CreateCqiFeedbackMimo(const NrMimoSignal& rxSignalRb,
                                             PmiUpdate pmiUpdate) = 0;
 
+    /// \brief Select the MIMO rank for a given channel matrix.
+    /// \param channelMatrix matrix to extract the rank
+    /// \return maximum supported rank
+    virtual uint8_t SelectRank(NrIntfNormChanMat& channelMatrix) const;
+
+    enum RankAlgorithm
+    {
+        SVD,         ///< Select MIMO rank via SVD decomposition
+        WaterFilling ///< Select MIMO rank via water-filling technique
+    };
+
   protected:
     struct PrecMatParams : public SimpleRefCount<PrecMatParams>
     {
@@ -93,6 +104,9 @@ class NrPmSearch : public Object
 
     uint8_t m_rankLimit{UINT8_MAX}; ///< Limit the UE's maximum supported rank
     std::vector<uint8_t> m_ranks{}; ///< The set of ranks for which to compute precoding matrices
+
+    double m_rankThreshold;        ///< Threshold used to determine the MIMO rank via SVD
+    RankAlgorithm m_rankAlgorithm; ///< Algorithm used to select the MIMO rank
 };
 
 } // namespace ns3

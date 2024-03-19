@@ -870,6 +870,10 @@ class NrHelper : public Object
         std::string pmSearchMethod{"ns3::NrPmSearchFull"}; ///< Precoding matrix search algorithm
         std::string fullSearchCb{"ns3::NrCbTwoPort"}; ///< Codebook when using full-search algorithm
         uint8_t rankLimit{UINT8_MAX}; ///< Limit maximum MIMO rank to model limited UE capabilities.
+        /// Limits the selection of ranks determined by SVD decomposition.
+        double rankThreshold{0.0};
+        /// Select algorithm that determines ranks in non-exhaustive search.
+        std::string rankAlgorithm{"SVD"};
     };
 
     /// \brief Set TypeId of the precoding matrix search algorithm

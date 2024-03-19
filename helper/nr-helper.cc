@@ -1898,7 +1898,10 @@ NrHelper::SetupMimoPmi(const NrHelper::MimoPmiParams& mp)
     auto searchTypeId = TypeId::LookupByName(mp.pmSearchMethod);
     SetPmSearchTypeId(searchTypeId);
     SetPmSearchAttribute("RankLimit", UintegerValue(mp.rankLimit));
-    if (searchTypeId == NrPmSearchFull::GetTypeId())
+    SetPmSearchAttribute("RankThreshold", DoubleValue(mp.rankThreshold));
+    SetPmSearchAttribute("RankAlgorithm", StringValue(mp.rankAlgorithm));
+    if (searchTypeId == NrPmSearchFull::GetTypeId() ||
+        searchTypeId.GetParent() == NrPmSearchFull::GetTypeId())
     {
         SetPmSearchAttribute("NrPmSearchFull::CodebookType",
                              TypeIdValue(TypeId::LookupByName(mp.fullSearchCb)));
