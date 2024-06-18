@@ -32,7 +32,8 @@
       libgsl-dev $LIBGSL gsl-bin
       libsqlite3-dev sqlite3
       libxml2 libxml2-dev
-      ssh
+      ssh python3-pip
+    - pip install GitPython
   variables:
     COMPILER: clang++-$CLANG
     LIBGSL: libgsl23
