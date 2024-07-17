@@ -508,41 +508,14 @@ main(int argc, char* argv[])
         DynamicCast<NrUeNetDevice>(*it)->UpdateConfig();
     }
 
-    // create the internet and install the IP stack on the UEs
-    // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
-    NodeContainer remoteHostContainer;
-    remoteHostContainer.Create(1);
-    Ptr<Node> remoteHost = remoteHostContainer.Get(0);
+    auto remoteHostAndIpv4address = epcHelper->SetupRemoteHost();
     InternetStackHelper internet;
-    internet.Install(remoteHostContainer);
-
-    // connect a remoteHost to pgw. Setup routing too
-    PointToPointHelper p2ph;
-    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
-    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
-    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
-    Ipv4AddressHelper ipv4h;
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
-    ipv4h.SetBase("1.0.0.0", "255.0.0.0");
-    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
-    Ptr<Ipv4StaticRouting> remoteHostStaticRouting =
-        ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
-    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(ueNodes);
     Ipv4InterfaceContainer ueIpIface;
     ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
-    Ipv4Address remoteHostAddr = internetIpIfaces.GetAddress(1);
-
     // Set the default gateway for the UEs
-    for (uint32_t j = 0; j < ueNodes.GetN(); ++j)
-    {
-        Ptr<Ipv4StaticRouting> ueStaticRouting =
-            ipv4RoutingHelper.GetStaticRouting(ueNodes.Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
-    }
+    epcHelper->SetUeDefaultGatewayAddress(ueNodes);
 
     // attach UEs to the closest eNB before creating the dedicated flows
     nrHelper->AttachToClosestEnb(ueNetDev, enbNetDev);
@@ -568,7 +541,7 @@ main(int argc, char* argv[])
                 dlClient.SetAttribute("PacketSize", UintegerValue(udpPacketSizeBe));
                 dlClient.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaUll)));
                 dlClient.SetAttribute("MaxPackets", UintegerValue(0xFFFFFFFF));
-                clientApps.Add(dlClient.Install(remoteHost));
+                clientApps.Add(dlClient.Install(remoteHostAndIpv4address.first));
 
                 Ptr<EpcTft> tft = Create<EpcTft>();
                 EpcTft::PacketFilter dlpf;
@@ -607,9 +580,9 @@ main(int argc, char* argv[])
                 PacketSinkHelper ulPacketSinkHelper(
                     "ns3::UdpSocketFactory",
                     InetSocketAddress(Ipv4Address::GetAny(), ulPort));
-                serverApps.Add(ulPacketSinkHelper.Install(remoteHost));
+                serverApps.Add(ulPacketSinkHelper.Install(remoteHostAndIpv4address.first));
 
-                UdpClientHelper ulClient(remoteHostAddr, ulPort);
+                UdpClientHelper ulClient(remoteHostAndIpv4address.second, ulPort);
                 ulClient.SetAttribute("PacketSize", UintegerValue(udpPacketSizeBe));
                 ulClient.SetAttribute("Interval", TimeValue(Seconds(1.0 / lambdaUll)));
                 ulClient.SetAttribute("MaxPackets", UintegerValue(0xFFFFFFFF));
@@ -660,7 +633,7 @@ main(int argc, char* argv[])
 
     FlowMonitorHelper flowmonHelper;
     NodeContainer endpointNodes;
-    endpointNodes.Add(remoteHost);
+    endpointNodes.Add(remoteHostAndIpv4address.first);
     endpointNodes.Add(ueNodes);
 
     Ptr<ns3::FlowMonitor> monitor = flowmonHelper.Install(endpointNodes);

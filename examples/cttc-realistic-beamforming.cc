@@ -877,39 +877,12 @@ CttcRealisticBeamforming::RunSimulation()
     }
 
     // Create the internet and install the IP stack on the UEs, get SGW/PGW and create a single
-    // RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
-    NodeContainer remoteHostContainer;
-    remoteHostContainer.Create(1);
-    Ptr<Node> remoteHost = remoteHostContainer.Get(0);
+    auto remoteHostAndIpv4address = epcHelper->SetupRemoteHost();
     InternetStackHelper internet;
-    internet.Install(remoteHostContainer);
-    // connect a remoteHost to pgw. Setup routing too
-    PointToPointHelper p2ph;
-    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
-    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
-    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
-    Ipv4AddressHelper ipv4h;
-    ipv4h.SetBase("1.0.0.0", "255.0.0.0");
-    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
-
-    // Configure routing
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
-    Ptr<Ipv4StaticRouting> remoteHostStaticRouting =
-        ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
-    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(ueNode);
     Ipv4InterfaceContainer ueIpIface;
     ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
-
-    // Set the default gateway for the UE
-    for (uint32_t j = 0; j < ueNode.GetN(); ++j)
-    {
-        Ptr<Ipv4StaticRouting> ueStaticRouting =
-            ipv4RoutingHelper.GetStaticRouting(ueNode.Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
-    }
+    epcHelper->SetUeDefaultGatewayAddress(ueNode);
 
     // Attach UE to gNB
     nrHelper->AttachToEnb(ueNetDev.Get(0), gNbDev.Get(0));
@@ -917,7 +890,12 @@ CttcRealisticBeamforming::RunSimulation()
     // Install UDP downlink applications
     ApplicationContainer clientAppDl;
     ApplicationContainer serverAppDl;
-    CreateDlTrafficApplications(clientAppDl, serverAppDl, ueNode, remoteHost, ueNetDev, ueIpIface);
+    CreateDlTrafficApplications(clientAppDl,
+                                serverAppDl,
+                                ueNode,
+                                remoteHostAndIpv4address.first,
+                                ueNetDev,
+                                ueIpIface);
 
     // Connect traces to our listener functions
     for (uint32_t i = 0; i < ueNetDev.GetN(); i++)

@@ -487,39 +487,16 @@ main(int argc, char* argv[])
         DynamicCast<NrUeNetDevice>(*it)->UpdateConfig();
     }
 
-    // create the internet and install the IP stack on the UEs
-    // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
-    NodeContainer remoteHostContainer;
-    remoteHostContainer.Create(1);
-    Ptr<Node> remoteHost = remoteHostContainer.Get(0);
-    InternetStackHelper internet;
-    internet.Install(remoteHostContainer);
+    auto remoteHostAndIpv4address = epcHelper->SetupRemoteHost();
 
-    // connect a remoteHost to pgw. Setup routing too
-    PointToPointHelper p2ph;
-    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
-    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.000)));
-    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
-    Ipv4AddressHelper ipv4h;
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
-    ipv4h.SetBase("1.0.0.0", "255.0.0.0");
-    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
-    Ptr<Ipv4StaticRouting> remoteHostStaticRouting =
-        ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
-    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
+    InternetStackHelper internet;
+
     internet.Install(gridScenario.GetUserTerminals());
     Ipv4InterfaceContainer ueIpIface;
     ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
 
     // Set the default gateway for the UEs
-    for (uint32_t j = 0; j < gridScenario.GetUserTerminals().GetN(); ++j)
-    {
-        Ptr<Ipv4StaticRouting> ueStaticRouting = ipv4RoutingHelper.GetStaticRouting(
-            gridScenario.GetUserTerminals().Get(j)->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
-    }
+    epcHelper->SetUeDefaultGatewayAddress(gridScenario.GetUserTerminals());
 
     // Attach to GNB
     nrHelper->AttachToClosestEnb(ueNetDev, enbNetDev);
@@ -537,7 +514,7 @@ main(int argc, char* argv[])
     // The server, that is the application which is listening, is installed in the UE
     // for the DL traffic, and in the remote host for the UL traffic
     serverApps.Add(dlPacketSinkLowLat.Install(gridScenario.GetUserTerminals()));
-    serverApps.Add(ulPacketSinkVoice.Install(remoteHost));
+    serverApps.Add(ulPacketSinkVoice.Install(remoteHostAndIpv4address.first));
 
     /*
      * Configure attributes for the different generators, using user-provided
@@ -593,7 +570,7 @@ main(int argc, char* argv[])
         if (enableDl)
         {
             dlClientLowLat.SetAttribute("RemoteAddress", AddressValue(ueAddress));
-            clientApps.Add(dlClientLowLat.Install(remoteHost));
+            clientApps.Add(dlClientLowLat.Install(remoteHostAndIpv4address.first));
 
             nrHelper->ActivateDedicatedEpsBearer(ueDevice, lowLatBearer, lowLatTft);
         }
@@ -602,7 +579,7 @@ main(int argc, char* argv[])
         if (enableUl)
         {
             ulClientVoice.SetAttribute("RemoteAddress",
-                                       AddressValue(internetIpIfaces.GetAddress(1)));
+                                       AddressValue(remoteHostAndIpv4address.second));
             clientApps.Add(ulClientVoice.Install(ue));
 
             nrHelper->ActivateDedicatedEpsBearer(ueDevice, videoBearer, voiceTft);
@@ -620,7 +597,7 @@ main(int argc, char* argv[])
 
     FlowMonitorHelper flowmonHelper;
     NodeContainer endpointNodes;
-    endpointNodes.Add(remoteHost);
+    endpointNodes.Add(remoteHostAndIpv4address.first);
     endpointNodes.Add(gridScenario.GetUserTerminals());
 
     Ptr<ns3::FlowMonitor> monitor = flowmonHelper.Install(endpointNodes);

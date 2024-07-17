@@ -489,34 +489,14 @@ main(int argc, char* argv[])
         DynamicCast<NrUeNetDevice>(*it)->UpdateConfig();
     }
 
-    // create the internet and install the IP stack on the UEs
-    // get SGW/PGW and create a single RemoteHost
-    Ptr<Node> pgw = epcHelper->GetPgwNode();
-    NodeContainer remoteHostContainer;
-    remoteHostContainer.Create(1);
-    Ptr<Node> remoteHost = remoteHostContainer.Get(0);
+    auto remoteHostAndIpv4address = epcHelper->SetupRemoteHost("100Gb/s", 2500, 10000);
+
     InternetStackHelper internet;
-    internet.Install(remoteHostContainer);
-
-    // connect a remoteHost to pgw. Setup routing too
-    PointToPointHelper p2ph;
-    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gb/s")));
-    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
-    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.010)));
-    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHost);
-
-    Ipv4AddressHelper ipv4h;
-    ipv4h.SetBase("1.0.0.0", "255.0.0.0");
-    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
-
-    Ptr<Ipv4StaticRouting> remoteHostStaticRouting =
-        ipv4RoutingHelper.GetStaticRouting(remoteHost->GetObject<Ipv4>());
-    remoteHostStaticRouting->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
     internet.Install(ueNodes);
 
     Ipv4InterfaceContainer ueIpIface;
     ueIpIface = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    epcHelper->SetUeDefaultGatewayAddress(ueNodes);
 
     // assign IP address to UEs, and install UDP downlink applications
     uint16_t dlPort = 1234;
@@ -525,11 +505,6 @@ main(int argc, char* argv[])
     for (uint32_t u = 0; u < ueNodes.GetN(); ++u)
     {
         Ptr<Node> ueNode = ueNodes.Get(u);
-        // Set the default gateway for the UE
-        Ptr<Ipv4StaticRouting> ueStaticRouting =
-            ipv4RoutingHelper.GetStaticRouting(ueNode->GetObject<Ipv4>());
-        ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
-
         UdpServerHelper dlPacketSinkHelper(dlPort);
         serverApps.Add(dlPacketSinkHelper.Install(ueNodes.Get(u)));
 
@@ -538,7 +513,7 @@ main(int argc, char* argv[])
         // dlClient.SetAttribute ("MaxPackets", UintegerValue(0xFFFFFFFF));
         dlClient.SetAttribute("MaxPackets", UintegerValue(10));
         dlClient.SetAttribute("PacketSize", UintegerValue(1500));
-        clientApps.Add(dlClient.Install(remoteHost));
+        clientApps.Add(dlClient.Install(remoteHostAndIpv4address.first));
     }
 
     // attach UEs to the closest gNB
