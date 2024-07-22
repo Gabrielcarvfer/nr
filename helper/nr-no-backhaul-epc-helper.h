@@ -76,7 +76,7 @@ class NrNoBackhaulEpcHelper : public NrEpcHelper
 
   protected:
     /**
-     * \brief DoAddX2Interface: Call AddX2Interface on top of the Enb device pointers
+     * \brief DoAddX2Interface: Call AddX2Interface on top of the Gnb device pointers
      *
      * \param enb1X2 EPCX2 of ENB1
      * \param enb1NrDev LTE device of ENB1

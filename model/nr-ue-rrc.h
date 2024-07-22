@@ -257,7 +257,7 @@ class NrUeRrc : public Object
 
     /**
      *
-     * \return the CellId of the attached Enb
+     * \return the CellId of the attached Gnb
      */
     uint16_t GetCellId() const;
 

@@ -26,7 +26,7 @@ class NrFfrAlgorithm;
  * \ingroup nr
  *
  * Defines a single carrier for enb, and contains pointers to NrGnbPhy,
- * NrEnbMac, NrFfrAlgorithm, and NrFfMacScheduler objects.
+ * NrGnbMac, NrFfrAlgorithm, and NrFfMacScheduler objects.
  *
  */
 class NrComponentCarrierEnb : public NrComponentCarrierBaseStation
@@ -69,8 +69,8 @@ class NrComponentCarrierEnb : public NrComponentCarrierBaseStation
      */
     void SetPhy(Ptr<NrGnbPhy> s);
     /**
-     * Set the NrEnbMac
-     * \param s a pointer to the NrEnbMac
+     * Set the NrGnbMac
+     * \param s a pointer to the NrGnbMac
      */
     void SetMac(Ptr<NrGnbMac> s);
 

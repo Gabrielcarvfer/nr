@@ -21,7 +21,7 @@
 #include <ns3/names.h>
 #include <ns3/nr-ch-access-manager.h>
 #include <ns3/nr-chunk-processor.h>
-#include <ns3/nr-epc-enb-application.h>
+#include <ns3/nr-epc-gnb-application.h>
 #include <ns3/nr-epc-ue-nas.h>
 #include <ns3/nr-epc-x2.h>
 #include <ns3/nr-gnb-mac.h>
@@ -972,7 +972,7 @@ NrHelper::InstallSingleGnbDevice(
     DynamicCast<BwpManagerGnb>(ccmEnbManager)
         ->SetBwpManagerAlgorithm(m_gnbBwpManagerAlgoFactory.Create<BwpManagerAlgorithm>());
 
-    // Convert Enb carrier map to only PhyConf map
+    // Convert Gnb carrier map to only PhyConf map
     // we want to make RRC to be generic, to be able to work with any type of carriers, not only
     // strictly LTE carriers
     std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConfMap;
@@ -1631,7 +1631,7 @@ NrHelper::ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, NrEpsBearer bearer)
     // Normally it is the EPC that takes care of activating DRBs
     // when the UE gets connected. When the EPC is not used, we achieve
     // the same behavior by hooking a dedicated DRB activation function
-    // to the Enb RRC Connection Established trace source
+    // to the Gnb RRC Connection Established trace source
 
     Ptr<const NrGnbNetDevice> enbnrDevice = ueDevice->GetObject<NrUeNetDevice>()->GetTargetEnb();
 

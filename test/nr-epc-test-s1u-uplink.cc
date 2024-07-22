@@ -20,7 +20,7 @@
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/log.h"
-#include "ns3/nr-epc-enb-application.h"
+#include "ns3/nr-epc-gnb-application.h"
 #include "ns3/nr-eps-bearer-tag.h"
 #include "ns3/nr-point-to-point-epc-helper.h"
 #include "ns3/packet-sink-helper.h"

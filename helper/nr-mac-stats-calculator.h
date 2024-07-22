@@ -83,7 +83,7 @@ class NrMacStatsCalculator : public NrStatsCalculator
 
     /**
      * Notifies the stats calculator that an downlink scheduling has occurred.
-     * @param cellId Cell ID of the attached Enb
+     * @param cellId Cell ID of the attached Gnb
      * @param imsi IMSI of the scheduled UE
      * @param dlSchedulingCallbackInfo the structure that contains downlink scheduling fields:
      * frameNo Frame number
@@ -102,7 +102,7 @@ class NrMacStatsCalculator : public NrStatsCalculator
 
     /**
      * Notifies the stats calculator that an uplink scheduling has occurred.
-     * @param cellId Cell ID of the attached Enb
+     * @param cellId Cell ID of the attached Gnb
      * @param imsi IMSI of the scheduled UE
      * @param frameNo Frame number
      * @param subframeNo Subframe number
@@ -121,7 +121,7 @@ class NrMacStatsCalculator : public NrStatsCalculator
                       uint8_t componentCarrierId);
 
     /**
-     * Trace sink for the ns3::NrEnbMac::DlScheduling trace source
+     * Trace sink for the ns3::NrGnbMac::DlScheduling trace source
      *
      * \param macStats
      * \param path
@@ -133,7 +133,7 @@ class NrMacStatsCalculator : public NrStatsCalculator
                                      nr::DlSchedulingCallbackInfo dlSchedulingCallbackInfo);
 
     /**
-     * Trace sink for the ns3::NrEnbMac::UlScheduling trace source
+     * Trace sink for the ns3::NrGnbMac::UlScheduling trace source
      *
      * \param macStats
      * \param path

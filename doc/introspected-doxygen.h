@@ -26,21 +26,21 @@ ns3::BandwidthPartGnb is accessible through the following paths with Config::Set
 </ul>
 \section attr_485 Attributes
 <ul>
-<li><b>NrGnbPhy</b>: The PHY associated to this EnbNetDevice
+<li><b>NrGnbPhy</b>: The PHY associated to this GnbNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
     <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrGnbPhy></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
-<li><b>NrGnbMac</b>: The MAC associated to this EnbNetDevice
+<li><b>NrGnbMac</b>: The MAC associated to this GnbNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
     <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrGnbMac></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
-<li><b>NrFfMacScheduler</b>: The scheduler associated to this EnbNetDevice
+<li><b>NrFfMacScheduler</b>: The scheduler associated to this GnbNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
     <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrFfMacScheduler></li>
@@ -206,20 +206,20 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerAlgorithm is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm`</li>
 </ul>
@@ -236,20 +236,20 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerAlgorithmStatic is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::NrSimpleUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 <li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrUeNetDevice/LteUeComponentCarrierManager/$ns3::BwpManagerUe/BwpManagerAlgorithm/$ns3::BwpManagerAlgorithmStatic`</li>
 </ul>
@@ -415,14 +415,14 @@ No TraceSources are defined for this type.<br>
 
 ns3::BwpManagerGnb is accessible through the following paths with Config::Set and Config::Connect:
 <ul>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteEnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
-<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/LteEnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::LteNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrNetDevice/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::NrNoOpComponentCarrierManager/$ns3::BwpManagerGnb`</li>
+<li>`/NodeList/[i]/DeviceList/[i]/$ns3::NrGnbNetDevice/NrGnbComponentCarrierManager/$ns3::BwpManagerGnb`</li>
 </ul>
 \section attr_487 Attributes
 <ul>
@@ -655,9 +655,9 @@ ns3::NrGnbMac is accessible through the following paths with Config::Set and Con
 </li>
 <li><b>SrReq</b>: Information regarding received scheduling request.<br>%Callback signature: ns3::NrGnbMac::SrTracedCallback
 </li>
-<li><b>GnbMacRxedCtrlMsgsTrace</b>: Enb MAC Rxed Control Messages Traces.<br>%Callback signature: ns3::NrMacRxTrace::RxedGnbMacCtrlMsgsTracedCallback
+<li><b>GnbMacRxedCtrlMsgsTrace</b>: Gnb MAC Rxed Control Messages Traces.<br>%Callback signature: ns3::NrMacRxTrace::RxedGnbMacCtrlMsgsTracedCallback
 </li>
-<li><b>GnbMacTxedCtrlMsgsTrace</b>: Enb MAC Txed Control Messages Traces.<br>%Callback signature: ns3::NrMacRxTrace::TxedGnbMacCtrlMsgsTracedCallback
+<li><b>GnbMacTxedCtrlMsgsTrace</b>: Gnb MAC Txed Control Messages Traces.<br>%Callback signature: ns3::NrMacRxTrace::TxedGnbMacCtrlMsgsTracedCallback
 </li>
 <li><b>DlHarqFeedback</b>: Harq feedback.<br>%Callback signature: ns3::NrGnbMac::DlHarqFeedbackTracedCallback
 </li>
@@ -678,10 +678,10 @@ ns3::NrGnbNetDevice is accessible through the following paths with Config::Set a
 </ul>
 \section attr_461 Attributes
 <ul>
-<li><b>LteEnbComponentCarrierManager</b>: The component carrier manager associated to this EnbNetDevice
+<li><b>NrGnbComponentCarrierManager</b>: The component carrier manager associated to this GnbNetDevice
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
-    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::LteEnbComponentCarrierManager></li>
+    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrGnbComponentCarrierManager></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
@@ -691,10 +691,10 @@ ns3::NrGnbNetDevice is accessible through the following paths with Config::Set a
     <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::BandwidthPartGnb></li>
     <li>Flags: <span class="mlabel">read </span></li>
   </ul>
-<li><b>LteEnbRrc</b>: The RRC layer associated with the ENB
+<li><b>NrGnbRrc</b>: The RRC layer associated with the ENB
   <ul>
     <li>Set with class:  \ref ns3::PointerValue</li>
-    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::LteEnbRrc></li>
+    <li>Underlying type:  \ref ns3::Ptr<  \ref ns3::NrGnbRrc></li>
     <li>Initial value: 0</li>
     <li>Flags: <span class="mlabel">construct </span><span class="mlabel">write </span><span class="mlabel">read </span></li>
   </ul>
@@ -807,9 +807,9 @@ ns3::NrGnbPhy is accessible through the following paths with Config::Set and Con
 <ul>
 <li><b>UlSinrTrace</b>: UL SINR statistics.<br>%Callback signature: ns3::UlSinr::TracedCallback
 </li>
-<li><b>GnbPhyRxedCtrlMsgsTrace</b>: Enb PHY Rxed Control Messages Traces.<br>%Callback signature: ns3::NrPhyRxTrace::RxedGnbPhyCtrlMsgsTracedCallback
+<li><b>GnbPhyRxedCtrlMsgsTrace</b>: Gnb PHY Rxed Control Messages Traces.<br>%Callback signature: ns3::NrPhyRxTrace::RxedGnbPhyCtrlMsgsTracedCallback
 </li>
-<li><b>GnbPhyTxedCtrlMsgsTrace</b>: Enb PHY Txed Control Messages Traces.<br>%Callback signature: ns3::NrPhyRxTrace::TxedGnbPhyCtrlMsgsTracedCallback
+<li><b>GnbPhyTxedCtrlMsgsTrace</b>: Gnb PHY Txed Control Messages Traces.<br>%Callback signature: ns3::NrPhyRxTrace::TxedGnbPhyCtrlMsgsTracedCallback
 </li>
 </ul>
 <b>Size</b> of this type is 1032 bytes (on a 64-bit architecture).
@@ -1734,9 +1734,9 @@ ns3::NrSpectrumPhy is accessible through the following paths with Config::Set an
 </ul>
 \section tracesources_466 TraceSources
 <ul>
-<li><b>RxPacketTraceEnb</b>: The no. of packets received and transmitted by the Base Station<br>%Callback signature: ns3::RxPacketTraceParams::TracedCallback
+<li><b>RxPacketTraceGnb</b>: The no. of packets received and transmitted by the Base Station<br>%Callback signature: ns3::RxPacketTraceParams::TracedCallback
 </li>
-<li><b>TxPacketTraceEnb</b>: Traces when the packet is being transmitted by the Base Station<br>%Callback signature: ns3::GnbPhyPacketCountParameter::TracedCallback
+<li><b>TxPacketTraceGnb</b>: Traces when the packet is being transmitted by the Base Station<br>%Callback signature: ns3::GnbPhyPacketCountParameter::TracedCallback
 </li>
 <li><b>RxPacketTraceUe</b>: The no. of packets received and transmitted by the User Device<br>%Callback signature: ns3::RxPacketTraceParams::TracedCallback
 </li>
@@ -1988,9 +1988,9 @@ This is a list of all \ref attribute by class.  For more information see the \re
 
 <b>ns3::BandwidthPartGnb</b><br>
 <ul>
-<li><b>NrGnbPhy</b>: The PHY associated to this EnbNetDevice</li>
-<li><b>NrGnbMac</b>: The MAC associated to this EnbNetDevice</li>
-<li><b>NrFfMacScheduler</b>: The scheduler associated to this EnbNetDevice</li>
+<li><b>NrGnbPhy</b>: The PHY associated to this GnbNetDevice</li>
+<li><b>NrGnbMac</b>: The MAC associated to this GnbNetDevice</li>
+<li><b>NrFfMacScheduler</b>: The scheduler associated to this GnbNetDevice</li>
 </ul>
 <b>ns3::BandwidthPartUe</b><br>
 <ul>
@@ -2046,9 +2046,9 @@ This is a list of all \ref attribute by class.  For more information see the \re
 </ul>
 <b>ns3::NrGnbNetDevice</b><br>
 <ul>
-<li><b>LteEnbComponentCarrierManager</b>: The component carrier manager associated to this EnbNetDevice</li>
+<li><b>NrGnbComponentCarrierManager</b>: The component carrier manager associated to this GnbNetDevice</li>
 <li><b>BandwidthPartMap</b>: List of Bandwidth Part container.</li>
-<li><b>LteEnbRrc</b>: The RRC layer associated with the ENB</li>
+<li><b>NrGnbRrc</b>: The RRC layer associated with the ENB</li>
 </ul>
 <b>ns3::NrGnbPhy</b><br>
 <ul>
@@ -2206,7 +2206,7 @@ CoDelQueueDisc                              | src/traffic-control/model/codel-qu
 CobaltQueueDisc                             | src/traffic-control/model/cobalt-queue-disc.cc
 CommandLine                                 | src/core/model/command-line.cc
 NrComponentCarrier                            | src/lte/model/component-carrier.cc
-NrComponentCarrierEnb                         | src/lte/model/component-carrier-enb.cc
+NrComponentCarrierGnb                         | src/lte/model/component-carrier-enb.cc
 ComponentCarrierUe                          | src/lte/model/component-carrier-ue.cc
 Config                                      | src/core/model/config.cc
 ConfigStore                                 | src/config-store/model/config-store.cc
@@ -2231,7 +2231,7 @@ DynamicQueueLimits                          | src/network/utils/dynamic-queue-li
 EmuEpcHelper                                | src/lte/helper/emu-epc-helper.cc
 EmuFdNetDeviceHelper                        | src/fd-net-device/helper/emu-fd-net-device-helper.cc
 Enum                                        | src/core/model/enum.cc
-NrEpcEnbApplication                           | src/lte/model/epc-enb-application.cc
+NrEpcGnbApplication                           | src/lte/model/epc-enb-application.cc
 EpcHelper                                   | src/lte/helper/epc-helper.cc
 NrEpcMmeApplication                           | src/lte/model/epc-mme-application.cc
 NrEpcPgwApplication                           | src/lte/model/epc-pgw-application.cc
@@ -2354,11 +2354,11 @@ LteAnr                                      | src/lte/model/lte-anr.cc
 LteChunkProcessor                           | src/lte/model/lte-chunk-processor.cc
 LteCommon                                   | src/lte/model/lte-common.cc
 LteControlMessage                           | src/lte/model/lte-control-messages.cc
-LteEnbComponentCarrierManager               | src/lte/model/lte-enb-component-carrier-manager.cc
-LteEnbMac                                   | src/lte/model/lte-enb-mac.cc
-LteEnbNetDevice                             | src/lte/model/lte-enb-net-device.cc
-LteEnbPhy                                   | src/lte/model/lte-enb-phy.cc
-LteEnbRrc                                   | src/lte/model/lte-enb-rrc.cc
+NrGnbComponentCarrierManager               | src/lte/model/lte-enb-component-carrier-manager.cc
+NrGnbMac                                   | src/lte/model/lte-enb-mac.cc
+NrGnbNetDevice                             | src/lte/model/lte-enb-net-device.cc
+NrGnbPhy                                   | src/lte/model/lte-enb-phy.cc
+NrGnbRrc                                   | src/lte/model/lte-enb-rrc.cc
 LteFfrAlgorithm                             | src/lte/model/lte-ffr-algorithm.cc
 LteFfrDistributedAlgorithm                  | src/lte/model/lte-ffr-distributed-algorithm.cc
 LteFfrEnhancedAlgorithm                     | src/lte/model/lte-ffr-enhanced-algorithm.cc
@@ -2371,7 +2371,7 @@ LteGlobalPathlossDatabase                   | src/lte/helper/lte-global-pathloss
 LteHandoverAlgorithm                        | src/lte/model/lte-handover-algorithm.cc
 LteHarqPhy                                  | src/lte/model/lte-harq-phy.cc
 LteHelper                                   | src/lte/helper/lte-helper.cc
-LteHexGridEnbTopologyHelper                 | src/lte/helper/lte-hex-grid-enb-topology-helper.cc
+LteHexGridGnbTopologyHelper                 | src/lte/helper/lte-hex-grid-enb-topology-helper.cc
 LteInterference                             | src/lte/model/lte-interference.cc
 NrLteMiErrorModel                             | src/lte/model/lte-mi-error-model.cc
 LteNetDevice                                | src/lte/model/lte-net-device.cc
@@ -2670,15 +2670,15 @@ This is a list of all \ref tracing sources.  For more information see the  \ref 
 <ul>
 <li><b>DlScheduling</b>: Information regarding DL scheduling.</li>
 <li><b>SrReq</b>: Information regarding received scheduling request.</li>
-<li><b>GnbMacRxedCtrlMsgsTrace</b>: Enb MAC Rxed Control Messages Traces.</li>
-<li><b>GnbMacTxedCtrlMsgsTrace</b>: Enb MAC Txed Control Messages Traces.</li>
+<li><b>GnbMacRxedCtrlMsgsTrace</b>: Gnb MAC Rxed Control Messages Traces.</li>
+<li><b>GnbMacTxedCtrlMsgsTrace</b>: Gnb MAC Txed Control Messages Traces.</li>
 <li><b>DlHarqFeedback</b>: Harq feedback.</li>
 </ul>
 <b>ns3::NrGnbPhy</b><br>
 <ul>
 <li><b>UlSinrTrace</b>: UL SINR statistics.</li>
-<li><b>GnbPhyRxedCtrlMsgsTrace</b>: Enb PHY Rxed Control Messages Traces.</li>
-<li><b>GnbPhyTxedCtrlMsgsTrace</b>: Enb PHY Txed Control Messages Traces.</li>
+<li><b>GnbPhyRxedCtrlMsgsTrace</b>: Gnb PHY Rxed Control Messages Traces.</li>
+<li><b>GnbPhyTxedCtrlMsgsTrace</b>: Gnb PHY Txed Control Messages Traces.</li>
 </ul>
 <b>ns3::NrInterference</b><br>
 <ul>
@@ -2691,8 +2691,8 @@ This is a list of all \ref tracing sources.  For more information see the  \ref 
 </ul>
 <b>ns3::NrSpectrumPhy</b><br>
 <ul>
-<li><b>RxPacketTraceEnb</b>: The no. of packets received and transmitted by the Base Station</li>
-<li><b>TxPacketTraceEnb</b>: Traces when the packet is being transmitted by the Base Station</li>
+<li><b>RxPacketTraceGnb</b>: The no. of packets received and transmitted by the Base Station</li>
+<li><b>TxPacketTraceGnb</b>: Traces when the packet is being transmitted by the Base Station</li>
 <li><b>RxPacketTraceUe</b>: The no. of packets received and transmitted by the User Device</li>
 <li><b>ChannelOccupied</b>: This traced callback is triggered every time that the channel is occupied</li>
 <li><b>TxDataTrace</b>: Indicates when the channel is being occupied by a data transmission</li>

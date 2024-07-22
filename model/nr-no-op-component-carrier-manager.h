@@ -11,7 +11,7 @@
 #define NR_NO_OP_COMPONENT_CARRIER_MANAGER_H
 
 #include "nr-ccm-rrc-sap.h"
-#include "nr-enb-component-carrier-manager.h"
+#include "nr-gnb-component-carrier-manager.h"
 #include "nr-rrc-sap.h"
 
 #include <map>

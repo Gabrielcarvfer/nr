@@ -7,8 +7,8 @@
 #ifndef NR_CCM_RRC_SAP_H
 #define NR_CCM_RRC_SAP_H
 
-#include "nr-enb-cmac-sap.h"
 #include "nr-eps-bearer.h"
+#include "nr-gnb-cmac-sap.h"
 #include "nr-mac-sap.h"
 #include "nr-rrc-sap.h"
 

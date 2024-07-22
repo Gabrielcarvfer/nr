@@ -12,7 +12,7 @@
 //   Biljana Bojovic <biljana.bojovic@cttc.es> (Carrier Aggregation)
 //   Vignesh Babu <ns3-dev@esk.fraunhofer.de> (RLF extensions)
 
-#include "nr-enb-rrc.h"
+#include "nr-gnb-rrc.h"
 
 #include "nr-common.h"
 #include "nr-component-carrier-enb.h"

@@ -114,11 +114,11 @@ NrGnbPhy::GetTypeId()
                             MakeTraceSourceAccessor(&NrGnbPhy::m_ulSinrTrace),
                             "ns3::UlSinr::TracedCallback")
             .AddTraceSource("GnbPhyRxedCtrlMsgsTrace",
-                            "Enb PHY Rxed Control Messages Traces.",
+                            "Gnb PHY Rxed Control Messages Traces.",
                             MakeTraceSourceAccessor(&NrGnbPhy::m_phyRxedCtrlMsgsTrace),
                             "ns3::NrPhyRxTrace::RxedGnbPhyCtrlMsgsTracedCallback")
             .AddTraceSource("GnbPhyTxedCtrlMsgsTrace",
-                            "Enb PHY Txed Control Messages Traces.",
+                            "Gnb PHY Txed Control Messages Traces.",
                             MakeTraceSourceAccessor(&NrGnbPhy::m_phyTxedCtrlMsgsTrace),
                             "ns3::NrPhyRxTrace::TxedGnbPhyCtrlMsgsTracedCallback")
             .AddAttribute("N0Delay",

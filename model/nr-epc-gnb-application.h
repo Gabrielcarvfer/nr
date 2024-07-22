@@ -9,7 +9,7 @@
 #ifndef NR_EPC_ENB_APPLICATION_H
 #define NR_EPC_ENB_APPLICATION_H
 
-#include "nr-epc-enb-s1-sap.h"
+#include "nr-epc-gnb-s1-sap.h"
 #include "nr-epc-s1ap-sap.h"
 
 #include <ns3/address.h>

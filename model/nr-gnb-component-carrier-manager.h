@@ -9,8 +9,8 @@
 
 #include "nr-ccm-mac-sap.h"
 #include "nr-ccm-rrc-sap.h"
-#include "nr-enb-cmac-sap.h"
-#include "nr-enb-rrc.h"
+#include "nr-gnb-cmac-sap.h"
+#include "nr-gnb-rrc.h"
 #include "nr-mac-sap.h"
 #include "nr-rrc-sap.h"
 

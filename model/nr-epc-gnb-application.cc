@@ -5,7 +5,7 @@
 // Author: Jaume Nin <jnin@cttc.cat>
 //         Nicola Baldo <nbaldo@cttc.cat>
 
-#include "nr-epc-enb-application.h"
+#include "nr-epc-gnb-application.h"
 
 #include "nr-epc-gtpu-header.h"
 #include "nr-eps-bearer-tag.h"
@@ -51,7 +51,7 @@ NrEpcEnbApplication::GetTypeId()
             .SetParent<Object>()
             .SetGroupName("Nr")
             .AddTraceSource("RxFromEnb",
-                            "Receive data packets from LTE Enb Net Device",
+                            "Receive data packets from NR Gnb Net Device",
                             MakeTraceSourceAccessor(&NrEpcEnbApplication::m_rxNrSocketPktTrace),
                             "ns3::NrEpcEnbApplication::RxTracedCallback")
             .AddTraceSource("RxFromS1u",

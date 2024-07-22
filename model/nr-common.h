@@ -176,7 +176,7 @@ class TransmissionModesLayers
 struct PhyTransmissionStatParameters
 {
     int64_t m_timestamp; ///< in millisecond
-    uint16_t m_cellId;   ///< Cell ID of the attached Enb
+    uint16_t m_cellId;   ///< Cell ID of the attached Gnb
     uint64_t m_imsi;     ///< IMSI of the scheduled UE
     uint16_t m_rnti;     ///< C-RNTI scheduled
     uint8_t m_txMode;    ///< the transmission Mode
@@ -200,7 +200,7 @@ struct PhyTransmissionStatParameters
 struct PhyReceptionStatParameters
 {
     int64_t m_timestamp;   ///< in millisecond
-    uint16_t m_cellId;     ///< Cell ID of the attached Enb
+    uint16_t m_cellId;     ///< Cell ID of the attached Gnb
     uint64_t m_imsi;       ///< IMSI of the scheduled UE
     uint16_t m_rnti;       ///< C-RNTI scheduled
     uint8_t m_txMode;      ///< the transmission Mode

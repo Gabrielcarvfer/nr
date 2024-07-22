@@ -4,7 +4,7 @@
 //
 // Author: Danilo Abrignani <danilo.abrignani@unibo.it>
 
-#include "nr-enb-component-carrier-manager.h"
+#include "nr-gnb-component-carrier-manager.h"
 
 #include "nr-common.h"
 

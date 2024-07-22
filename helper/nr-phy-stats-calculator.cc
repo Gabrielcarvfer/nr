@@ -234,7 +234,7 @@ NrPhyStatsCalculator::ReportUeSinr(Ptr<NrPhyStatsCalculator> phyStats,
     std::ostringstream pathAndRnti;
     pathAndRnti << path << "/" << rnti;
     std::string pathEnbMac = path.substr(0, path.find("/ComponentCarrierMap"));
-    pathEnbMac += "/NrEnbMac/DlScheduling";
+    pathEnbMac += "/NrGnbMac/DlScheduling";
     if (phyStats->ExistsImsiPath(pathAndRnti.str()))
     {
         imsi = phyStats->GetImsiPath(pathAndRnti.str());

@@ -808,7 +808,7 @@ ns3::NrUeNetDevice#</dia:string>
         <dia:composite type="text">
           <dia:attribute name="string">
             <dia:string>#RRC
-ns3::LteEnbRrc#</dia:string>
+ns3::NrGnbRrc#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>

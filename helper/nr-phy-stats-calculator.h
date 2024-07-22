@@ -32,13 +32,13 @@ namespace ns3
  *   - componentCarrierId
  * - UE SINR
  *   - Timestamp (in seconds)
- *   - Cell ID of the reported Enb
+ *   - Cell ID of the reported Gnb
  *   - IMSI
  *   - C-RNTI
  *   - measured and reported SINR value in linear
  *   - componentCarrierId
  * - Interference for UL
- *   - Cell ID of the reported Enb
+ *   - Cell ID of the reported Gnb
  *   - IMSI of the scheduled UE
  *   - C-RNTI scheduled
  *   - Measured interference for each RB
@@ -120,7 +120,7 @@ class NrPhyStatsCalculator : public NrStatsCalculator
 
     /**
      * Notifies the stats calculator that an UE SINR report has occurred.
-     * @param cellId Cell ID of the reported Enb
+     * @param cellId Cell ID of the reported Gnb
      * @param imsi IMSI of the scheduled UE
      * @param rnti C-RNTI scheduled
      * @param sinrLinear measured and reported SINR value in linear
@@ -134,7 +134,7 @@ class NrPhyStatsCalculator : public NrStatsCalculator
 
     /**
      * Notifies the stats calculator that an interference report has occurred.
-     * @param cellId Cell ID of the reported Enb
+     * @param cellId Cell ID of the reported Gnb
      * @param interference Measured interference for each RB
      */
     void ReportInterference(uint16_t cellId, Ptr<SpectrumValue> interference);

@@ -6,10 +6,10 @@
 
 #include "bandwidth-part-gnb.h"
 #include "bwp-manager-gnb.h"
-#include "nr-enb-component-carrier-manager.h"
-#include "nr-enb-rrc.h"
+#include "nr-gnb-component-carrier-manager.h"
 #include "nr-gnb-mac.h"
 #include "nr-gnb-phy.h"
+#include "nr-gnb-rrc.h"
 
 #include <ns3/abort.h>
 #include <ns3/ipv4-l3-protocol.h>

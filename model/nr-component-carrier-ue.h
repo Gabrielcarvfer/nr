@@ -56,8 +56,8 @@ class ComponentCarrierUe : public NrComponentCarrier
     void SetPhy(Ptr<NrUePhy> s);
 
     /**
-     * Set the NrEnbMac
-     * \param s a pointer to the NrEnbMac
+     * Set the NrGnbMac
+     * \param s a pointer to the NrGnbMac
      */
     void SetMac(Ptr<NrUeMac> s);
 

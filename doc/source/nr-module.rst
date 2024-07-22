@@ -59,7 +59,7 @@ The 'NR' module has been designed to perform end-to-end simulations of 3GPP-orie
 
    End-to-end class overview
 
-Concerning the RAN, we detail what is happening between ``NRGnbNetDevice`` and ``NRUeNetDevice`` in Figure :ref:`fig-ran`. The ``NRGnbMac`` and ``NRUeMac`` MAC classes implement the LTE module Service Access Point (SAP) provider and user interfaces, enabling the communication with the LTE RLC layer. The module supports RLC TM, SM, UM, and AM modes. The MAC layer contains the scheduler (``NRMacScheduler`` and derived classes). Every scheduler also implements an SAP for LTE RRC layer configuration (``LteEnbRrc``). The ``NrPhy`` classes are used to perform the directional communication for both downlink (DL) and uplink (UL), to transmit/receive the data and control channels. Each ``NrPhy`` class writes into an instance of the ``NrSpectrumPhy`` class, which is shared between the UL and DL parts.
+Concerning the RAN, we detail what is happening between ``NRGnbNetDevice`` and ``NRUeNetDevice`` in Figure :ref:`fig-ran`. The ``NRGnbMac`` and ``NRUeMac`` MAC classes implement the LTE module Service Access Point (SAP) provider and user interfaces, enabling the communication with the LTE RLC layer. The module supports RLC TM, SM, UM, and AM modes. The MAC layer contains the scheduler (``NRMacScheduler`` and derived classes). Every scheduler also implements an SAP for LTE RRC layer configuration (``NrGnbRrc``). The ``NrPhy`` classes are used to perform the directional communication for both downlink (DL) and uplink (UL), to transmit/receive the data and control channels. Each ``NrPhy`` class writes into an instance of the ``NrSpectrumPhy`` class, which is shared between the UL and DL parts.
 
 .. _fig-ran:
 

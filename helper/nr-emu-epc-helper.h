@@ -81,7 +81,7 @@ class EmunrEpcHelper : public NrNoBackhaulEpcHelper
     std::string m_sgwMacAddress;
 
     /**
-     * First 5 bytes of the Enb MAC address base
+     * First 5 bytes of the Gnb MAC address base
      */
     std::string m_enbMacAddressBase;
 };

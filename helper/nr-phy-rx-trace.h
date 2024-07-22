@@ -94,7 +94,7 @@ class NrPhyRxTrace : public Object
                                          RxPacketTraceParams param);
 
     /**
-     *  Trace sink for Enb Phy Received Control Messages.
+     *  Trace sink for Gnb Phy Received Control Messages.
      *
      * \param [in] phyStats Physical layer statistics.
      * \param [in] path Path of the file where the traces will be written
@@ -113,7 +113,7 @@ class NrPhyRxTrace : public Object
                                            Ptr<const NrControlMessage> msg);
 
     /**
-     *  Trace sink for Enb Phy Transmitted Control Messages.
+     *  Trace sink for Gnb Phy Transmitted Control Messages.
      *
      * \param [in] frame Frame number
      * \param [in] subframe Subframe number

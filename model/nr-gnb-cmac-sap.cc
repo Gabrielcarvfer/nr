@@ -2,18 +2,18 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 //
-// Author: Marco Miozzo <marco.miozzo@cttc.es>
+// Author: Marco Miozzo <mmiozzo@cttc.es>
 
-#include "nr-enb-phy-sap.h"
+#include "nr-gnb-cmac-sap.h"
 
 namespace ns3
 {
 
-NrEnbPhySapProvider::~NrEnbPhySapProvider()
+NrEnbCmacSapProvider::~NrEnbCmacSapProvider()
 {
 }
 
-NrEnbPhySapUser::~NrEnbPhySapUser()
+NrEnbCmacSapUser::~NrEnbCmacSapUser()
 {
 }
 

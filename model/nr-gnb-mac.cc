@@ -417,11 +417,11 @@ NrGnbMac::GetTypeId()
                             MakeTraceSourceAccessor(&NrGnbMac::m_srCallback),
                             "ns3::NrGnbMac::SrTracedCallback")
             .AddTraceSource("GnbMacRxedCtrlMsgsTrace",
-                            "Enb MAC Rxed Control Messages Traces.",
+                            "Gnb MAC Rxed Control Messages Traces.",
                             MakeTraceSourceAccessor(&NrGnbMac::m_macRxedCtrlMsgsTrace),
                             "ns3::NrMacRxTrace::RxedGnbMacCtrlMsgsTracedCallback")
             .AddTraceSource("GnbMacTxedCtrlMsgsTrace",
-                            "Enb MAC Txed Control Messages Traces.",
+                            "Gnb MAC Txed Control Messages Traces.",
                             MakeTraceSourceAccessor(&NrGnbMac::m_macTxedCtrlMsgsTrace),
                             "ns3::NrMacRxTrace::TxedGnbMacCtrlMsgsTracedCallback")
             .AddTraceSource("DlHarqFeedback",

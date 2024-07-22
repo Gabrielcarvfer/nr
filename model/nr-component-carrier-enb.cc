@@ -36,7 +36,7 @@ NrComponentCarrierEnb::GetTypeId()
                           PointerValue(),
                           MakePointerAccessor(&NrComponentCarrierEnb::m_phy),
                           MakePointerChecker<NrGnbPhy>())
-            .AddAttribute("NrEnbMac",
+            .AddAttribute("NrGnbMac",
                           "The MAC associated to this EnbNetDevice",
                           PointerValue(),
                           MakePointerAccessor(&NrComponentCarrierEnb::m_mac),

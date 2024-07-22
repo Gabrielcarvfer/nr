@@ -142,25 +142,25 @@ set(source_files
     model/nr-common.cc
     helper/nr-stats-calculator.cc
     model/nr-ue-cphy-sap.cc
-    model/nr-enb-rrc.cc
+    model/nr-gnb-rrc.cc
     model/nr-ue-rrc.cc
     model/nr-interference.cc
     model/nr-epc-x2.cc
     model/nr-epc-ue-nas.cc
     model/nr-rrc-sap.cc
-    model/nr-enb-cphy-sap.cc
+    model/nr-gnb-cphy-sap.cc
     model/nr-ccm-mac-sap.cc
-    model/nr-enb-cmac-sap.cc
+    model/nr-gnb-cmac-sap.cc
     model/nr-mac-sap.cc
     model/nr-chunk-processor.cc
-    model/nr-enb-phy-sap.cc
+    model/nr-gnb-phy-sap.cc
     model/nr-component-carrier.cc
     model/nr-ccm-rrc-sap.cc
     model/nr-rlc.cc
     model/nr-no-op-component-carrier-manager.cc
     model/nr-simple-ue-component-carrier-manager.cc
     model/nr-ue-cmac-sap.cc
-    model/nr-epc-enb-application.cc
+    model/nr-epc-gnb-application.cc
     helper/nr-epc-helper.cc
     model/nr-epc-x2.cc
     model/nr-rrc-protocol-real.cc
@@ -168,10 +168,10 @@ set(source_files
     model/nr-ue-component-carrier-manager.cc
     helper/nr-no-backhaul-epc-helper.cc
     model/nr-epc-mme-application.cc
-    model/nr-epc-enb-application.cc
+    model/nr-epc-gnb-application.cc
     model/nr-epc-pgw-application.cc
     model/nr-epc-sgw-application.cc
-    model/nr-enb-component-carrier-manager.cc
+    model/nr-gnb-component-carrier-manager.cc
     model/nr-pdcp.cc
     model/nr-rlc-am.cc
     model/nr-rlc-am-header.cc
@@ -186,8 +186,8 @@ set(source_files
     model/nr-radio-bearer-tag.cc
     model/nr-epc-s1ap-sap.cc
     model/nr-epc-s11-sap.cc
-    model/nr-epc-enb-s1-sap.cc
-    model/nr-epc-enb-application.cc
+    model/nr-epc-gnb-s1-sap.cc
+    model/nr-epc-gnb-application.cc
     model/nr-ffr-rrc-sap.cc
     model/nr-anr-sap.cc
     model/nr-handover-algorithm.cc
@@ -370,37 +370,37 @@ set(header_files
     model/nr-common.h
     helper/nr-stats-calculator.h
     model/nr-ue-cphy-sap.h
-    model/nr-enb-rrc.h
+    model/nr-gnb-rrc.h
     model/nr-ue-rrc.h
     model/nr-interference.h
     model/nr-epc-x2.h
     model/nr-epc-ue-nas.h
     model/nr-rrc-sap.h
-    model/nr-enb-cphy-sap.h
+    model/nr-gnb-cphy-sap.h
     model/nr-ccm-mac-sap.h
-    model/nr-enb-cmac-sap.h
+    model/nr-gnb-cmac-sap.h
     model/nr-mac-sap.h
     model/nr-chunk-processor.h
-    model/nr-enb-phy-sap.h
+    model/nr-gnb-phy-sap.h
     model/nr-component-carrier.h
     model/nr-ccm-rrc-sap.h
     model/nr-rlc.h
     model/nr-no-op-component-carrier-manager.h
     model/nr-simple-ue-component-carrier-manager.h
     model/nr-ue-cmac-sap.h
-    model/nr-epc-enb-application.h
+    model/nr-epc-gnb-application.h
     helper/nr-epc-helper.h
     model/nr-epc-x2.h
     model/nr-rrc-protocol-real.h
     model/nr-interference-base.h
     model/nr-ue-component-carrier-manager.h
-    model/nr-enb-component-carrier-manager.h
+    model/nr-gnb-component-carrier-manager.h
     helper/nr-no-backhaul-epc-helper.h
     model/nr-epc-mme-application.h
-    model/nr-epc-enb-application.h
+    model/nr-epc-gnb-application.h
     model/nr-epc-pgw-application.h
     model/nr-epc-sgw-application.h
-    model/nr-enb-component-carrier-manager.h
+    model/nr-gnb-component-carrier-manager.h
     model/nr-pdcp.h
     model/nr-rlc-am.h
     model/nr-rlc-am-header.h
@@ -415,8 +415,8 @@ set(header_files
     model/nr-radio-bearer-tag.h
     model/nr-epc-s1ap-sap.h
     model/nr-epc-s11-sap.h
-    model/nr-epc-enb-s1-sap.h
-    model/nr-epc-enb-application.h
+    model/nr-epc-gnb-s1-sap.h
+    model/nr-epc-gnb-application.h
     model/nr-ffr-rrc-sap.h
     model/nr-anr-sap.h
     model/nr-handover-algorithm.h

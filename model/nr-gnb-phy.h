@@ -7,8 +7,8 @@
 
 #include "ideal-beamforming-algorithm.h"
 #include "nr-control-messages.h"
-#include "nr-enb-cphy-sap.h"
-#include "nr-enb-phy-sap.h"
+#include "nr-gnb-cphy-sap.h"
+#include "nr-gnb-phy-sap.h"
 #include "nr-harq-phy.h"
 #include "nr-phy.h"
 

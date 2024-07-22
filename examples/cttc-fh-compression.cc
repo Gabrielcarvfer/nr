@@ -47,7 +47,6 @@ $ ./ns3 run "cttc-fh-compression --PrintHelp"
 #include "ns3/nr-module.h"
 #include "ns3/point-to-point-module.h"
 #include <ns3/antenna-module.h>
-#include <ns3/nr-radio-environment-map-helper.h>
 #include <ns3/rng-seed-manager.h>
 #include <ns3/three-gpp-ftp-m1-helper.h>
 
@@ -78,9 +77,9 @@ class RadioNetworkParametersHelper
      * \brief Set the radio network parameters to LTE.
      * \param freqReuse The cell frequency reuse.
      */
-    void SetNetworkToNr(const std::string scenario,
-                        const std::string operationMode,
-                        uint16_t numCcs);
+    void SetNetworkToLte(const std::string scenario,
+                         const std::string operationMode,
+                         uint16_t numCcs);
 
     /**
      * \brief Set the radio network parameters to NR.
@@ -88,10 +87,10 @@ class RadioNetworkParametersHelper
      * \param numerology Numerology to use.
      * \param freqReuse The cell frequency reuse.
      */
-    void SetNetworkToNr(const std::string scenario,
-                        const std::string operationMode,
-                        uint16_t numerology,
-                        uint16_t numCcs);
+    void SetNetworkToLte(const std::string scenario,
+                         const std::string operationMode,
+                         uint16_t numerology,
+                         uint16_t numCcs);
 
     /**
      * \brief Gets the BS transmit power
@@ -163,9 +162,9 @@ GetMcsVectorFromInput(const std::string& pattern)
 }
 
 void
-RadioNetworkParametersHelper::SetNetworkToNr(const std::string scenario,
-                                             const std::string operationMode,
-                                             uint16_t numCcs)
+RadioNetworkParametersHelper::SetNetworkToLte(const std::string scenario,
+                                              const std::string operationMode,
+                                              uint16_t numCcs)
 {
     NS_ABORT_MSG_IF(scenario != "UMa" && scenario != "UMi", "Unsupported scenario");
 
@@ -187,10 +186,10 @@ RadioNetworkParametersHelper::SetNetworkToNr(const std::string scenario,
 }
 
 void
-RadioNetworkParametersHelper::SetNetworkToNr(const std::string scenario,
-                                             const std::string operationMode,
-                                             uint16_t numerology,
-                                             uint16_t numCcs)
+RadioNetworkParametersHelper::SetNetworkToLte(const std::string scenario,
+                                              const std::string operationMode,
+                                              uint16_t numerology,
+                                              uint16_t numCcs)
 {
     NS_ABORT_MSG_IF(scenario != "UMa" && scenario != "UMi", "Unsupported scenario");
 
@@ -272,7 +271,7 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
     RadioNetworkParametersHelper ranHelper;
     if (radioNetwork == "LTE")
     {
-        ranHelper.SetNetworkToNr(scenario, operationMode, 1);
+        ranHelper.SetNetworkToLte(scenario, operationMode, 1);
         if (errorModel.empty())
         {
             errorModel = "ns3::LenaErrorModel";
@@ -284,7 +283,7 @@ Set5gLenaSimulatorParameters(HexagonalGridScenarioHelper gridScenario,
     }
     else if (radioNetwork == "NR")
     {
-        ranHelper.SetNetworkToNr(scenario, operationMode, numerology, 1);
+        ranHelper.SetNetworkToLte(scenario, operationMode, numerology, 1);
         if (errorModel.empty())
         {
             errorModel = "ns3::NrEesmIrT2";

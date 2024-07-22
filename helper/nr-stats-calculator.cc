@@ -6,8 +6,8 @@
 
 #include <ns3/config.h>
 #include <ns3/log.h>
-#include <ns3/nr-enb-rrc.h>
 #include <ns3/nr-gnb-net-device.h>
+#include <ns3/nr-gnb-rrc.h>
 #include <ns3/nr-ue-net-device.h>
 #include <ns3/nr-ue-rrc.h>
 

@@ -4,8 +4,8 @@
 
 #include "nr-rrc-protocol-ideal.h"
 
-#include "nr-enb-rrc.h"
 #include "nr-gnb-net-device.h"
+#include "nr-gnb-rrc.h"
 #include "nr-ue-net-device.h"
 #include "nr-ue-rrc.h"
 

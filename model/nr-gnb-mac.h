@@ -6,7 +6,7 @@
 #define NR_ENB_MAC_H
 
 #include "nr-ccm-mac-sap.h"
-#include "nr-enb-cmac-sap.h"
+#include "nr-gnb-cmac-sap.h"
 #include "nr-mac-pdu-info.h"
 #include "nr-mac-sap.h"
 #include "nr-mac-sched-sap.h"
@@ -206,7 +206,7 @@ class NrGnbMac : public Object
     typedef void (*SrTracedCallback)(const uint8_t bwpId, const uint16_t rnti);
 
     /**
-     *  TracedCallback signature for Enb Mac Received Control Messages.
+     *  TracedCallback signature for Gnb Mac Received Control Messages.
      *
      * \param [in] frame Frame number.
      * \param [in] subframe Subframe number.
@@ -224,7 +224,7 @@ class NrGnbMac : public Object
                                                      Ptr<NrControlMessage>);
 
     /**
-     *  TracedCallback signature for Enb Mac Transmitted Control Messages.
+     *  TracedCallback signature for Gnb Mac Transmitted Control Messages.
      *
      * \param [in] frame Frame number.
      * \param [in] subframe Subframe number.

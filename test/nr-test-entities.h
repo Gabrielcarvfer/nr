@@ -15,7 +15,7 @@
 #include "ns3/nr-rlc-sap.h"
 #include "ns3/simulator.h"
 #include "ns3/test.h"
-#include <ns3/nr-epc-enb-s1-sap.h>
+#include <ns3/nr-epc-gnb-s1-sap.h>
 
 namespace ns3
 {

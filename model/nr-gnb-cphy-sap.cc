@@ -4,16 +4,16 @@
 //
 // Author: Nicola Baldo <nbaldo@cttc.es>
 
-#include "nr-epc-enb-s1-sap.h"
+#include "nr-gnb-cphy-sap.h"
 
 namespace ns3
 {
 
-NrEpcEnbS1SapProvider::~NrEpcEnbS1SapProvider()
+NrEnbCphySapProvider::~NrEnbCphySapProvider()
 {
 }
 
-NrEpcEnbS1SapUser::~NrEpcEnbS1SapUser()
+NrEnbCphySapUser::~NrEnbCphySapUser()
 {
 }
 

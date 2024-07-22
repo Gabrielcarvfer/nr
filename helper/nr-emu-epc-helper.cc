@@ -13,7 +13,7 @@
 #include "ns3/epc-x2.h"
 #include "ns3/log.h"
 #include "ns3/lte-enb-net-device.h"
-#include "ns3/nr-enb-rrc.h"
+#include "ns3/nr-gnb-rrc.h"
 #include "ns3/string.h"
 
 #include <iomanip>

@@ -146,7 +146,7 @@ class NrUePhy : public NrPhy
     void SetUplinkPowerControl(Ptr<NrUePowerControl> pc);
 
     /**
-     * \brief Register the UE to a certain Enb
+     * \brief Register the UE to a certain Gnb
      *
      * Install the configuration parameters in the UE.
      *
