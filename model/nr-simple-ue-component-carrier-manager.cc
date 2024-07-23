@@ -250,6 +250,7 @@ NrSimpleUeComponentCarrierManager::DoRemoveLc(uint8_t lcid)
     std::vector<uint16_t> res;
     NS_ABORT_MSG_IF(m_lcAttached.find(lcid) == m_lcAttached.end(), "could not find LCID " << lcid);
     m_lcAttached.erase(lcid);
+
     // send back all the configuration to the NrComponentCarrier where we want to remove the Lc
     auto it = m_componentCarrierLcMap.begin();
     while (it != m_componentCarrierLcMap.end())
@@ -259,6 +260,7 @@ NrSimpleUeComponentCarrierManager::DoRemoveLc(uint8_t lcid)
         {
             res.insert(res.end(), it->first);
         }
+        it->second.erase(lcToRemove);
         it++;
     }
     NS_ABORT_MSG_IF(res.empty(),

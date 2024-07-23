@@ -653,7 +653,7 @@ NrUeManager::PrepareHandover(uint16_t cellId)
     case CONNECTED_NORMALLY: {
         m_targetCellId = cellId;
 
-        auto sourceComponentCarrier = DynamicCast<NrComponentCarrierEnb>(
+        auto sourceComponentCarrier = DynamicCast<NrComponentCarrierBaseStation>(
             m_rrc->m_componentCarrierPhyConf.at(m_componentCarrierId));
         NS_ASSERT(m_targetCellId != sourceComponentCarrier->GetCellId());
 
@@ -868,8 +868,8 @@ NrUeManager::GetRrcConnectionReconfigurationForHandover(uint8_t componentCarrier
 
     NrRrcSap::RrcConnectionReconfiguration result = BuildRrcConnectionReconfiguration();
 
-    auto targetComponentCarrier =
-        DynamicCast<NrComponentCarrierEnb>(m_rrc->m_componentCarrierPhyConf.at(componentCarrierId));
+    auto targetComponentCarrier = DynamicCast<NrComponentCarrierBaseStation>(
+        m_rrc->m_componentCarrierPhyConf.at(componentCarrierId));
     result.haveMobilityControlInfo = true;
     result.mobilityControlInfo.targetPhysCellId = targetComponentCarrier->GetCellId();
     result.mobilityControlInfo.haveCarrierFreq = true;

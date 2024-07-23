@@ -94,6 +94,7 @@ class BwpManagerUe : public NrSimpleUeComponentCarrierManager
         uint8_t lcId,
         NrUeCmacSapProvider::LogicalChannelConfig lcConfig,
         NrMacSapUser* msu) override;
+    std::vector<uint16_t> DoRemoveLc(uint8_t lcid) override;
     NrMacSapUser* DoConfigureSignalBearer(uint8_t lcId,
                                           NrUeCmacSapProvider::LogicalChannelConfig lcConfig,
                                           NrMacSapUser* msu) override;

@@ -835,6 +835,11 @@ NrGnbMac::DoReceivePhyPdu(Ptr<Packet> p)
     p->RemoveHeader(macHeader);
 
     auto lcidIt = rntiIt->second.find(macHeader.GetLcId());
+    if (lcidIt == rntiIt->second.end())
+    {
+        NS_LOG_DEBUG("Discarding PDU addressed to non-existent LCID " << macHeader.GetLcId());
+        return;
+    }
 
     NrMacSapUser::ReceivePduParameters rxParams;
     rxParams.p = p;
@@ -1356,6 +1361,25 @@ NrGnbMac::DoRemoveUe(uint16_t rnti)
     m_macCschedSapProvider->CschedUeReleaseReq(params);
     m_miDlHarqProcessesPackets.erase(rnti);
     m_rlcAttached.erase(rnti);
+
+    // remove unprocessed preamble received for RACH during handover
+    auto jt = m_allocatedNcRaPreambleMap.begin();
+    while (jt != m_allocatedNcRaPreambleMap.end())
+    {
+        if (jt->second.rnti == rnti)
+        {
+            auto it = m_receivedRachPreambleCount.find(jt->first);
+            if (it != m_receivedRachPreambleCount.end())
+            {
+                m_receivedRachPreambleCount.erase(it->first);
+            }
+            jt = m_allocatedNcRaPreambleMap.erase(jt);
+        }
+        else
+        {
+            ++jt;
+        }
+    }
 }
 
 void
@@ -1459,7 +1483,63 @@ NrGnbMac::DoGetRachConfig()
 NrEnbCmacSapProvider::AllocateNcRaPreambleReturnValue
 NrGnbMac::DoAllocateNcRaPreamble(uint16_t rnti)
 {
-    return NrEnbCmacSapProvider::AllocateNcRaPreambleReturnValue();
+    bool found = false;
+    uint8_t preambleId;
+    for (preambleId = m_numberOfRaPreambles; preambleId < 64; ++preambleId)
+    {
+        std::map<uint8_t, NcRaPreambleInfo>::iterator it =
+            m_allocatedNcRaPreambleMap.find(preambleId);
+        /**
+         * Allocate preamble only if its free. The non-contention preamble
+         * assigned to UE during handover or PDCCH order is valid only until the
+         * time duration of the “expiryTime” of the preamble is reached. This
+         * timer value is only maintained at the gNB and the UE has no way of
+         * knowing if this timer has expired. If the UE tries to send the preamble
+         * again after the expiryTime and the preamble is re-assigned to another
+         * UE, it results in errors. This has been solved by re-assigning the
+         * preamble to another UE only if it is not being used (An UE can be using
+         * the preamble even after the expiryTime duration).
+         */
+        if ((it != m_allocatedNcRaPreambleMap.end()) && (it->second.expiryTime < Simulator::Now()))
+        {
+            if (!m_cmacSapUser->IsRandomAccessCompleted(it->second.rnti))
+            {
+                // random access of the UE is not completed,
+                // check other preambles
+                continue;
+            }
+        }
+        if ((it == m_allocatedNcRaPreambleMap.end()) || (it->second.expiryTime < Simulator::Now()))
+        {
+            found = true;
+            NcRaPreambleInfo preambleInfo;
+            uint32_t expiryIntervalMs =
+                (uint32_t)m_preambleTransMax * ((uint32_t)m_raResponseWindowSize + 5);
+
+            preambleInfo.expiryTime = Simulator::Now() + MilliSeconds(expiryIntervalMs);
+            preambleInfo.rnti = rnti;
+            NS_LOG_INFO("allocated preamble for NC based RA: preamble "
+                        << preambleId << ", RNTI " << preambleInfo.rnti << ", exiryTime "
+                        << preambleInfo.expiryTime);
+            m_allocatedNcRaPreambleMap[preambleId] =
+                preambleInfo; // create if not exist, update otherwise
+            break;
+        }
+    }
+    NrEnbCmacSapProvider::AllocateNcRaPreambleReturnValue ret;
+    if (found)
+    {
+        ret.valid = true;
+        ret.raPreambleId = preambleId;
+        ret.raPrachMaskIndex = 0;
+    }
+    else
+    {
+        ret.valid = false;
+        ret.raPreambleId = 0;
+        ret.raPrachMaskIndex = 0;
+    }
+    return ret;
 }
 
 // ////////////////////////////////////////////

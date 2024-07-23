@@ -909,6 +909,10 @@ class NrHelper : public Object
 
     void AddX2Interface(NodeContainer gnbNodes);
     void AddX2Interface(Ptr<Node> gnbNode1, Ptr<Node> gnbNode2);
+
+    std::string GetHandoverAlgorithmType() const;
+    void SetHandoverAlgorithmType(std::string type);
+    void SetHandoverAlgorithmAttribute(std::string n, const AttributeValue& v);
     void HandoverRequest(Time hoTime,
                          Ptr<NetDevice> ueDev,
                          Ptr<NetDevice> sourceGnbDev,
@@ -917,6 +921,7 @@ class NrHelper : public Object
                          Ptr<NetDevice> ueDev,
                          Ptr<NetDevice> sourceGnbDev,
                          uint16_t targetCellId);
+
   private:
     bool m_enableMimoFeedback{false}; ///< Let UE compute MIMO feedback with PMI and RI
     ObjectFactory m_pmSearchFactory;  ///< Factory for precoding matrix search algorithm
@@ -973,8 +978,8 @@ class NrHelper : public Object
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps);
 
     void DoHandoverRequest(Ptr<NetDevice> ueDev,
-                                 Ptr<NetDevice> sourceGnbDev,
-                                 uint16_t targetCellId);
+                           Ptr<NetDevice> sourceGnbDev,
+                           uint16_t targetCellId);
     void AttachToClosestEnb(Ptr<NetDevice> ueDevice, NetDeviceContainer enbDevices);
 
     ObjectFactory m_gnbNetDeviceFactory;            //!< NetDevice factory for gnb
@@ -1000,6 +1005,7 @@ class NrHelper : public Object
     ObjectFactory m_gnbUlAmcFactory;                //!< UL AMC factory
     ObjectFactory m_gnbBeamManagerFactory;          //!< gNb Beam manager factory
     ObjectFactory m_ueBeamManagerFactory;           //!< UE beam manager factory
+    ObjectFactory m_handoverAlgorithmFactory;       //!< Handover algorithm factory
 
     uint64_t m_imsiCounter{0};   //!< Imsi counter
     uint16_t m_cellIdCounter{1}; //!< CellId Counter

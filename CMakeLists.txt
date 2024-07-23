@@ -174,7 +174,6 @@ set(source_files
     model/nr-pm-search.cc
     model/nr-radio-bearer-info.cc
     model/nr-radio-bearer-tag.cc
-    model/nr-radio-bearer-tag.cc
     model/nr-rlc-am-header.cc
     model/nr-rlc-am.cc
     model/nr-rlc-header.cc
@@ -188,15 +187,12 @@ set(source_files
     model/nr-rrc-header.cc
     model/nr-rrc-protocol-ideal.cc
     model/nr-rrc-protocol-real.cc
-    model/nr-rrc-protocol-real.cc
-    model/nr-rrc-sap.cc
     model/nr-rrc-sap.cc
     model/nr-simple-ue-component-carrier-manager.cc
     model/nr-spectrum-phy.cc
     model/nr-spectrum-signal-parameters.cc
     model/nr-ue-ccm-rrc-sap.cc
     model/nr-ue-cmac-sap.cc
-    model/nr-ue-component-carrier-manager.cc
     model/nr-ue-component-carrier-manager.cc
     model/nr-ue-cphy-sap.cc
     model/nr-ue-mac.cc
@@ -474,6 +470,9 @@ set(test_sources
     test/nr-test-lte-rrc.cc
     test/nr-test-ipv6-routing.cc
     test/nr-test-lte-epc-e2e-data.cc
+    test/nr-test-ue-measurements.cc
+    test/nr-test-deactivate-bearer.cc # Requires implementing LC release in NrComponentCarrier, NrMacSchedulerUeInfo,
+    test/nr-test-lte-x2-handover.cc
     # cmake-format: off
     # todo:
     # test/nr-test-cell-selection.cc             \
@@ -487,11 +486,8 @@ set(test_sources
     # test/nr-test-secondary-cell-handover.cc    /
     # test/nr-test-secondary-cell-selection.cc  /
     #
-    # test/nr-test-ue-measurements.cc     \
     # test/nr-test-carrier-aggregation.cc  | requires scheduler integration
     # test/nr-test-cqi-generation.cc      /
-    #
-    # test/nr-test-deactivate-bearer.cc | Requires implementing LC release in NrMacSchedulerNs3::DoCschedLcReleaseReq, NrComponentCarrier, NrMacSchedulerUeInfo, NrMacSchedulerLcg
     # cmake-format: on
 )
 

@@ -64,12 +64,12 @@ class NrUeMeasurementsTestCase : public TestCase
      * \param rsrqDbUe2 RSRQ in dBm UE 2
      */
     NrUeMeasurementsTestCase(std::string name,
-                              double d1,
-                              double d2,
-                              double rsrpDbmUe1,
-                              double rsrpDbmUe2,
-                              double rsrqDbUe1,
-                              double rsrqDbUe2);
+                             double d1,
+                             double d2,
+                             double rsrpDbmUe1,
+                             double rsrpDbmUe2,
+                             double rsrqDbUe1,
+                             double rsrqDbUe2);
     ~NrUeMeasurementsTestCase() override;
 
     /**
@@ -152,9 +152,9 @@ class NrUeMeasurementsPiecewiseTestCase1 : public TestCase
      * \param expectedRsrp the expected RSRP
      */
     NrUeMeasurementsPiecewiseTestCase1(std::string name,
-                                        NrRrcSap::ReportConfigEutra config,
-                                        std::vector<Time> expectedTime,
-                                        std::vector<uint8_t> expectedRsrp);
+                                       NrRrcSap::ReportConfigEutra config,
+                                       std::vector<Time> expectedTime,
+                                       std::vector<uint8_t> expectedRsrp);
 
     ~NrUeMeasurementsPiecewiseTestCase1() override;
 
@@ -287,9 +287,9 @@ class NrUeMeasurementsPiecewiseTestCase2 : public TestCase
      * \param expectedRsrp the expected RSRP
      */
     NrUeMeasurementsPiecewiseTestCase2(std::string name,
-                                        NrRrcSap::ReportConfigEutra config,
-                                        std::vector<Time> expectedTime,
-                                        std::vector<uint8_t> expectedRsrp);
+                                       NrRrcSap::ReportConfigEutra config,
+                                       std::vector<Time> expectedTime,
+                                       std::vector<uint8_t> expectedRsrp);
 
     ~NrUeMeasurementsPiecewiseTestCase2() override;
 
@@ -439,8 +439,8 @@ class NrUeMeasurementsPiecewiseTestCase3 : public TestCase
      * \param expectedTime the expected time
      */
     NrUeMeasurementsPiecewiseTestCase3(std::string name,
-                                        NrRrcSap::ReportConfigEutra config,
-                                        std::vector<Time> expectedTime);
+                                       NrRrcSap::ReportConfigEutra config,
+                                       std::vector<Time> expectedTime);
 
     ~NrUeMeasurementsPiecewiseTestCase3() override;
 
@@ -557,11 +557,11 @@ class NrUeMeasurementsHandoverTestCase : public TestCase
      * \param duration the duration
      */
     NrUeMeasurementsHandoverTestCase(std::string name,
-                                      std::list<NrRrcSap::ReportConfigEutra> sourceConfigList,
-                                      std::list<NrRrcSap::ReportConfigEutra> targetConfigList,
-                                      std::vector<Time> expectedTime,
-                                      std::vector<uint8_t> expectedRsrp,
-                                      Time duration);
+                                     std::list<NrRrcSap::ReportConfigEutra> sourceConfigList,
+                                     std::list<NrRrcSap::ReportConfigEutra> targetConfigList,
+                                     std::vector<Time> expectedTime,
+                                     std::vector<uint8_t> expectedRsrp,
+                                     Time duration);
 
     ~NrUeMeasurementsHandoverTestCase() override;
 

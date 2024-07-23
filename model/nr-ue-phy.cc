@@ -1366,9 +1366,9 @@ NrUePhy::ReportUeMeasurements()
         NrUeCphySapUser::UeMeasurementsElement newEl;
         newEl.m_cellId = (*it).first;
         newEl.m_rsrp = avg_rsrp;
-        newEl.m_rsrq = avg_rsrq;  //LEAVE IT 0 FOR THE MOMENT
-        ret.m_ueMeasurementsList.push_back (newEl);
-        ret.m_componentCarrierId = GetBwpId ();
+        newEl.m_rsrq = avg_rsrq; // LEAVE IT 0 FOR THE MOMENT
+        ret.m_ueMeasurementsList.push_back(newEl);
+        ret.m_componentCarrierId = GetBwpId();
 
         m_reportUeMeasurements(m_rnti,
                                (*it).first,
@@ -1379,7 +1379,7 @@ NrUePhy::ReportUeMeasurements()
     }
 
     // report to RRC
-    m_ueCphySapUser->ReportUeMeasurements (ret);
+    m_ueCphySapUser->ReportUeMeasurements(ret);
 
     m_ueMeasurementsMap.clear();
     Simulator::Schedule(m_ueMeasurementsFilterPeriod, &NrUePhy::ReportUeMeasurements, this);

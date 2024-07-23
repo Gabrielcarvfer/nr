@@ -358,6 +358,10 @@ NrUeMac::DoTransmitPdu(NrMacSapProvider::TransmitPduParameters params)
     NrRadioBearerTag bearerTag(params.rnti, params.lcid, 0);
     params.pdu->AddPacketTag(bearerTag);
 
+    if (!m_miUlHarqProcessesPacket.at(params.harqProcessId).m_pktBurst)
+    {
+        m_miUlHarqProcessesPacket.at(params.harqProcessId).m_pktBurst = CreateObject<PacketBurst>();
+    }
     m_miUlHarqProcessesPacket.at(params.harqProcessId).m_pktBurst->AddPacket(params.pdu);
     m_miUlHarqProcessesPacketTimer.at(params.harqProcessId) = GetNumHarqProcess();
 
@@ -586,6 +590,11 @@ NrUeMac::DoReceivePhyPdu(Ptr<Packet> p)
     rxParams.lcid = header.GetLcId();
 
     auto it = m_lcInfoMap.find(header.GetLcId());
+    // Ignore non-existing lcids
+    if (it == m_lcInfoMap.end())
+    {
+        return;
+    }
 
     // p can be empty. Well, right now no, but when someone will add CE in downlink,
     // then p can be empty.
@@ -1084,6 +1093,28 @@ void
 NrUeMac::DoRemoveLc(uint8_t lcId)
 {
     NS_LOG_FUNCTION(this << " lcId" << lcId);
+    NS_ASSERT_MSG(m_lcInfoMap.find(lcId) != m_lcInfoMap.end(), "could not find LCID " << lcId);
+    m_lcInfoMap.erase(lcId);
+    m_ulBsrReceived.erase(lcId); // empty BSR buffer for this lcId
+    // for (auto& harqProcess: m_miUlHarqProcessesPacket)
+    //{
+    //     uint32_t packets = harqProcess.m_pktBurst->GetNPackets();
+    //     auto itPackets = harqProcess.m_pktBurst->GetPackets();
+    //     for (uint32_t p = 0; p < packets; p++)
+    //     {
+    //         uint32_t i = packets-p-1;
+    //         if (harqProcess.m_lcidList.at(i) == lcId)
+    //         {
+    //             // how to erase from packetburst?
+    //             //auto it = itPackets.begin();
+    //             //std::advance(it, i);
+    //             //harqProcess.m_pktBurst->GetPackets().erase(it);
+    //             auto it2 = harqProcess.m_lcidList.begin();
+    //             std::advance(it2, i);
+    //             harqProcess.m_lcidList.erase(it2);
+    //         }
+    //     }
+    // }
 }
 
 NrMacSapProvider*

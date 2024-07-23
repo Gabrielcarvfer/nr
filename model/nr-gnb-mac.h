@@ -364,7 +364,31 @@ class NrGnbMac : public Object
     std::vector<NrMacSchedSapProvider::SchedUlCqiInfoReqParameters> m_ulCqiReceived;
     std::vector<MacCeElement> m_ulCeReceived; // CE received (BSR up to now)
 
+    // start of RACH related member variables
+    uint8_t m_numberOfRaPreambles;  ///< number of RA preambles
+    uint8_t m_preambleTransMax;     ///< preamble transmit maximum
+    uint8_t m_raResponseWindowSize; ///< RA response window size
+    uint8_t m_connEstFailCount;     ///< the counter value for T300 timer expiration
+
+    /**
+     * info associated with a preamble allocated for non-contention based RA
+     *
+     */
+    struct NcRaPreambleInfo
+    {
+        uint16_t rnti;   ///< rnti previously allocated for this non-contention based RA procedure
+        Time expiryTime; ///< value the expiration time of this allocation (so that stale preambles
+                         ///< can be reused)
+    };
+
+    /**
+     * map storing as key the random access preamble IDs allocated for
+     * non-contention based access, and as value the associated info
+     *
+     */
+    std::map<uint8_t, NcRaPreambleInfo> m_allocatedNcRaPreambleMap;
     std::unordered_map<uint8_t, uint32_t> m_receivedRachPreambleCount;
+    // end of RACH related member variables
 
     std::unordered_map<uint16_t, std::unordered_map<uint8_t, NrMacSapUser*>> m_rlcAttached;
 

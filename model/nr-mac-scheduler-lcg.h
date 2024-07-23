@@ -200,6 +200,8 @@ class NrMacSchedulerLCG
      */
     void AssignedData(uint8_t lcId, uint32_t size, std::string type);
 
+    void ReleaseLC(uint8_t lcId);
+
   private:
     uint8_t m_id{0};                            //!< ID of the LCG
     std::unordered_map<uint8_t, LCPtr> m_lcMap; //!< Map between LC id and their pointer

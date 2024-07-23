@@ -127,7 +127,15 @@ NrHelper::GetTypeId()
                           "If false, NrRrcProtocolReal will be used.",
                           BooleanValue(true),
                           MakeBooleanAccessor(&NrHelper::m_useIdealRrc),
-                          MakeBooleanChecker());
+                          MakeBooleanChecker())
+            .AddAttribute("HandoverAlgorithm",
+                          "The type of handover algorithm to be used for gNBs. "
+                          "The allowed values for this attributes are the type names "
+                          "of any class inheriting from ns3::LteHandoverAlgorithm.",
+                          StringValue("ns3::NoOpHandoverAlgorithm"),
+                          MakeStringAccessor(&NrHelper::SetHandoverAlgorithmType,
+                                             &NrHelper::GetHandoverAlgorithmType),
+                          MakeStringChecker());
     return tid;
 }
 
@@ -917,8 +925,8 @@ NrHelper::InstallSingleGnbDevice(
     Ptr<NrGnbNetDevice> dev = m_gnbNetDeviceFactory.Create<NrGnbNetDevice>();
 
     NS_LOG_DEBUG("Creating gNB, cellId = " << m_cellIdCounter);
-    uint16_t cellId = m_cellIdCounter++;
-
+    uint16_t cellId = m_cellIdCounter;
+    m_cellIdCounter += allBwps.empty(); // Avoid two gNBs with duplicated cellId
     dev->SetCellId(cellId);
     dev->SetNode(n);
 
@@ -935,9 +943,10 @@ NrHelper::InstallSingleGnbDevice(
 
         cc->SetUlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
         cc->SetDlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
-        cc->SetDlEarfcn(0); // Argh... handover not working
-        cc->SetUlEarfcn(0); // Argh... handover not working
-        cc->SetCellId(m_cellIdCounter++);
+        cc->SetDlEarfcn(0);             // Argh... handover not working
+        cc->SetUlEarfcn(0);             // Argh... handover not working
+        cc->SetCellId(m_cellIdCounter); // First CC of a gNB matches its cellId
+        m_cellIdCounter++;              // Other CCs are sequential
 
         auto phy = CreateGnbPhy(
             n,
@@ -1091,6 +1100,27 @@ NrHelper::InstallSingleGnbDevice(
     return dev;
 }
 
+std::string
+NrHelper::GetHandoverAlgorithmType() const
+{
+    return m_handoverAlgorithmFactory.GetTypeId().GetName();
+}
+
+void
+NrHelper::SetHandoverAlgorithmType(std::string type)
+{
+    NS_LOG_FUNCTION(this << type);
+    m_handoverAlgorithmFactory = ObjectFactory();
+    m_handoverAlgorithmFactory.SetTypeId(type);
+}
+
+void
+NrHelper::SetHandoverAlgorithmAttribute(std::string n, const AttributeValue& v)
+{
+    NS_LOG_FUNCTION(this << n);
+    m_handoverAlgorithmFactory.Set(n, v);
+}
+
 void
 NrHelper::AddX2Interface(NodeContainer gnbNodes)
 {
@@ -1118,9 +1148,9 @@ NrHelper::AddX2Interface(Ptr<Node> gnbNode1, Ptr<Node> gnbNode2)
 
 void
 NrHelper::HandoverRequest(Time hoTime,
-                           Ptr<NetDevice> ueDev,
-                           Ptr<NetDevice> sourceGnbDev,
-                           Ptr<NetDevice> targetGnbDev)
+                          Ptr<NetDevice> ueDev,
+                          Ptr<NetDevice> sourceGnbDev,
+                          Ptr<NetDevice> targetGnbDev)
 {
     NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetGnbDev);
     NS_ASSERT_MSG(m_nrEpcHelper,
@@ -1137,9 +1167,9 @@ NrHelper::HandoverRequest(Time hoTime,
 
 void
 NrHelper::HandoverRequest(Time hoTime,
-                           Ptr<NetDevice> ueDev,
-                           Ptr<NetDevice> sourceGnbDev,
-                           uint16_t targetCellId)
+                          Ptr<NetDevice> ueDev,
+                          Ptr<NetDevice> sourceGnbDev,
+                          uint16_t targetCellId)
 {
     NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetCellId);
     NS_ASSERT_MSG(m_nrEpcHelper,
@@ -1155,8 +1185,8 @@ NrHelper::HandoverRequest(Time hoTime,
 
 void
 NrHelper::DoHandoverRequest(Ptr<NetDevice> ueDev,
-                             Ptr<NetDevice> sourceGnbDev,
-                             uint16_t targetCellId)
+                            Ptr<NetDevice> sourceGnbDev,
+                            uint16_t targetCellId)
 {
     NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetCellId);
 

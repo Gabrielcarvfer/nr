@@ -1609,6 +1609,7 @@ NrUeRrc::ApplyRadioResourceConfigDedicated(NrRrcSap::RadioResourceConfigDedicate
         {
             m_cmacSapProvider.at(i)->RemoveLc(drbid + 2);
         }
+        // m_ccmRrcSapProvider->RemoveLc(drbid+2);
     }
 }
 

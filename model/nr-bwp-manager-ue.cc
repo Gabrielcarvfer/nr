@@ -81,6 +81,12 @@ BwpManagerUe::DoAddLc(uint8_t lcId,
     return NrSimpleUeComponentCarrierManager::DoAddLc(lcId, lcConfig, msu);
 }
 
+std::vector<uint16_t>
+BwpManagerUe::DoRemoveLc(uint8_t lcid)
+{
+    return NrSimpleUeComponentCarrierManager::DoRemoveLc(lcId);
+}
+
 NrMacSapUser*
 BwpManagerUe::DoConfigureSignalBearer(uint8_t lcId,
                                       NrUeCmacSapProvider::LogicalChannelConfig lcConfig,
