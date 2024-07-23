@@ -52,7 +52,7 @@ class NrNeighbourRelation;
  * role of the "user" part. The following code skeleton establishes the
  * connection between both instances:
  *
- *     Ptr<NrEnbRrc> u = ...;
+ *     Ptr<NrGnbRrc> u = ...;
  *     Ptr<NrAnr> p = ...;
  *     u->SetNrAnrSapProvider (p->GetNrAnrSapProvider ());
  *     p->SetNrAnrSapUser (u->GetNrAnrSapUser ());
@@ -112,14 +112,14 @@ class NrAnr : public Object
      * \brief Set the "user" part of the ANR SAP interface that this ANR instance
      *        will interact with.
      * \param s a reference to the "user" part of the interface, typically a
-     *          member of an NrEnbRrc instance
+     *          member of an NrGnbRrc instance
      */
     virtual void SetNrAnrSapUser(NrAnrSapUser* s);
 
     /**
      * \brief Export the "provider" part of the ANR SAP interface.
      * \return the reference to the "provider" part of the interface, typically to
-     *         be kept by an NrEnbRrc instance
+     *         be kept by an NrGnbRrc instance
      */
     virtual NrAnrSapProvider* GetNrAnrSapProvider();
 

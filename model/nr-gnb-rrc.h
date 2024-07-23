@@ -12,8 +12,8 @@
 //   Biljana Bojovic <biljana.bojovic@cttc.es> (Carrier Aggregation)
 //   Vignesh Babu <ns3-dev@esk.fraunhofer.de> (RLF extensions)
 
-#ifndef NR_ENB_RRC_H
-#define NR_ENB_RRC_H
+#ifndef NR_GNB_RRC_H
+#define NR_GNB_RRC_H
 
 #include "nr-anr-sap.h"
 #include "nr-ccm-rrc-sap.h"
@@ -43,7 +43,7 @@ namespace ns3
 class NrRadioBearerInfo;
 class NrSignalingRadioBearerInfo;
 class NrDataRadioBearerInfo;
-class NrEnbRrc;
+class NrGnbRrc;
 class Packet;
 
 /**
@@ -82,12 +82,12 @@ class NrUeManager : public Object
     /**
      * NrUeManager constructor
      *
-     * \param rrc pointer to the NrEnbRrc holding this NrUeManager
+     * \param rrc pointer to the NrGnbRrc holding this NrUeManager
      * \param rnti RNTI of the UE
      * \param s initial state of the NrUeManager
      * \param componentCarrierId primary component carrier ID
      */
-    NrUeManager(Ptr<NrEnbRrc> rrc, uint16_t rnti, State s, uint8_t componentCarrierId);
+    NrUeManager(Ptr<NrGnbRrc> rrc, uint16_t rnti, State s, uint8_t componentCarrierId);
 
     ~NrUeManager() override;
 
@@ -260,44 +260,44 @@ class NrUeManager : public Object
     // METHODS FORWARDED FROM ENB RRC SAP ///////////////////////////////////////
 
     /**
-     * Implement the NrEnbRrcSapProvider::CompleteSetupUe interface.
+     * Implement the NrGnbRrcSapProvider::CompleteSetupUe interface.
      * \param params CompleteSetupUeParameters
      */
-    void CompleteSetupUe(NrEnbRrcSapProvider::CompleteSetupUeParameters params);
+    void CompleteSetupUe(NrGnbRrcSapProvider::CompleteSetupUeParameters params);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvRrcConnectionRequest interface.
+     * Implement the NrGnbRrcSapProvider::RecvRrcConnectionRequest interface.
      * \param msg the RRC connection request message
      */
     void RecvRrcConnectionRequest(NrRrcSap::RrcConnectionRequest msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvRrcConnectionSetupCompleted interface.
+     * Implement the NrGnbRrcSapProvider::RecvRrcConnectionSetupCompleted interface.
      * \param msg RRC connection setup completed message
      */
     void RecvRrcConnectionSetupCompleted(NrRrcSap::RrcConnectionSetupCompleted msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvRrcConnectionReconfigurationCompleted interface.
+     * Implement the NrGnbRrcSapProvider::RecvRrcConnectionReconfigurationCompleted interface.
      * \param msg RRC connection reconfiguration completed message
      */
     void RecvRrcConnectionReconfigurationCompleted(
         NrRrcSap::RrcConnectionReconfigurationCompleted msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvRrcConnectionReestablishmentRequest interface.
+     * Implement the NrGnbRrcSapProvider::RecvRrcConnectionReestablishmentRequest interface.
      * \param msg the RRC connection reestablishment request message
      */
     void RecvRrcConnectionReestablishmentRequest(NrRrcSap::RrcConnectionReestablishmentRequest msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvRrcConnectionReestablishmentComplete interface.
+     * Implement the NrGnbRrcSapProvider::RecvRrcConnectionReestablishmentComplete interface.
      * \param msg the RRC connection reestablsihment complete message
      */
     void RecvRrcConnectionReestablishmentComplete(
         NrRrcSap::RrcConnectionReestablishmentComplete msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvMeasurementReport interface.
+     * Implement the NrGnbRrcSapProvider::RecvMeasurementReport interface.
      * \param msg the measrurement report
      */
     void RecvMeasurementReport(NrRrcSap::MeasurementReport msg);
     /**
-     * Implement the NrEnbRrcSapProvider::RecvIdealUeContextRemoveRequest interface.
+     * Implement the NrGnbRrcSapProvider::RecvIdealUeContextRemoveRequest interface.
      *
      * \param rnti the C-RNTI identifying the user
      */
@@ -551,7 +551,7 @@ class NrUeManager : public Object
 
     NrRrcSap::PhysicalConfigDedicated m_physicalConfigDedicated; ///< physical config dedicated
     /// Pointer to the parent eNodeB RRC.
-    Ptr<NrEnbRrc> m_rrc;
+    Ptr<NrGnbRrc> m_rrc;
     /// The current NrUeManager state.
     State m_state;
 
@@ -583,32 +583,32 @@ class NrUeManager : public Object
     /**
      * Time limit before a _connection request timeout_ occurs. Set after a new
      * UE context is added after a successful Random Access. Calling
-     * NrEnbRrc::ConnectionRequestTimeout() when it expires. Cancelled when RRC
+     * NrGnbRrc::ConnectionRequestTimeout() when it expires. Cancelled when RRC
      * CONNECTION REQUEST is received.
      */
     EventId m_connectionRequestTimeout;
     /**
      * Time limit before a _connection setup timeout_ occurs. Set after an RRC
-     * CONNECTION SETUP is sent. Calling NrEnbRrc::ConnectionSetupTimeout() when
+     * CONNECTION SETUP is sent. Calling NrGnbRrc::ConnectionSetupTimeout() when
      * it expires. Cancelled when RRC CONNECTION SETUP COMPLETE is received.
      */
     EventId m_connectionSetupTimeout;
     /**
      * The delay before a _connection rejected timeout_ occurs. Set after an RRC
-     * CONNECTION REJECT is sent. Calling NrEnbRrc::ConnectionRejectedTimeout()
+     * CONNECTION REJECT is sent. Calling NrGnbRrc::ConnectionRejectedTimeout()
      * when it expires.
      */
     EventId m_connectionRejectedTimeout;
     /**
      * Time limit before a _handover joining timeout_ occurs. Set after a new UE
      * context is added after receiving a handover request. Calling
-     * NrEnbRrc::HandoverJoiningTimeout() when it expires. Cancelled when
+     * NrGnbRrc::HandoverJoiningTimeout() when it expires. Cancelled when
      * RRC CONNECTION RECONFIGURATION COMPLETE is received.
      */
     EventId m_handoverJoiningTimeout;
     /**
      * Time limit before a _handover leaving timeout_ occurs. Set after a
-     * handover command is sent. Calling NrEnbRrc::HandoverLeavingTimeout()
+     * handover command is sent. Calling NrGnbRrc::HandoverLeavingTimeout()
      * when it expires. Cancelled when RRC CONNECTION RE-ESTABLISHMENT or X2
      * UE CONTEXT RELEASE is received.
      */
@@ -638,38 +638,38 @@ class NrUeManager : public Object
  *
  * The LTE Radio Resource Control entity at the eNB
  */
-class NrEnbRrc : public Object
+class NrGnbRrc : public Object
 {
     /// allow EnbRrcMemberNrEnbCmacSapUser class friend access
     friend class EnbRrcMemberNrEnbCmacSapUser;
-    /// allow MemberNrHandoverManagementSapUser<NrEnbRrc> class friend access
-    friend class MemberNrHandoverManagementSapUser<NrEnbRrc>;
-    /// allow MemberNrAnrSapUser<NrEnbRrc> class friend access
-    friend class MemberNrAnrSapUser<NrEnbRrc>;
-    /// allow MemberNrFfrRrcSapUser<NrEnbRrc> class friend access
-    friend class MemberNrFfrRrcSapUser<NrEnbRrc>;
-    /// allow MemberNrEnbRrcSapProvider<NrEnbRrc> class friend access
-    friend class MemberNrEnbRrcSapProvider<NrEnbRrc>;
-    /// allow MemberNrEnbRrcSapProvider<NrEnbRrc> class friend access
-    friend class NrMemberEpcEnbS1SapUser<NrEnbRrc>;
-    /// allow NrMemberEpcEnbS1SapUser<NrEnbRrc> class friend access
-    friend class NrEpcX2SpecificEpcX2SapUser<NrEnbRrc>;
+    /// allow MemberNrHandoverManagementSapUser<NrGnbRrc> class friend access
+    friend class MemberNrHandoverManagementSapUser<NrGnbRrc>;
+    /// allow MemberNrAnrSapUser<NrGnbRrc> class friend access
+    friend class MemberNrAnrSapUser<NrGnbRrc>;
+    /// allow MemberNrFfrRrcSapUser<NrGnbRrc> class friend access
+    friend class MemberNrFfrRrcSapUser<NrGnbRrc>;
+    /// allow MemberNrGnbRrcSapProvider<NrGnbRrc> class friend access
+    friend class MemberNrGnbRrcSapProvider<NrGnbRrc>;
+    /// allow MemberNrGnbRrcSapProvider<NrGnbRrc> class friend access
+    friend class NrMemberEpcEnbS1SapUser<NrGnbRrc>;
+    /// allow NrMemberEpcEnbS1SapUser<NrGnbRrc> class friend access
+    friend class NrEpcX2SpecificEpcX2SapUser<NrGnbRrc>;
     /// allow NrUeManager class friend access
     friend class NrUeManager;
-    /// allow  MemberNrCcmRrcSapUser<NrEnbRrc> class friend access
-    friend class MemberNrCcmRrcSapUser<NrEnbRrc>;
+    /// allow  MemberNrCcmRrcSapUser<NrGnbRrc> class friend access
+    friend class MemberNrCcmRrcSapUser<NrGnbRrc>;
 
   public:
     /**
      * create an RRC instance for use within an eNB
      *
      */
-    NrEnbRrc();
+    NrGnbRrc();
 
     /**
      * Destructor
      */
-    ~NrEnbRrc() override;
+    ~NrGnbRrc() override;
 
     // inherited from Object
   protected:
@@ -797,14 +797,14 @@ class NrEnbRrc : public Object
      *
      * \param s the RRC SAP User to be used by this RRC
      */
-    void SetNrEnbRrcSapUser(NrEnbRrcSapUser* s);
+    void SetNrGnbRrcSapUser(NrGnbRrcSapUser* s);
 
     /**
      *
      *
      * \return s the RRC SAP Provider interface offered to the MAC by this RRC
      */
-    NrEnbRrcSapProvider* GetNrEnbRrcSapProvider();
+    NrGnbRrcSapProvider* GetNrGnbRrcSapProvider();
 
     /**
      * set the MAC SAP provider. The eNB RRC does not use this
@@ -901,7 +901,7 @@ class NrEnbRrc : public Object
      * other tasks:
      *  - Initializing UE measurement (i.e. measurement object and quantity
      *    configuration), which is expected to be further configured through
-     *    `NrEnbRrc::AddUeMeasReportConfig`;
+     *    `NrGnbRrc::AddUeMeasReportConfig`;
      *  - Enabling MIB (Master Information Block) broadcast transmission
      *  - Enabling SIB (System Information Block) broadcast transmission
      *
@@ -1134,14 +1134,14 @@ class NrEnbRrc : public Object
     // RRC SAP methods
 
     /**
-     * Part of the RRC protocol. Forwarding NrEnbRrcSapProvider::CompleteSetupUe interface to
+     * Part of the RRC protocol. Forwarding NrGnbRrcSapProvider::CompleteSetupUe interface to
      * NrUeManager::CompleteSetupUe
      * \param rnti the RNTI
-     * \param params the NrEnbRrcSapProvider::CompleteSetupUeParameters
+     * \param params the NrGnbRrcSapProvider::CompleteSetupUeParameters
      */
-    void DoCompleteSetupUe(uint16_t rnti, NrEnbRrcSapProvider::CompleteSetupUeParameters params);
+    void DoCompleteSetupUe(uint16_t rnti, NrGnbRrcSapProvider::CompleteSetupUeParameters params);
     /**
-     * Part of the RRC protocol. Forwarding NrEnbRrcSapProvider::RecvRrcConnectionRequest interface
+     * Part of the RRC protocol. Forwarding NrGnbRrcSapProvider::RecvRrcConnectionRequest interface
      * to NrUeManager::RecvRrcConnectionRequest
      *
      * \param rnti the RNTI
@@ -1149,7 +1149,7 @@ class NrEnbRrc : public Object
      */
     void DoRecvRrcConnectionRequest(uint16_t rnti, NrRrcSap::RrcConnectionRequest msg);
     /**
-     * Part of the RRC protocol. Forwarding NrEnbRrcSapProvider::RecvRrcConnectionSetupCompleted
+     * Part of the RRC protocol. Forwarding NrGnbRrcSapProvider::RecvRrcConnectionSetupCompleted
      * interface to NrUeManager::RecvRrcConnectionSetupCompleted
      *
      * \param rnti the RNTI
@@ -1159,7 +1159,7 @@ class NrEnbRrc : public Object
                                            NrRrcSap::RrcConnectionSetupCompleted msg);
     /**
      * Part of the RRC protocol. Forwarding
-     * NrEnbRrcSapProvider::RecvRrcConnectionReconfigurationCompleted interface to
+     * NrGnbRrcSapProvider::RecvRrcConnectionReconfigurationCompleted interface to
      * NrUeManager::RecvRrcConnectionReconfigurationCompleted
      *
      * \param rnti the RNTI
@@ -1170,7 +1170,7 @@ class NrEnbRrc : public Object
         NrRrcSap::RrcConnectionReconfigurationCompleted msg);
     /**
      * Part of the RRC protocol. Forwarding
-     * NrEnbRrcSapProvider::RecvRrcConnectionReestablishmentRequest interface to
+     * NrGnbRrcSapProvider::RecvRrcConnectionReestablishmentRequest interface to
      * NrUeManager::RecvRrcConnectionReestablishmentRequest
      *
      * \param rnti the RNTI
@@ -1181,7 +1181,7 @@ class NrEnbRrc : public Object
         NrRrcSap::RrcConnectionReestablishmentRequest msg);
     /**
      * Part of the RRC protocol. Forwarding
-     * NrEnbRrcSapProvider::RecvRrcConnectionReestablishmentComplete interface to
+     * NrGnbRrcSapProvider::RecvRrcConnectionReestablishmentComplete interface to
      * NrUeManager::RecvRrcConnectionReestablishmentComplete
      *
      * \param rnti the RNTI
@@ -1191,7 +1191,7 @@ class NrEnbRrc : public Object
         uint16_t rnti,
         NrRrcSap::RrcConnectionReestablishmentComplete msg);
     /**
-     * Part of the RRC protocol. Forwarding NrEnbRrcSapProvider::RecvMeasurementReport interface to
+     * Part of the RRC protocol. Forwarding NrGnbRrcSapProvider::RecvMeasurementReport interface to
      * NrUeManager::RecvMeasurementReport
      *
      * \param rnti the RNTI
@@ -1200,7 +1200,7 @@ class NrEnbRrc : public Object
     void DoRecvMeasurementReport(uint16_t rnti, NrRrcSap::MeasurementReport msg);
     /**
      * \brief Part of the RRC protocol. Forwarding
-     * NrEnbRrcSapProvider::RecvIdealUeContextRemoveRequest interface to
+     * NrGnbRrcSapProvider::RecvIdealUeContextRemoveRequest interface to
      * NrUeManager::RecvIdealUeContextRemoveRequest.
      *
      * Remove the UE context at eNodeB and also remove the bearers established
@@ -1548,9 +1548,9 @@ class NrEnbRrc : public Object
     std::vector<NrFfrRrcSapProvider*> m_ffrRrcSapProvider;
 
     /// Interface to send messages to UE over the RRC protocol.
-    NrEnbRrcSapUser* m_rrcSapUser;
+    NrGnbRrcSapUser* m_rrcSapUser;
     /// Interface to receive messages from UE over the RRC protocol.
-    NrEnbRrcSapProvider* m_rrcSapProvider;
+    NrGnbRrcSapProvider* m_rrcSapProvider;
 
     /// Interface to the eNodeB MAC instance, to be used by RLC instances.
     NrMacSapProvider* m_macSapProvider;
@@ -1773,8 +1773,8 @@ class NrEnbRrc : public Object
     std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>>
         m_componentCarrierPhyConf; ///< component carrier phy configuration
 
-}; // end of `class NrEnbRrc`
+}; // end of `class NrGnbRrc`
 
 } // namespace ns3
 
-#endif // NR_ENB_RRC_H
+#endif // NR_GNB_RRC_H

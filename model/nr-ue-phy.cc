@@ -188,7 +188,11 @@ NrUePhy::GetTypeId()
             .AddTraceSource("ReportPowerSpectralDensity",
                             "Power Spectral Density data.",
                             MakeTraceSourceAccessor(&NrUePhy::m_reportPowerSpectralDensity),
-                            "ns3::NrUePhy::PowerSpectralDensityTracedCallback");
+                            "ns3::NrUePhy::PowerSpectralDensityTracedCallback")
+            .AddTraceSource("ReportUeMeasurements",
+                            "Report UE measurements RSRP (dBm) and RSRQ (dB).",
+                            MakeTraceSourceAccessor(&NrUePhy::m_reportUeMeasurements),
+                            "ns3::NrUePhy::RsrpRsrqTracedCallback");
     return tid;
 }
 
@@ -1335,13 +1339,13 @@ NrUePhy::ReportUeMeasurements()
 {
     NS_LOG_FUNCTION(this);
 
-    // NrUeCphySapUser::UeMeasurementsParameters ret;
+    NrUeCphySapUser::UeMeasurementsParameters ret;
 
     std::map<uint16_t, UeMeasurementsElement>::iterator it;
     for (it = m_ueMeasurementsMap.begin(); it != m_ueMeasurementsMap.end(); it++)
     {
         double avg_rsrp;
-        // double avg_rsrq = 0;
+        double avg_rsrq = 0;
         if ((*it).second.rsrpNum != 0)
         {
             avg_rsrp = (*it).second.rsrpSum / static_cast<double>((*it).second.rsrpNum);
@@ -1359,16 +1363,23 @@ NrUePhy::ReportUeMeasurements()
 
         m_reportRsrpTrace(GetCellId(), m_imsi, m_rnti, avg_rsrp, GetBwpId());
 
-        /*NrUeCphySapUser::UeMeasurementsElement newEl;
+        NrUeCphySapUser::UeMeasurementsElement newEl;
         newEl.m_cellId = (*it).first;
         newEl.m_rsrp = avg_rsrp;
         newEl.m_rsrq = avg_rsrq;  //LEAVE IT 0 FOR THE MOMENT
         ret.m_ueMeasurementsList.push_back (newEl);
-        ret.m_componentCarrierId = GetBwpId ();*/
+        ret.m_componentCarrierId = GetBwpId ();
+
+        m_reportUeMeasurements(m_rnti,
+                               (*it).first,
+                               avg_rsrp,
+                               avg_rsrq,
+                               (*it).first == GetCellId(),
+                               ret.m_componentCarrierId);
     }
 
     // report to RRC
-    // m_ueCphySapUser->ReportUeMeasurements (ret);
+    m_ueCphySapUser->ReportUeMeasurements (ret);
 
     m_ueMeasurementsMap.clear();
     Simulator::Schedule(m_ueMeasurementsFilterPeriod, &NrUePhy::ReportUeMeasurements, this);

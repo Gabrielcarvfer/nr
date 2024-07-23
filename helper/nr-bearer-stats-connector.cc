@@ -145,22 +145,22 @@ NrBearerStatsConnector::EnsureConnected()
     NS_LOG_FUNCTION(this);
     if (!m_connected)
     {
-        Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/NewUeContext",
+        Config::Connect("/NodeList/*/DeviceList/*/NrGnbRrc/NewUeContext",
                         MakeBoundCallback(&NrBearerStatsConnector::NotifyNewUeContextEnb, this));
         Config::Connect(
             "/NodeList/*/DeviceList/*/NrUeRrc/RandomAccessSuccessful",
             MakeBoundCallback(&NrBearerStatsConnector::NotifyRandomAccessSuccessfulUe, this));
         Config::Connect(
-            "/NodeList/*/DeviceList/*/NrEnbRrc/ConnectionReconfiguration",
+            "/NodeList/*/DeviceList/*/NrGnbRrc/ConnectionReconfiguration",
             MakeBoundCallback(&NrBearerStatsConnector::NotifyConnectionReconfigurationEnb, this));
         Config::Connect(
             "/NodeList/*/DeviceList/*/NrUeRrc/ConnectionReconfiguration",
             MakeBoundCallback(&NrBearerStatsConnector::NotifyConnectionReconfigurationUe, this));
-        Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/HandoverStart",
+        Config::Connect("/NodeList/*/DeviceList/*/NrGnbRrc/HandoverStart",
                         MakeBoundCallback(&NrBearerStatsConnector::NotifyHandoverStartEnb, this));
         Config::Connect("/NodeList/*/DeviceList/*/NrUeRrc/HandoverStart",
                         MakeBoundCallback(&NrBearerStatsConnector::NotifyHandoverStartUe, this));
-        Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/HandoverEndOk",
+        Config::Connect("/NodeList/*/DeviceList/*/NrGnbRrc/HandoverEndOk",
                         MakeBoundCallback(&NrBearerStatsConnector::NotifyHandoverEndOkEnb, this));
         Config::Connect("/NodeList/*/DeviceList/*/NrUeRrc/HandoverEndOk",
                         MakeBoundCallback(&NrBearerStatsConnector::NotifyHandoverEndOkUe, this));
@@ -433,7 +433,7 @@ NrBearerStatsConnector::ConnectTracesEnb(std::string context,
                                          uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << context);
-    NS_LOG_LOGIC(this << "expected context  should match /NodeList/*/DeviceList/*/NrEnbRrc/");
+    NS_LOG_LOGIC(this << "expected context  should match /NodeList/*/DeviceList/*/NrGnbRrc/");
     std::ostringstream basePath;
     basePath << context.substr(0, context.rfind('/')) << "/UeMap/" << (uint32_t)rnti;
     if (m_rlcStats)

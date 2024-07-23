@@ -17,7 +17,7 @@ class PacketBurst;
 class Node;
 class NrGnbPhy;
 class NrGnbMac;
-class NrEnbRrc;
+class NrGnbRrc;
 class BandwidthPartGnb;
 class NrEnbComponentCarrierManager;
 class BwpManagerGnb;
@@ -66,9 +66,9 @@ class NrGnbNetDevice : public NrNetDevice
 
     uint16_t GetEarfcn(uint8_t index) const;
 
-    void SetRrc(Ptr<NrEnbRrc> rrc);
+    void SetRrc(Ptr<NrGnbRrc> rrc);
 
-    Ptr<NrEnbRrc> GetRrc();
+    Ptr<NrGnbRrc> GetRrc();
 
     void SetCcMap(const std::map<uint8_t, Ptr<BandwidthPartGnb>>& ccm);
 
@@ -136,7 +136,7 @@ class NrGnbNetDevice : public NrNetDevice
     bool DoSend(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) override;
 
   private:
-    Ptr<NrEnbRrc> m_rrc;
+    Ptr<NrGnbRrc> m_rrc;
 
     uint16_t m_cellId; //!< Cell ID. Set by the helper.
 

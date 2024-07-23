@@ -1107,7 +1107,7 @@ class NrUeRrcSapProvider : public NrRrcSap
  *        this class corresponds to the transmission of a message that is
  *        defined in Section 6.2.2 of TS 36.331.
  */
-class NrEnbRrcSapUser : public NrRrcSap
+class NrGnbRrcSapUser : public NrRrcSap
 {
   public:
     /// SetupUeParameters structure
@@ -1227,7 +1227,7 @@ class NrEnbRrcSapUser : public NrRrcSap
  *        in this class corresponds to the reception of a message that is
  *        defined in Section 6.2.2 of TS 36.331.
  */
-class NrEnbRrcSapProvider : public NrRrcSap
+class NrGnbRrcSapProvider : public NrRrcSap
 {
   public:
     /// CompleteSetupUeParameters structure
@@ -1517,12 +1517,12 @@ MemberNrUeRrcSapProvider<C>::RecvRrcConnectionReject(RrcConnectionReject msg)
 }
 
 /**
- * Template for the implementation of the NrEnbRrcSapUser as a member
+ * Template for the implementation of the NrGnbRrcSapUser as a member
  * of an owner class of type C to which all methods are forwarded
  *
  */
 template <class C>
-class MemberNrEnbRrcSapUser : public NrEnbRrcSapUser
+class MemberNrGnbRrcSapUser : public NrGnbRrcSapUser
 {
   public:
     /**
@@ -1530,12 +1530,12 @@ class MemberNrEnbRrcSapUser : public NrEnbRrcSapUser
      *
      * \param owner the owner class
      */
-    MemberNrEnbRrcSapUser(C* owner);
+    MemberNrGnbRrcSapUser(C* owner);
 
     // Delete default constructor to avoid misuse
-    MemberNrEnbRrcSapUser() = delete;
+    MemberNrGnbRrcSapUser() = delete;
 
-    // inherited from NrEnbRrcSapUser
+    // inherited from NrGnbRrcSapUser
     void SetupUe(uint16_t rnti, SetupUeParameters params) override;
     void RemoveUe(uint16_t rnti) override;
     void SendSystemInformation(uint16_t cellId, SystemInformation msg) override;
@@ -1556,42 +1556,42 @@ class MemberNrEnbRrcSapUser : public NrEnbRrcSapUser
 };
 
 template <class C>
-MemberNrEnbRrcSapUser<C>::MemberNrEnbRrcSapUser(C* owner)
+MemberNrGnbRrcSapUser<C>::MemberNrGnbRrcSapUser(C* owner)
     : m_owner(owner)
 {
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SetupUe(uint16_t rnti, SetupUeParameters params)
+MemberNrGnbRrcSapUser<C>::SetupUe(uint16_t rnti, SetupUeParameters params)
 {
     m_owner->DoSetupUe(rnti, params);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::RemoveUe(uint16_t rnti)
+MemberNrGnbRrcSapUser<C>::RemoveUe(uint16_t rnti)
 {
     m_owner->DoRemoveUe(rnti);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendSystemInformation(uint16_t cellId, SystemInformation msg)
+MemberNrGnbRrcSapUser<C>::SendSystemInformation(uint16_t cellId, SystemInformation msg)
 {
     m_owner->DoSendSystemInformation(cellId, msg);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionSetup(uint16_t rnti, RrcConnectionSetup msg)
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionSetup(uint16_t rnti, RrcConnectionSetup msg)
 {
     m_owner->DoSendRrcConnectionSetup(rnti, msg);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionReconfiguration(uint16_t rnti,
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionReconfiguration(uint16_t rnti,
                                                            RrcConnectionReconfiguration msg)
 {
     m_owner->DoSendRrcConnectionReconfiguration(rnti, msg);
@@ -1599,7 +1599,7 @@ MemberNrEnbRrcSapUser<C>::SendRrcConnectionReconfiguration(uint16_t rnti,
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionReestablishment(uint16_t rnti,
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionReestablishment(uint16_t rnti,
                                                            RrcConnectionReestablishment msg)
 {
     m_owner->DoSendRrcConnectionReestablishment(rnti, msg);
@@ -1607,7 +1607,7 @@ MemberNrEnbRrcSapUser<C>::SendRrcConnectionReestablishment(uint16_t rnti,
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionReestablishmentReject(
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionReestablishmentReject(
     uint16_t rnti,
     RrcConnectionReestablishmentReject msg)
 {
@@ -1616,52 +1616,52 @@ MemberNrEnbRrcSapUser<C>::SendRrcConnectionReestablishmentReject(
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionRelease(uint16_t rnti, RrcConnectionRelease msg)
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionRelease(uint16_t rnti, RrcConnectionRelease msg)
 {
     m_owner->DoSendRrcConnectionRelease(rnti, msg);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapUser<C>::SendRrcConnectionReject(uint16_t rnti, RrcConnectionReject msg)
+MemberNrGnbRrcSapUser<C>::SendRrcConnectionReject(uint16_t rnti, RrcConnectionReject msg)
 {
     m_owner->DoSendRrcConnectionReject(rnti, msg);
 }
 
 template <class C>
 Ptr<Packet>
-MemberNrEnbRrcSapUser<C>::EncodeHandoverPreparationInformation(HandoverPreparationInfo msg)
+MemberNrGnbRrcSapUser<C>::EncodeHandoverPreparationInformation(HandoverPreparationInfo msg)
 {
     return m_owner->DoEncodeHandoverPreparationInformation(msg);
 }
 
 template <class C>
 NrRrcSap::HandoverPreparationInfo
-MemberNrEnbRrcSapUser<C>::DecodeHandoverPreparationInformation(Ptr<Packet> p)
+MemberNrGnbRrcSapUser<C>::DecodeHandoverPreparationInformation(Ptr<Packet> p)
 {
     return m_owner->DoDecodeHandoverPreparationInformation(p);
 }
 
 template <class C>
 Ptr<Packet>
-MemberNrEnbRrcSapUser<C>::EncodeHandoverCommand(RrcConnectionReconfiguration msg)
+MemberNrGnbRrcSapUser<C>::EncodeHandoverCommand(RrcConnectionReconfiguration msg)
 {
     return m_owner->DoEncodeHandoverCommand(msg);
 }
 
 template <class C>
 NrRrcSap::RrcConnectionReconfiguration
-MemberNrEnbRrcSapUser<C>::DecodeHandoverCommand(Ptr<Packet> p)
+MemberNrGnbRrcSapUser<C>::DecodeHandoverCommand(Ptr<Packet> p)
 {
     return m_owner->DoDecodeHandoverCommand(p);
 }
 
 /**
- * Template for the implementation of the NrEnbRrcSapProvider as a member
+ * Template for the implementation of the NrGnbRrcSapProvider as a member
  * of an owner class of type C to which all methods are forwarded
  */
 template <class C>
-class MemberNrEnbRrcSapProvider : public NrEnbRrcSapProvider
+class MemberNrGnbRrcSapProvider : public NrGnbRrcSapProvider
 {
   public:
     /**
@@ -1669,12 +1669,12 @@ class MemberNrEnbRrcSapProvider : public NrEnbRrcSapProvider
      *
      * \param owner
      */
-    MemberNrEnbRrcSapProvider(C* owner);
+    MemberNrGnbRrcSapProvider(C* owner);
 
     // Delete default constructor to avoid misuse
-    MemberNrEnbRrcSapProvider() = delete;
+    MemberNrGnbRrcSapProvider() = delete;
 
-    // methods inherited from NrEnbRrcSapProvider go here
+    // methods inherited from NrGnbRrcSapProvider go here
     void CompleteSetupUe(uint16_t rnti, CompleteSetupUeParameters params) override;
     void RecvRrcConnectionRequest(uint16_t rnti, RrcConnectionRequest msg) override;
     void RecvRrcConnectionSetupCompleted(uint16_t rnti, RrcConnectionSetupCompleted msg) override;
@@ -1694,28 +1694,28 @@ class MemberNrEnbRrcSapProvider : public NrEnbRrcSapProvider
 };
 
 template <class C>
-MemberNrEnbRrcSapProvider<C>::MemberNrEnbRrcSapProvider(C* owner)
+MemberNrGnbRrcSapProvider<C>::MemberNrGnbRrcSapProvider(C* owner)
     : m_owner(owner)
 {
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::CompleteSetupUe(uint16_t rnti, CompleteSetupUeParameters params)
+MemberNrGnbRrcSapProvider<C>::CompleteSetupUe(uint16_t rnti, CompleteSetupUeParameters params)
 {
     m_owner->DoCompleteSetupUe(rnti, params);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionRequest(uint16_t rnti, RrcConnectionRequest msg)
+MemberNrGnbRrcSapProvider<C>::RecvRrcConnectionRequest(uint16_t rnti, RrcConnectionRequest msg)
 {
     Simulator::ScheduleNow(&C::DoRecvRrcConnectionRequest, m_owner, rnti, msg);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionSetupCompleted(uint16_t rnti,
+MemberNrGnbRrcSapProvider<C>::RecvRrcConnectionSetupCompleted(uint16_t rnti,
                                                               RrcConnectionSetupCompleted msg)
 {
     Simulator::ScheduleNow(&C::DoRecvRrcConnectionSetupCompleted, m_owner, rnti, msg);
@@ -1723,7 +1723,7 @@ MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionSetupCompleted(uint16_t rnti,
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReconfigurationCompleted(
+MemberNrGnbRrcSapProvider<C>::RecvRrcConnectionReconfigurationCompleted(
     uint16_t rnti,
     RrcConnectionReconfigurationCompleted msg)
 {
@@ -1732,7 +1732,7 @@ MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReconfigurationCompleted(
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentRequest(
+MemberNrGnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentRequest(
     uint16_t rnti,
     RrcConnectionReestablishmentRequest msg)
 {
@@ -1741,7 +1741,7 @@ MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentRequest(
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentComplete(
+MemberNrGnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentComplete(
     uint16_t rnti,
     RrcConnectionReestablishmentComplete msg)
 {
@@ -1750,14 +1750,14 @@ MemberNrEnbRrcSapProvider<C>::RecvRrcConnectionReestablishmentComplete(
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvMeasurementReport(uint16_t rnti, MeasurementReport msg)
+MemberNrGnbRrcSapProvider<C>::RecvMeasurementReport(uint16_t rnti, MeasurementReport msg)
 {
     Simulator::ScheduleNow(&C::DoRecvMeasurementReport, m_owner, rnti, msg);
 }
 
 template <class C>
 void
-MemberNrEnbRrcSapProvider<C>::RecvIdealUeContextRemoveRequest(uint16_t rnti)
+MemberNrGnbRrcSapProvider<C>::RecvIdealUeContextRemoveRequest(uint16_t rnti)
 {
     Simulator::ScheduleNow(&C::DoRecvIdealUeContextRemoveRequest, m_owner, rnti);
 }

@@ -66,7 +66,7 @@ class NrFfrAlgorithm : public Object
      * \brief Set the "user" part of the NrFfrRrcSap interface that
      *        this frequency reuse algorithm instance will interact with.
      * \param s a reference to the "user" part of the interface, typically a
-     *          member of an NrEnbRrc instance
+     *          member of an NrGnbRrc instance
      */
     virtual void SetNrFfrRrcSapUser(NrFfrRrcSapUser* s) = 0;
 
@@ -80,7 +80,7 @@ class NrFfrAlgorithm : public Object
     /**
      * \brief Export the "provider" part of the NrFfrRrcSap interface.
      * \return the reference to the "provider" part of the interface, typically to
-     *         be kept by an NrEnbRrc instance
+     *         be kept by an NrGnbRrc instance
      */
     virtual NrFfrRrcSapProvider* GetNrFfrRrcSapProvider() = 0;
 

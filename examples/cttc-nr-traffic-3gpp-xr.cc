@@ -193,8 +193,8 @@ main(int argc, char* argv[])
     nrHelper->SetUePhyAttribute("NoiseFigure", DoubleValue(7));
 
     Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(999999999));
-    Config::SetDefault("ns3::NrEnbRrc::EpsBearerToRlcMapping",
-                       EnumValue(useUdp ? NrEnbRrc::RLC_UM_ALWAYS : NrEnbRrc::RLC_AM_ALWAYS));
+    Config::SetDefault("ns3::NrGnbRrc::EpsBearerToRlcMapping",
+                       EnumValue(useUdp ? NrGnbRrc::RLC_UM_ALWAYS : NrGnbRrc::RLC_AM_ALWAYS));
 
     nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(4));
     nrHelper->SetGnbAntennaAttribute("NumColumns", UintegerValue(8));

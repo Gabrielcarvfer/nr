@@ -266,19 +266,19 @@ NrRrcConnectionEstablishmentTestCase::DoRun()
 
     if (m_nUes < 25)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(40));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(40));
     }
     else if (m_nUes < 60)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(80));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(80));
     }
     else if (m_nUes < 120)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(160));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(160));
     }
     else
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(320));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(320));
     }
 
     // normal code
@@ -318,7 +318,7 @@ NrRrcConnectionEstablishmentTestCase::DoRun()
     // Set AdmitConnectionRequest attribute
     for (auto it = enbDevs.Begin(); it != enbDevs.End(); ++it)
     {
-        Ptr<NrEnbRrc> enbRrc = (*it)->GetObject<NrGnbNetDevice>()->GetRrc();
+        Ptr<NrGnbRrc> enbRrc = (*it)->GetObject<NrGnbNetDevice>()->GetRrc();
         enbRrc->SetAttribute("AdmitRrcConnectionRequest",
                              BooleanValue(m_admitRrcConnectionRequest));
     }
@@ -424,7 +424,7 @@ NrRrcConnectionEstablishmentTestCase::CheckConnected(Ptr<NetDevice> ueDevice,
     // Verifying UE context state in eNodeB RRC.
 
     Ptr<NrGnbNetDevice> enbNrDevice = enbDevice->GetObject<NrGnbNetDevice>();
-    Ptr<NrEnbRrc> enbRrc = enbNrDevice->GetRrc();
+    Ptr<NrGnbRrc> enbRrc = enbNrDevice->GetRrc();
     const bool hasContext = enbRrc->HasUeManager(rnti);
 
     if (hasContext)
@@ -540,7 +540,7 @@ NrRrcConnectionEstablishmentTestCase::CheckNotConnected(Ptr<NetDevice> ueDevice,
     bool ueStateIsConnectedNormally = (NrUeRrc::CONNECTED_NORMALLY == ueRrc->GetState());
 
     Ptr<NrGnbNetDevice> enbNrDevice = enbDevice->GetObject<NrGnbNetDevice>();
-    Ptr<NrEnbRrc> enbRrc = enbNrDevice->GetRrc();
+    Ptr<NrGnbRrc> enbRrc = enbNrDevice->GetRrc();
     const bool hasContext = enbRrc->HasUeManager(rnti);
     bool contextStateIsConnectedNormally = false;
     if (hasContext)
@@ -624,19 +624,19 @@ NrRrcConnectionEstablishmentErrorTestCase::DoRun()
 
     if (m_nUes < 25)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(40));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(40));
     }
     else if (m_nUes < 60)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(80));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(80));
     }
     else if (m_nUes < 120)
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(160));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(160));
     }
     else
     {
-        Config::SetDefault("ns3::NrEnbRrc::SrsPeriodicity", UintegerValue(320));
+        Config::SetDefault("ns3::NrGnbRrc::SrsPeriodicity", UintegerValue(320));
     }
 
     // normal code
@@ -685,7 +685,7 @@ NrRrcConnectionEstablishmentErrorTestCase::DoRun()
     // Set AdmitConnectionRequest attribute
     for (auto it = enbDevs.Begin(); it != enbDevs.End(); ++it)
     {
-        Ptr<NrEnbRrc> enbRrc = (*it)->GetObject<NrGnbNetDevice>()->GetRrc();
+        Ptr<NrGnbRrc> enbRrc = (*it)->GetObject<NrGnbNetDevice>()->GetRrc();
         enbRrc->SetAttribute("AdmitRrcConnectionRequest",
                              BooleanValue(m_admitRrcConnectionRequest));
     }
@@ -779,7 +779,7 @@ NrRrcTestSuite::NrRrcTestSuite()
 {
     //  LogComponentEnableAll (LOG_PREFIX_ALL);
     //  LogComponentEnable ("NrRrcTest", LOG_LEVEL_ALL);
-    //  LogComponentEnable ("NrEnbRrc", LOG_INFO);
+    //  LogComponentEnable ("NrGnbRrc", LOG_INFO);
     //  LogComponentEnable ("NrUeRrc", LOG_INFO);
 
     NS_LOG_FUNCTION(this);

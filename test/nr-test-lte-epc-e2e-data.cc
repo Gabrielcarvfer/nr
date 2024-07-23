@@ -287,7 +287,7 @@ NrEpcE2eDataTestCase::DoRun()
             }
         }
     }
-    Config::Set("/NodeList/*/DeviceList/*/NrEnbRrc/UeMap/*/RadioBearerMap/*/NrRlc/MaxTxBufferSize",
+    Config::Set("/NodeList/*/DeviceList/*/NrGnbRrc/UeMap/*/RadioBearerMap/*/NrRlc/MaxTxBufferSize",
                 UintegerValue(2 * 1024 * 1024));
     Config::Set("/NodeList/*/DeviceList/*/NrUeRrc/RadioBearerMap/*/NrRlc/MaxTxBufferSize",
                 UintegerValue(2 * 1024 * 1024));

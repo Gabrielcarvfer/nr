@@ -23,7 +23,7 @@ namespace ns3
 
 class NrUeRrcSapProvider;
 class NrUeRrcSapUser;
-class NrEnbRrcSapProvider;
+class NrGnbRrcSapProvider;
 class NrUeRrc;
 
 namespace nr
@@ -155,7 +155,7 @@ class UeRrcProtocolReal : public Object
     uint16_t m_rnti;                          ///< the RNTI
     NrUeRrcSapProvider* m_ueRrcSapProvider;   ///< UE RRC SAP provider
     NrUeRrcSapUser* m_ueRrcSapUser;           ///< UE RRC SAP user
-    NrEnbRrcSapProvider* m_enbRrcSapProvider; ///< ENB RRC SAP provider
+    NrGnbRrcSapProvider* m_enbRrcSapProvider; ///< ENB RRC SAP provider
 
     NrUeRrcSapUser::SetupParameters m_setupParameters; ///< setup parameters
     NrUeRrcSapProvider::CompleteSetupParameters
@@ -169,20 +169,20 @@ class UeRrcProtocolReal : public Object
  * LTE MAC scheduler.
  *
  */
-class NrEnbRrcProtocolReal : public Object
+class NrGnbRrcProtocolReal : public Object
 {
-    /// allow MemberNrEnbRrcSapUser<NrEnbRrcProtocolReal> class friend access
-    friend class MemberNrEnbRrcSapUser<NrEnbRrcProtocolReal>;
-    /// allow NrPdcpSpecificNrPdcpSapUser<NrEnbRrcProtocolReal> class friend access
-    friend class NrPdcpSpecificNrPdcpSapUser<NrEnbRrcProtocolReal>;
-    /// allow NrRlcSpecificNrRlcSapUser<NrEnbRrcProtocolReal> class friend access
-    friend class NrRlcSpecificNrRlcSapUser<NrEnbRrcProtocolReal>;
+    /// allow MemberNrGnbRrcSapUser<NrGnbRrcProtocolReal> class friend access
+    friend class MemberNrGnbRrcSapUser<NrGnbRrcProtocolReal>;
+    /// allow NrPdcpSpecificNrPdcpSapUser<NrGnbRrcProtocolReal> class friend access
+    friend class NrPdcpSpecificNrPdcpSapUser<NrGnbRrcProtocolReal>;
+    /// allow NrRlcSpecificNrRlcSapUser<NrGnbRrcProtocolReal> class friend access
+    friend class NrRlcSpecificNrRlcSapUser<NrGnbRrcProtocolReal>;
     /// allow RealProtocolRlcSapUser class friend access
     friend class RealProtocolRlcSapUser;
 
   public:
-    NrEnbRrcProtocolReal();
-    ~NrEnbRrcProtocolReal() override;
+    NrGnbRrcProtocolReal();
+    ~NrGnbRrcProtocolReal() override;
 
     // inherited from Object
     void DoDispose() override;
@@ -195,15 +195,15 @@ class NrEnbRrcProtocolReal : public Object
     /**
      * Set LTE ENB RRC SAP provider function
      *
-     * \param p NrEnbRrcSapProvider *
+     * \param p NrGnbRrcSapProvider *
      */
-    void SetNrEnbRrcSapProvider(NrEnbRrcSapProvider* p);
+    void SetNrGnbRrcSapProvider(NrGnbRrcSapProvider* p);
     /**
      * Get LTE ENB RRC SAP user function
      *
-     * \returns NrEnbRrcSapUser *
+     * \returns NrGnbRrcSapUser *
      */
-    NrEnbRrcSapUser* GetNrEnbRrcSapUser();
+    NrGnbRrcSapUser* GetNrGnbRrcSapUser();
 
     /**
      * Set cell ID function
@@ -228,14 +228,14 @@ class NrEnbRrcProtocolReal : public Object
     void SetUeRrcSapProvider(uint16_t rnti, NrUeRrcSapProvider* p);
 
   private:
-    // methods forwarded from NrEnbRrcSapUser
+    // methods forwarded from NrGnbRrcSapUser
     /**
      * Setup UE function
      *
      * \param rnti the RNTI
-     * \param params NrEnbRrcSapUser::SetupUeParameters
+     * \param params NrGnbRrcSapUser::SetupUeParameters
      */
-    void DoSetupUe(uint16_t rnti, NrEnbRrcSapUser::SetupUeParameters params);
+    void DoSetupUe(uint16_t rnti, NrGnbRrcSapUser::SetupUeParameters params);
     /**
      * Remove UE function
      *
@@ -346,12 +346,12 @@ class NrEnbRrcProtocolReal : public Object
 
     uint16_t m_rnti;                                                ///< the RNTI
     uint16_t m_cellId;                                              ///< the cell ID
-    NrEnbRrcSapProvider* m_enbRrcSapProvider;                       ///< ENB RRC SAP provider
-    NrEnbRrcSapUser* m_enbRrcSapUser;                               ///< ENB RRC SAP user
+    NrGnbRrcSapProvider* m_enbRrcSapProvider;                       ///< ENB RRC SAP provider
+    NrGnbRrcSapUser* m_enbRrcSapUser;                               ///< ENB RRC SAP user
     std::map<uint16_t, NrUeRrcSapProvider*> m_enbRrcSapProviderMap; ///< ENB RRC SAP provider map
-    std::map<uint16_t, NrEnbRrcSapUser::SetupUeParameters>
+    std::map<uint16_t, NrGnbRrcSapUser::SetupUeParameters>
         m_setupUeParametersMap; ///< setup UE parameters map
-    std::map<uint16_t, NrEnbRrcSapProvider::CompleteSetupUeParameters>
+    std::map<uint16_t, NrGnbRrcSapProvider::CompleteSetupUeParameters>
         m_completeSetupUeParametersMap; ///< complete setup UE parameters map
 };
 
@@ -362,17 +362,17 @@ class RealProtocolRlcSapUser : public NrRlcSapUser
     /**
      * Real protocol RC SAP user
      *
-     * \param pdcp NrEnbRrcProtocolReal *
+     * \param pdcp NrGnbRrcProtocolReal *
      * \param rnti the RNTI
      */
-    RealProtocolRlcSapUser(NrEnbRrcProtocolReal* pdcp, uint16_t rnti);
+    RealProtocolRlcSapUser(NrGnbRrcProtocolReal* pdcp, uint16_t rnti);
 
     // Interface implemented from NrRlcSapUser
     void ReceivePdcpPdu(Ptr<Packet> p) override;
 
   private:
     RealProtocolRlcSapUser();
-    NrEnbRrcProtocolReal* m_pdcp; ///< PDCP
+    NrGnbRrcProtocolReal* m_pdcp; ///< PDCP
     uint16_t m_rnti;              ///< RNTI
 };
 

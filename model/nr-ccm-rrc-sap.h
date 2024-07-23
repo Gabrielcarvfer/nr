@@ -120,7 +120,7 @@ class NrCcmRrcSapProvider
 
     /**
      * \brief Add the Signal Bearer for a specific Ue in NrEnbComponenCarrierManager
-     * \param lcInfo this structure it is hard-coded in the NrEnbRrc
+     * \param lcInfo this structure it is hard-coded in the NrGnbRrc
      * \param rlcMacSapUser it is the MacSapUser of the Rlc instance
      * \return the NrMacSapUser of the ComponentCarrierManager
      *
@@ -139,8 +139,8 @@ class NrCcmRrcSapProvider
  */
 class NrCcmRrcSapUser
 {
-    /// allow NrEnbRrc class friend access
-    friend class NrEnbRrc;
+    /// allow NrGnbRrc class friend access
+    friend class NrGnbRrc;
 
   public:
     virtual ~NrCcmRrcSapUser();
@@ -185,7 +185,7 @@ class NrCcmRrcSapUser
      * \param lcConfig is a single structure contains logical Channel Id, Logical Channel config and
      * Component Carrier Id
      */
-    virtual void AddLcs(std::vector<NrEnbRrcSapProvider::LogicalChannelConfig> lcConfig) = 0;
+    virtual void AddLcs(std::vector<NrGnbRrcSapProvider::LogicalChannelConfig> lcConfig) = 0;
 
     /**
      * remove an existing LC
@@ -317,7 +317,7 @@ class MemberNrCcmRrcSapUser : public NrCcmRrcSapUser
     MemberNrCcmRrcSapUser(C* owner);
 
     // inherited from NrCcmRrcSapUser
-    void AddLcs(std::vector<NrEnbRrcSapProvider::LogicalChannelConfig> lcConfig) override;
+    void AddLcs(std::vector<NrGnbRrcSapProvider::LogicalChannelConfig> lcConfig) override;
     void ReleaseLcs(uint16_t rnti, uint8_t lcid) override;
     uint8_t AddUeMeasReportConfigForComponentCarrier(
         NrRrcSap::ReportConfigEutra reportConfig) override;
@@ -337,7 +337,7 @@ MemberNrCcmRrcSapUser<C>::MemberNrCcmRrcSapUser(C* owner)
 
 template <class C>
 void
-MemberNrCcmRrcSapUser<C>::AddLcs(std::vector<NrEnbRrcSapProvider::LogicalChannelConfig> lcConfig)
+MemberNrCcmRrcSapUser<C>::AddLcs(std::vector<NrGnbRrcSapProvider::LogicalChannelConfig> lcConfig)
 {
     NS_FATAL_ERROR("Function should not be called because it is not implemented.");
     // m_owner->DoAddLcs (lcConfig);

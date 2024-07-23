@@ -42,11 +42,11 @@ NrGnbNetDevice::GetTypeId()
                           ObjectMapValue(),
                           MakeObjectMapAccessor(&NrGnbNetDevice::m_ccMap),
                           MakeObjectMapChecker<BandwidthPartGnb>())
-            .AddAttribute("NrEnbRrc",
+            .AddAttribute("NrGnbRrc",
                           "The RRC layer associated with the ENB",
                           PointerValue(),
                           MakePointerAccessor(&NrGnbNetDevice::m_rrc),
-                          MakePointerChecker<NrEnbRrc>());
+                          MakePointerChecker<NrGnbRrc>());
     return tid;
 }
 
@@ -203,12 +203,12 @@ NrGnbNetDevice::GetEarfcn(uint8_t index) const
 }
 
 void
-NrGnbNetDevice::SetRrc(Ptr<NrEnbRrc> rrc)
+NrGnbNetDevice::SetRrc(Ptr<NrGnbRrc> rrc)
 {
     m_rrc = rrc;
 }
 
-Ptr<NrEnbRrc>
+Ptr<NrGnbRrc>
 NrGnbNetDevice::GetRrc()
 {
     return m_rrc;

@@ -47,7 +47,7 @@ class NrUeComponentCarrierManager : public Object
      * \brief Set the "user" part of the NrComponentCarrier Management SAP interface
      * that this UE component carrier manager will interact with.
      * \param s a reference to the "user" part of the interface, typically a
-     *          member of an NrEnbRrc instance
+     *          member of an NrGnbRrc instance
      */
     virtual void SetNrCcmRrcSapUser(NrUeCcmRrcSapUser* s);
 

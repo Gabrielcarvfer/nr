@@ -163,7 +163,7 @@ NrPhyTxStatsCalculator::DlPhyTransmissionCallback(Ptr<NrPhyTxStatsCalculator> ph
     uint64_t imsi = 0;
     std::ostringstream pathAndRnti;
     std::string pathEnb = path.substr(0, path.find("/ComponentCarrierMap"));
-    pathAndRnti << pathEnb << "/NrEnbRrc/UeMap/" << params.m_rnti;
+    pathAndRnti << pathEnb << "/NrGnbRrc/UeMap/" << params.m_rnti;
     if (phyTxStats->ExistsImsiPath(pathAndRnti.str()))
     {
         imsi = phyTxStats->GetImsiPath(pathAndRnti.str());

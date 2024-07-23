@@ -78,7 +78,7 @@ class NrUeCcmRrcSapProvider
     /**
      * \brief Add the Signal Bearer for a specific Ue in NrUeComponenCarrierManager
      * \param lcid the Logical Channel Id
-     * \param lcConfig this structure it is hard-coded in the NrEnbRrc
+     * \param lcConfig this structure it is hard-coded in the NrGnbRrc
      * \param msu it is the MacSapUser of the Rlc instance
      * \return the NrMacSapUser of the ComponentCarrierManager
      *

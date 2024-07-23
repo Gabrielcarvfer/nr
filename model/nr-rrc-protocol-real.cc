@@ -203,7 +203,7 @@ UeRrcProtocolReal::DoSendIdealUeContextRemoveRequest(uint16_t rnti)
                             //  have changed due to handover
     // ideally informing eNB
     Simulator::Schedule(RRC_REAL_MSG_DELAY,
-                        &NrEnbRrcSapProvider::RecvIdealUeContextRemoveRequest,
+                        &NrGnbRrcSapProvider::RecvIdealUeContextRemoveRequest,
                         m_enbRrcSapProvider,
                         rnti);
 }
@@ -282,9 +282,9 @@ UeRrcProtocolReal::SetEnbRrcSapProvider()
         }
     }
     NS_ASSERT_MSG(found, " Unable to find eNB with CellId =" << cellId);
-    m_enbRrcSapProvider = enbDev->GetRrc()->GetNrEnbRrcSapProvider();
-    Ptr<NrEnbRrcProtocolReal> enbRrcProtocolReal =
-        enbDev->GetRrc()->GetObject<NrEnbRrcProtocolReal>();
+    m_enbRrcSapProvider = enbDev->GetRrc()->GetNrGnbRrcSapProvider();
+    Ptr<NrGnbRrcProtocolReal> enbRrcProtocolReal =
+        enbDev->GetRrc()->GetObject<NrGnbRrcProtocolReal>();
     enbRrcProtocolReal->SetUeRrcSapProvider(m_rnti, m_ueRrcSapProvider);
 }
 
@@ -370,22 +370,22 @@ UeRrcProtocolReal::DoReceivePdcpSdu(NrPdcpSapUser::ReceivePdcpSduParameters para
     }
 }
 
-NS_OBJECT_ENSURE_REGISTERED(NrEnbRrcProtocolReal);
+NS_OBJECT_ENSURE_REGISTERED(NrGnbRrcProtocolReal);
 
-NrEnbRrcProtocolReal::NrEnbRrcProtocolReal()
+NrGnbRrcProtocolReal::NrGnbRrcProtocolReal()
     : m_enbRrcSapProvider(nullptr)
 {
     NS_LOG_FUNCTION(this);
-    m_enbRrcSapUser = new MemberNrEnbRrcSapUser<NrEnbRrcProtocolReal>(this);
+    m_enbRrcSapUser = new MemberNrGnbRrcSapUser<NrGnbRrcProtocolReal>(this);
 }
 
-NrEnbRrcProtocolReal::~NrEnbRrcProtocolReal()
+NrGnbRrcProtocolReal::~NrGnbRrcProtocolReal()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-NrEnbRrcProtocolReal::DoDispose()
+NrGnbRrcProtocolReal::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     delete m_enbRrcSapUser;
@@ -400,35 +400,35 @@ NrEnbRrcProtocolReal::DoDispose()
 }
 
 TypeId
-NrEnbRrcProtocolReal::GetTypeId()
+NrGnbRrcProtocolReal::GetTypeId()
 {
-    static TypeId tid = TypeId("ns3::NrEnbRrcProtocolReal")
+    static TypeId tid = TypeId("ns3::NrGnbRrcProtocolReal")
                             .SetParent<Object>()
                             .SetGroupName("Nr")
-                            .AddConstructor<NrEnbRrcProtocolReal>();
+                            .AddConstructor<NrGnbRrcProtocolReal>();
     return tid;
 }
 
 void
-NrEnbRrcProtocolReal::SetNrEnbRrcSapProvider(NrEnbRrcSapProvider* p)
+NrGnbRrcProtocolReal::SetNrGnbRrcSapProvider(NrGnbRrcSapProvider* p)
 {
     m_enbRrcSapProvider = p;
 }
 
-NrEnbRrcSapUser*
-NrEnbRrcProtocolReal::GetNrEnbRrcSapUser()
+NrGnbRrcSapUser*
+NrGnbRrcProtocolReal::GetNrGnbRrcSapUser()
 {
     return m_enbRrcSapUser;
 }
 
 void
-NrEnbRrcProtocolReal::SetCellId(uint16_t cellId)
+NrGnbRrcProtocolReal::SetCellId(uint16_t cellId)
 {
     m_cellId = cellId;
 }
 
 NrUeRrcSapProvider*
-NrEnbRrcProtocolReal::GetUeRrcSapProvider(uint16_t rnti)
+NrGnbRrcProtocolReal::GetUeRrcSapProvider(uint16_t rnti)
 {
     auto it = m_enbRrcSapProviderMap.find(rnti);
     NS_ASSERT_MSG(it != m_enbRrcSapProviderMap.end(), "could not find RNTI = " << rnti);
@@ -436,7 +436,7 @@ NrEnbRrcProtocolReal::GetUeRrcSapProvider(uint16_t rnti)
 }
 
 void
-NrEnbRrcProtocolReal::SetUeRrcSapProvider(uint16_t rnti, NrUeRrcSapProvider* p)
+NrGnbRrcProtocolReal::SetUeRrcSapProvider(uint16_t rnti, NrUeRrcSapProvider* p)
 {
     auto it = m_enbRrcSapProviderMap.find(rnti);
     // assign UE RRC only if the RNTI is found at eNB
@@ -447,7 +447,7 @@ NrEnbRrcProtocolReal::SetUeRrcSapProvider(uint16_t rnti, NrUeRrcSapProvider* p)
 }
 
 void
-NrEnbRrcProtocolReal::DoSetupUe(uint16_t rnti, NrEnbRrcSapUser::SetupUeParameters params)
+NrGnbRrcProtocolReal::DoSetupUe(uint16_t rnti, NrGnbRrcSapUser::SetupUeParameters params)
 {
     NS_LOG_FUNCTION(this << rnti);
 
@@ -488,13 +488,13 @@ NrEnbRrcProtocolReal::DoSetupUe(uint16_t rnti, NrEnbRrcSapUser::SetupUeParameter
     // Store SetupUeParameters
     m_setupUeParametersMap[rnti] = params;
 
-    NrEnbRrcSapProvider::CompleteSetupUeParameters completeSetupUeParameters;
+    NrGnbRrcSapProvider::CompleteSetupUeParameters completeSetupUeParameters;
     auto csupIt = m_completeSetupUeParametersMap.find(rnti);
     if (csupIt == m_completeSetupUeParametersMap.end())
     {
         // Create NrRlcSapUser, NrPdcpSapUser
         NrRlcSapUser* srb0SapUser = new RealProtocolRlcSapUser(this, rnti);
-        NrPdcpSapUser* srb1SapUser = new NrPdcpSpecificNrPdcpSapUser<NrEnbRrcProtocolReal>(this);
+        NrPdcpSapUser* srb1SapUser = new NrPdcpSpecificNrPdcpSapUser<NrGnbRrcProtocolReal>(this);
         completeSetupUeParameters.srb0SapUser = srb0SapUser;
         completeSetupUeParameters.srb1SapUser = srb1SapUser;
         // Store NrRlcSapUser, NrPdcpSapUser
@@ -508,7 +508,7 @@ NrEnbRrcProtocolReal::DoSetupUe(uint16_t rnti, NrEnbRrcSapUser::SetupUeParameter
 }
 
 void
-NrEnbRrcProtocolReal::DoRemoveUe(uint16_t rnti)
+NrGnbRrcProtocolReal::DoRemoveUe(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     auto it = m_completeSetupUeParametersMap.find(rnti);
@@ -521,7 +521,7 @@ NrEnbRrcProtocolReal::DoRemoveUe(uint16_t rnti)
 }
 
 void
-NrEnbRrcProtocolReal::DoSendSystemInformation(uint16_t cellId, NrRrcSap::SystemInformation msg)
+NrGnbRrcProtocolReal::DoSendSystemInformation(uint16_t cellId, NrRrcSap::SystemInformation msg)
 {
     NS_LOG_FUNCTION(this << cellId);
     // walk list of all nodes to get UEs with this cellId
@@ -554,7 +554,7 @@ NrEnbRrcProtocolReal::DoSendSystemInformation(uint16_t cellId, NrRrcSap::SystemI
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionSetup(uint16_t rnti, NrRrcSap::RrcConnectionSetup msg)
+NrGnbRrcProtocolReal::DoSendRrcConnectionSetup(uint16_t rnti, NrRrcSap::RrcConnectionSetup msg)
 {
     Ptr<Packet> packet = Create<Packet>();
 
@@ -572,7 +572,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionSetup(uint16_t rnti, NrRrcSap::RrcConne
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionReject(uint16_t rnti, NrRrcSap::RrcConnectionReject msg)
+NrGnbRrcProtocolReal::DoSendRrcConnectionReject(uint16_t rnti, NrRrcSap::RrcConnectionReject msg)
 {
     Ptr<Packet> packet = Create<Packet>();
 
@@ -590,7 +590,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionReject(uint16_t rnti, NrRrcSap::RrcConn
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionReconfiguration(uint16_t rnti,
+NrGnbRrcProtocolReal::DoSendRrcConnectionReconfiguration(uint16_t rnti,
                                                          NrRrcSap::RrcConnectionReconfiguration msg)
 {
     Ptr<Packet> packet = Create<Packet>();
@@ -609,7 +609,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionReconfiguration(uint16_t rnti,
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionReestablishment(uint16_t rnti,
+NrGnbRrcProtocolReal::DoSendRrcConnectionReestablishment(uint16_t rnti,
                                                          NrRrcSap::RrcConnectionReestablishment msg)
 {
     Ptr<Packet> packet = Create<Packet>();
@@ -628,7 +628,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionReestablishment(uint16_t rnti,
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionReestablishmentReject(
+NrGnbRrcProtocolReal::DoSendRrcConnectionReestablishmentReject(
     uint16_t rnti,
     NrRrcSap::RrcConnectionReestablishmentReject msg)
 {
@@ -648,7 +648,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionReestablishmentReject(
 }
 
 void
-NrEnbRrcProtocolReal::DoSendRrcConnectionRelease(uint16_t rnti, NrRrcSap::RrcConnectionRelease msg)
+NrGnbRrcProtocolReal::DoSendRrcConnectionRelease(uint16_t rnti, NrRrcSap::RrcConnectionRelease msg)
 {
     // The code below is commented so RRC connection release can be sent in an ideal way
     /*
@@ -682,7 +682,7 @@ NrEnbRrcProtocolReal::DoSendRrcConnectionRelease(uint16_t rnti, NrRrcSap::RrcCon
 }
 
 void
-NrEnbRrcProtocolReal::DoReceivePdcpPdu(uint16_t rnti, Ptr<Packet> p)
+NrGnbRrcProtocolReal::DoReceivePdcpPdu(uint16_t rnti, Ptr<Packet> p)
 {
     // Get type of message received
     NrRrcUlCcchMessage rrcUlCcchMessage;
@@ -714,7 +714,7 @@ NrEnbRrcProtocolReal::DoReceivePdcpPdu(uint16_t rnti, Ptr<Packet> p)
 }
 
 void
-NrEnbRrcProtocolReal::DoReceivePdcpSdu(NrPdcpSapUser::ReceivePdcpSduParameters params)
+NrGnbRrcProtocolReal::DoReceivePdcpSdu(NrPdcpSapUser::ReceivePdcpSduParameters params)
 {
     // Get type of message received
     NrRrcUlDcchMessage rrcUlDcchMessage;
@@ -766,7 +766,7 @@ NrEnbRrcProtocolReal::DoReceivePdcpSdu(NrPdcpSapUser::ReceivePdcpSduParameters p
 }
 
 Ptr<Packet>
-NrEnbRrcProtocolReal::DoEncodeHandoverPreparationInformation(NrRrcSap::HandoverPreparationInfo msg)
+NrGnbRrcProtocolReal::DoEncodeHandoverPreparationInformation(NrRrcSap::HandoverPreparationInfo msg)
 {
     NrHandoverPreparationInfoHeader h;
     h.SetMessage(msg);
@@ -777,7 +777,7 @@ NrEnbRrcProtocolReal::DoEncodeHandoverPreparationInformation(NrRrcSap::HandoverP
 }
 
 NrRrcSap::HandoverPreparationInfo
-NrEnbRrcProtocolReal::DoDecodeHandoverPreparationInformation(Ptr<Packet> p)
+NrGnbRrcProtocolReal::DoDecodeHandoverPreparationInformation(Ptr<Packet> p)
 {
     NrHandoverPreparationInfoHeader h;
     p->RemoveHeader(h);
@@ -786,7 +786,7 @@ NrEnbRrcProtocolReal::DoDecodeHandoverPreparationInformation(Ptr<Packet> p)
 }
 
 Ptr<Packet>
-NrEnbRrcProtocolReal::DoEncodeHandoverCommand(NrRrcSap::RrcConnectionReconfiguration msg)
+NrGnbRrcProtocolReal::DoEncodeHandoverCommand(NrRrcSap::RrcConnectionReconfiguration msg)
 {
     NrRrcConnectionReconfigurationHeader h;
     h.SetMessage(msg);
@@ -796,7 +796,7 @@ NrEnbRrcProtocolReal::DoEncodeHandoverCommand(NrRrcSap::RrcConnectionReconfigura
 }
 
 NrRrcSap::RrcConnectionReconfiguration
-NrEnbRrcProtocolReal::DoDecodeHandoverCommand(Ptr<Packet> p)
+NrGnbRrcProtocolReal::DoDecodeHandoverCommand(Ptr<Packet> p)
 {
     NrRrcConnectionReconfigurationHeader h;
     p->RemoveHeader(h);
@@ -806,7 +806,7 @@ NrEnbRrcProtocolReal::DoDecodeHandoverCommand(Ptr<Packet> p)
 
 //////////////////////////////////////////////////////
 
-RealProtocolRlcSapUser::RealProtocolRlcSapUser(NrEnbRrcProtocolReal* pdcp, uint16_t rnti)
+RealProtocolRlcSapUser::RealProtocolRlcSapUser(NrGnbRrcProtocolReal* pdcp, uint16_t rnti)
     : m_pdcp(pdcp),
       m_rnti(rnti)
 {

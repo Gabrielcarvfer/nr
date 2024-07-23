@@ -171,7 +171,7 @@ NrMacStatsCalculator::DlSchedulingCallback(Ptr<NrMacStatsCalculator> macStats,
     uint64_t imsi = 0;
     std::ostringstream pathAndRnti;
     std::string pathEnb = path.substr(0, path.find("/ComponentCarrierMap"));
-    pathAndRnti << pathEnb << "/NrEnbRrc/UeMap/" << dlSchedulingCallbackInfo.rnti;
+    pathAndRnti << pathEnb << "/NrGnbRrc/UeMap/" << dlSchedulingCallbackInfo.rnti;
     if (macStats->ExistsImsiPath(pathAndRnti.str()))
     {
         imsi = macStats->GetImsiPath(pathAndRnti.str());
@@ -210,7 +210,7 @@ NrMacStatsCalculator::UlSchedulingCallback(Ptr<NrMacStatsCalculator> macStats,
     uint64_t imsi = 0;
     std::ostringstream pathAndRnti;
     std::string pathEnb = path.substr(0, path.find("/ComponentCarrierMap"));
-    pathAndRnti << pathEnb << "/NrEnbRrc/UeMap/" << rnti;
+    pathAndRnti << pathEnb << "/NrGnbRrc/UeMap/" << rnti;
     if (macStats->ExistsImsiPath(pathAndRnti.str()))
     {
         imsi = macStats->GetImsiPath(pathAndRnti.str());

@@ -116,10 +116,10 @@ ConnectPdcpRlcTraces()
 void
 ConnectUlPdcpRlcTraces()
 {
-    Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/UeMap/*/DataRadioBearerMap/*/NrPdcp/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrGnbRrc/UeMap/*/DataRadioBearerMap/*/NrPdcp/RxPDU",
                     MakeCallback(&RxPdcpPDU));
 
-    Config::Connect("/NodeList/*/DeviceList/*/NrEnbRrc/UeMap/*/DataRadioBearerMap/*/NrRlc/RxPDU",
+    Config::Connect("/NodeList/*/DeviceList/*/NrGnbRrc/UeMap/*/DataRadioBearerMap/*/NrRlc/RxPDU",
                     MakeCallback(&RxRlcPDU));
 }
 

@@ -18,9 +18,9 @@ namespace ns3
 
 /**
  * This class implements the Service Access Point (SAP) between the
- * NrEnbRrc and the NrEpcEnbApplication. In particular, this class implements the
+ * NrGnbRrc and the NrEpcEnbApplication. In particular, this class implements the
  * Provider part of the SAP, i.e., the methods exported by the
- * NrEpcEnbApplication and called by the NrEnbRrc.
+ * NrEpcEnbApplication and called by the NrGnbRrc.
  */
 class NrEpcEnbS1SapProvider
 {
@@ -78,8 +78,8 @@ class NrEpcEnbS1SapProvider
 
 /**
  * This class implements the Service Access Point (SAP) between the
- * NrEnbRrc and the NrEpcEnbApplication. In particular, this class implements the
- * User part of the SAP, i.e., the methods exported by the NrEnbRrc
+ * NrGnbRrc and the NrEpcEnbApplication. In particular, this class implements the
+ * User part of the SAP, i.e., the methods exported by the NrGnbRrc
  * and called by the NrEpcEnbApplication.
  */
 class NrEpcEnbS1SapUser

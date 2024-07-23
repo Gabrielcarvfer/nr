@@ -907,6 +907,16 @@ class NrHelper : public Object
     std::pair<double, BandwidthPartInfoPtrVector> CreateBandwidthParts(
         std::vector<CcBwpCreator::SimpleOperationBandConf> bandConfs);
 
+    void AddX2Interface(NodeContainer gnbNodes);
+    void AddX2Interface(Ptr<Node> gnbNode1, Ptr<Node> gnbNode2);
+    void HandoverRequest(Time hoTime,
+                         Ptr<NetDevice> ueDev,
+                         Ptr<NetDevice> sourceGnbDev,
+                         Ptr<NetDevice> targetGnbDev);
+    void HandoverRequest(Time hoTime,
+                         Ptr<NetDevice> ueDev,
+                         Ptr<NetDevice> sourceGnbDev,
+                         uint16_t targetCellId);
   private:
     bool m_enableMimoFeedback{false}; ///< Let UE compute MIMO feedback with PMI and RI
     ObjectFactory m_pmSearchFactory;  ///< Factory for precoding matrix search algorithm
@@ -961,6 +971,10 @@ class NrHelper : public Object
     Ptr<NetDevice> InstallSingleGnbDevice(
         const Ptr<Node>& n,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps);
+
+    void DoHandoverRequest(Ptr<NetDevice> ueDev,
+                                 Ptr<NetDevice> sourceGnbDev,
+                                 uint16_t targetCellId);
     void AttachToClosestEnb(Ptr<NetDevice> ueDevice, NetDeviceContainer enbDevices);
 
     ObjectFactory m_gnbNetDeviceFactory;            //!< NetDevice factory for gnb

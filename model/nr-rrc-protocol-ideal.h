@@ -17,7 +17,7 @@ namespace ns3
 
 class NrUeRrcSapProvider;
 class NrUeRrcSapUser;
-class NrEnbRrcSapProvider;
+class NrGnbRrcSapProvider;
 class NrUeRrc;
 
 /**
@@ -99,7 +99,7 @@ class nrUeRrcProtocolIdeal : public Object
     uint16_t m_rnti;
     NrUeRrcSapProvider* m_ueRrcSapProvider;
     NrUeRrcSapUser* m_ueRrcSapUser;
-    NrEnbRrcSapProvider* m_enbRrcSapProvider;
+    NrGnbRrcSapProvider* m_enbRrcSapProvider;
 };
 
 /**
@@ -110,7 +110,7 @@ class nrUeRrcProtocolIdeal : public Object
  */
 class NrGnbRrcProtocolIdeal : public Object
 {
-    friend class MemberNrEnbRrcSapUser<NrGnbRrcProtocolIdeal>;
+    friend class MemberNrGnbRrcSapUser<NrGnbRrcProtocolIdeal>;
 
   public:
     NrGnbRrcProtocolIdeal();
@@ -120,15 +120,15 @@ class NrGnbRrcProtocolIdeal : public Object
     void DoDispose() override;
     static TypeId GetTypeId();
 
-    void SetNrEnbRrcSapProvider(NrEnbRrcSapProvider* p);
-    NrEnbRrcSapUser* GetNrEnbRrcSapUser();
+    void SetNrGnbRrcSapProvider(NrGnbRrcSapProvider* p);
+    NrGnbRrcSapUser* GetNrGnbRrcSapUser();
 
     NrUeRrcSapProvider* GetUeRrcSapProvider(uint16_t rnti);
     void SetUeRrcSapProvider(uint16_t rnti, NrUeRrcSapProvider* p);
 
   private:
-    // methods forwarded from NrEnbRrcSapUser
-    void DoSetupUe(uint16_t rnti, NrEnbRrcSapUser::SetupUeParameters params);
+    // methods forwarded from NrGnbRrcSapUser
+    void DoSetupUe(uint16_t rnti, NrGnbRrcSapUser::SetupUeParameters params);
     void DoRemoveUe(uint16_t rnti);
     void DoSendSystemInformation(uint16_t cellId, NrRrcSap::SystemInformation msg);
     void SendSystemInformation(uint16_t cellId, NrRrcSap::SystemInformation msg);
@@ -147,8 +147,8 @@ class NrGnbRrcProtocolIdeal : public Object
     NrRrcSap::RrcConnectionReconfiguration DoDecodeHandoverCommand(Ptr<Packet> p);
 
     uint16_t m_rnti;
-    NrEnbRrcSapProvider* m_enbRrcSapProvider;
-    NrEnbRrcSapUser* m_enbRrcSapUser;
+    NrGnbRrcSapProvider* m_enbRrcSapProvider;
+    NrGnbRrcSapUser* m_enbRrcSapUser;
     std::map<uint16_t, NrUeRrcSapProvider*> m_enbRrcSapProviderMap;
 };
 

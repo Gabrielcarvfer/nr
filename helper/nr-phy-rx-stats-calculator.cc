@@ -188,7 +188,7 @@ NrPhyRxStatsCalculator::UlPhyReceptionCallback(Ptr<NrPhyRxStatsCalculator> phyRx
     uint64_t imsi = 0;
     std::ostringstream pathAndRnti;
     std::string pathEnb = path.substr(0, path.find("/ComponentCarrierMap"));
-    pathAndRnti << pathEnb << "/NrEnbRrc/UeMap/" << params.m_rnti;
+    pathAndRnti << pathEnb << "/NrGnbRrc/UeMap/" << params.m_rnti;
     if (phyRxStats->ExistsImsiPath(pathAndRnti.str()))
     {
         imsi = phyRxStats->GetImsiPath(pathAndRnti.str());

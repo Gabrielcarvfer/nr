@@ -966,7 +966,7 @@ NrHelper::InstallSingleGnbDevice(
         ccMap.insert(std::make_pair(bwpId, cc));
     }
 
-    Ptr<NrEnbRrc> rrc = CreateObject<NrEnbRrc>();
+    Ptr<NrGnbRrc> rrc = CreateObject<NrGnbRrc>();
     Ptr<NrEnbComponentCarrierManager> ccmEnbManager =
         DynamicCast<NrEnbComponentCarrierManager>(CreateObject<BwpManagerGnb>());
     DynamicCast<BwpManagerGnb>(ccmEnbManager)
@@ -997,26 +997,26 @@ NrHelper::InstallSingleGnbDevice(
     if (useIdealRrc)
     {
         Ptr<NrGnbRrcProtocolIdeal> rrcProtocol = CreateObject<NrGnbRrcProtocolIdeal>();
-        rrcProtocol->SetNrEnbRrcSapProvider(rrc->GetNrEnbRrcSapProvider());
-        rrc->SetNrEnbRrcSapUser(rrcProtocol->GetNrEnbRrcSapUser());
+        rrcProtocol->SetNrGnbRrcSapProvider(rrc->GetNrGnbRrcSapProvider());
+        rrc->SetNrGnbRrcSapUser(rrcProtocol->GetNrGnbRrcSapUser());
         rrc->AggregateObject(rrcProtocol);
     }
     else
     {
-        Ptr<nr::NrEnbRrcProtocolReal> rrcProtocol = CreateObject<nr::NrEnbRrcProtocolReal>();
-        rrcProtocol->SetNrEnbRrcSapProvider(rrc->GetNrEnbRrcSapProvider());
-        rrc->SetNrEnbRrcSapUser(rrcProtocol->GetNrEnbRrcSapUser());
+        Ptr<nr::NrGnbRrcProtocolReal> rrcProtocol = CreateObject<nr::NrGnbRrcProtocolReal>();
+        rrcProtocol->SetNrGnbRrcSapProvider(rrc->GetNrGnbRrcSapProvider());
+        rrc->SetNrGnbRrcSapUser(rrcProtocol->GetNrGnbRrcSapUser());
         rrc->AggregateObject(rrcProtocol);
     }
 
     if (m_nrEpcHelper != nullptr)
     {
-        EnumValue<NrEnbRrc::NrEpsBearerToRlcMapping_t> epsBearerToRlcMapping;
+        EnumValue<NrGnbRrc::NrEpsBearerToRlcMapping_t> epsBearerToRlcMapping;
         rrc->GetAttribute("EpsBearerToRlcMapping", epsBearerToRlcMapping);
         // it does not make sense to use RLC/SM when also using the EPC
-        if (epsBearerToRlcMapping.Get() == NrEnbRrc::RLC_SM_ALWAYS)
+        if (epsBearerToRlcMapping.Get() == NrGnbRrc::RLC_SM_ALWAYS)
         {
-            rrc->SetAttribute("EpsBearerToRlcMapping", EnumValue(NrEnbRrc::RLC_UM_ALWAYS));
+            rrc->SetAttribute("EpsBearerToRlcMapping", EnumValue(NrGnbRrc::RLC_UM_ALWAYS));
         }
     }
 
@@ -1067,7 +1067,7 @@ NrHelper::InstallSingleGnbDevice(
 
     dev->SetAttribute("NrEnbComponentCarrierManager", PointerValue(ccmEnbManager));
     dev->SetCcMap(ccMap);
-    dev->SetAttribute("NrEnbRrc", PointerValue(rrc));
+    dev->SetAttribute("NrGnbRrc", PointerValue(rrc));
     dev->Initialize();
 
     n->AddDevice(dev);
@@ -1089,6 +1089,80 @@ NrHelper::InstallSingleGnbDevice(
         rrc->SetEpcX2SapProvider(x2->GetEpcX2SapProvider());
     }
     return dev;
+}
+
+void
+NrHelper::AddX2Interface(NodeContainer gnbNodes)
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_ASSERT_MSG(m_nrEpcHelper, "X2 interfaces cannot be set up when the EPC is not used");
+
+    for (auto i = gnbNodes.Begin(); i != gnbNodes.End(); ++i)
+    {
+        for (auto j = i + 1; j != gnbNodes.End(); ++j)
+        {
+            AddX2Interface(*i, *j);
+        }
+    }
+}
+
+void
+NrHelper::AddX2Interface(Ptr<Node> gnbNode1, Ptr<Node> gnbNode2)
+{
+    NS_LOG_FUNCTION(this);
+    NS_LOG_INFO("setting up the X2 interface");
+
+    m_nrEpcHelper->AddX2Interface(gnbNode1, gnbNode2);
+}
+
+void
+NrHelper::HandoverRequest(Time hoTime,
+                           Ptr<NetDevice> ueDev,
+                           Ptr<NetDevice> sourceGnbDev,
+                           Ptr<NetDevice> targetGnbDev)
+{
+    NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetGnbDev);
+    NS_ASSERT_MSG(m_nrEpcHelper,
+                  "Handover requires the use of the EPC - did you forget to call "
+                  "NrHelper::SetEpcHelper () ?");
+    uint16_t targetCellId = targetGnbDev->GetObject<NrGnbNetDevice>()->GetCellId();
+    Simulator::Schedule(hoTime,
+                        &NrHelper::DoHandoverRequest,
+                        this,
+                        ueDev,
+                        sourceGnbDev,
+                        targetCellId);
+}
+
+void
+NrHelper::HandoverRequest(Time hoTime,
+                           Ptr<NetDevice> ueDev,
+                           Ptr<NetDevice> sourceGnbDev,
+                           uint16_t targetCellId)
+{
+    NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetCellId);
+    NS_ASSERT_MSG(m_nrEpcHelper,
+                  "Handover requires the use of the EPC - did you forget to call "
+                  "NrHelper::SetEpcHelper () ?");
+    Simulator::Schedule(hoTime,
+                        &NrHelper::DoHandoverRequest,
+                        this,
+                        ueDev,
+                        sourceGnbDev,
+                        targetCellId);
+}
+
+void
+NrHelper::DoHandoverRequest(Ptr<NetDevice> ueDev,
+                             Ptr<NetDevice> sourceGnbDev,
+                             uint16_t targetCellId)
+{
+    NS_LOG_FUNCTION(this << ueDev << sourceGnbDev << targetCellId);
+
+    Ptr<NrGnbRrc> sourceRrc = sourceGnbDev->GetObject<NrGnbNetDevice>()->GetRrc();
+    uint16_t rnti = ueDev->GetObject<NrUeNetDevice>()->GetRrc()->GetRnti();
+    sourceRrc->SendHandoverRequest(rnti, targetCellId);
 }
 
 void
@@ -1531,9 +1605,9 @@ NrHelper::DoDeActivateDedicatedEpsBearer(Ptr<NetDevice> ueDevice,
     uint64_t imsi = ueDevice->GetObject<NrUeNetDevice>()->GetImsi();
     uint16_t rnti = ueDevice->GetObject<NrUeNetDevice>()->GetRrc()->GetRnti();
 
-    Ptr<NrEnbRrc> enbRrc = enbDevice->GetObject<NrGnbNetDevice>()->GetRrc();
+    Ptr<NrGnbRrc> gnbRrc = enbDevice->GetObject<NrGnbNetDevice>()->GetRrc();
 
-    enbRrc->DoSendReleaseDataRadioBearer(imsi, rnti, bearerId);
+    gnbRrc->DoSendReleaseDataRadioBearer(imsi, rnti, bearerId);
 }
 
 void
@@ -1597,9 +1671,9 @@ NrDrbActivator::ActivateDrb(uint64_t imsi, uint16_t cellId, uint16_t rnti)
         uint16_t rnti = ueRrc->GetRnti();
         Ptr<const NrGnbNetDevice> enbNrDevice =
             m_ueDevice->GetObject<NrUeNetDevice>()->GetTargetEnb();
-        Ptr<NrEnbRrc> enbRrc = enbNrDevice->GetObject<NrGnbNetDevice>()->GetRrc();
-        NS_ASSERT(enbRrc->HasCellId(ueRrc->GetCellId()));
-        Ptr<NrUeManager> ueManager = enbRrc->GetUeManager(rnti);
+        Ptr<NrGnbRrc> gnbRrc = enbNrDevice->GetObject<NrGnbNetDevice>()->GetRrc();
+        NS_ASSERT(gnbRrc->HasCellId(ueRrc->GetCellId()));
+        Ptr<NrUeManager> ueManager = gnbRrc->GetUeManager(rnti);
         NS_ASSERT(ueManager->GetState() == NrUeManager::CONNECTED_NORMALLY ||
                   ueManager->GetState() == NrUeManager::CONNECTION_RECONFIGURATION);
         NrEpcEnbS1SapUser::DataRadioBearerSetupRequestParameters params;
@@ -1607,7 +1681,7 @@ NrDrbActivator::ActivateDrb(uint64_t imsi, uint16_t cellId, uint16_t rnti)
         params.bearer = m_bearer;
         params.bearerId = 0;
         params.gtpTeid = 0; // don't care
-        enbRrc->GetS1SapUser()->DataRadioBearerSetupRequest(params);
+        gnbRrc->GetS1SapUser()->DataRadioBearerSetupRequest(params);
         m_active = true;
     }
 }
@@ -1637,7 +1711,7 @@ NrHelper::ActivateDataRadioBearer(Ptr<NetDevice> ueDevice, NrEpsBearer bearer)
 
     std::ostringstream path;
     path << "/NodeList/" << enbnrDevice->GetNode()->GetId() << "/DeviceList/"
-         << enbnrDevice->GetIfIndex() << "/NrEnbRrc/ConnectionEstablished";
+         << enbnrDevice->GetIfIndex() << "/NrGnbRrc/ConnectionEstablished";
     Ptr<NrDrbActivator> arg = Create<NrDrbActivator>(ueDevice, bearer);
     Config::Connect(path.str(), MakeBoundCallback(&NrDrbActivator::ActivateCallback, arg));
 }

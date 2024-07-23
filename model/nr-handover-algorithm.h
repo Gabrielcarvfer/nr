@@ -38,7 +38,7 @@ class NrHandoverManagementSapProvider;
  * role of the "user" part. The following code skeleton establishes the
  * connection between both instances:
  *
- *     Ptr<NrEnbRrc> u = ...;
+ *     Ptr<NrGnbRrc> u = ...;
  *     Ptr<NrHandoverAlgorithm> p = ...;
  *     u->SetNrHandoverManagementSapProvider (p->GetNrHandoverManagementSapProvider ());
  *     p->SetNrHandoverManagementSapUser (u->GetNrHandoverManagementSapUser ());
@@ -64,14 +64,14 @@ class NrHandoverAlgorithm : public Object
      * \brief Set the "user" part of the Handover Management SAP interface that
      *        this handover algorithm instance will interact with.
      * \param s a reference to the "user" part of the interface, typically a
-     *          member of an NrEnbRrc instance
+     *          member of an NrGnbRrc instance
      */
     virtual void SetNrHandoverManagementSapUser(NrHandoverManagementSapUser* s) = 0;
 
     /**
      * \brief Export the "provider" part of the Handover Management SAP interface.
      * \return the reference to the "provider" part of the interface, typically to
-     *         be kept by an NrEnbRrc instance
+     *         be kept by an NrGnbRrc instance
      */
     virtual NrHandoverManagementSapProvider* GetNrHandoverManagementSapProvider() = 0;
 

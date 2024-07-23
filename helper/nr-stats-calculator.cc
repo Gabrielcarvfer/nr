@@ -107,7 +107,7 @@ NrStatsCalculator::FindImsiFromGnbRlcPath(std::string path)
 {
     NS_LOG_FUNCTION(path);
     // Sample path input:
-    // /NodeList/#NodeId/DeviceList/#DeviceId/NrEnbRrc/UeMap/#C-RNTI/DataRadioBearerMap/#LCID/NrRlc/RxPDU
+    // /NodeList/#NodeId/DeviceList/#DeviceId/NrGnbRrc/UeMap/#C-RNTI/DataRadioBearerMap/#LCID/NrRlc/RxPDU
 
     // We retrieve the NrUeManager associated to the C-RNTI and perform the IMSI lookup
     std::string ueMapPath = path.substr(0, path.find("/DataRadioBearerMap"));
@@ -156,10 +156,10 @@ NrStatsCalculator::FindCellIdFromGnbRlcPath(std::string path)
 {
     NS_LOG_FUNCTION(path);
     // Sample path input:
-    // /NodeList/#NodeId/DeviceList/#DeviceId/NrEnbRrc/UeMap/#C-RNTI/DataRadioBearerMap/#LCID/NrRlc/RxPDU
+    // /NodeList/#NodeId/DeviceList/#DeviceId/NrGnbRrc/UeMap/#C-RNTI/DataRadioBearerMap/#LCID/NrRlc/RxPDU
 
     // We retrieve the CellId associated to the gNB
-    std::string gnbNetDevicePath = path.substr(0, path.find("/NrEnbRrc"));
+    std::string gnbNetDevicePath = path.substr(0, path.find("/NrGnbRrc"));
     Config::MatchContainer match = Config::LookupMatches(gnbNetDevicePath);
     if (match.GetN() != 0)
     {
@@ -184,7 +184,7 @@ NrStatsCalculator::FindImsiFromGnbMac(std::string path, uint16_t rnti)
     std::ostringstream oss;
     std::string p = path.substr(0, path.find("/BandwidthPartMap"));
     oss << rnti;
-    p += "/NrEnbRrc/UeMap/" + oss.str();
+    p += "/NrGnbRrc/UeMap/" + oss.str();
     uint64_t imsi = FindImsiFromGnbRlcPath(p);
     NS_LOG_LOGIC("FindImsiFromGnbMac: " << path << ", " << rnti << ", " << imsi);
     return imsi;
@@ -198,7 +198,7 @@ NrStatsCalculator::FindCellIdFromGnbMac(std::string path, uint16_t rnti)
     std::ostringstream oss;
     std::string p = path.substr(0, path.find("/BandwidthPartMap"));
     oss << rnti;
-    p += "/NrEnbRrc/UeMap/" + oss.str();
+    p += "/NrGnbRrc/UeMap/" + oss.str();
     uint16_t cellId = FindCellIdFromGnbRlcPath(p);
     NS_LOG_LOGIC("FindCellIdFromGnbMac: " << path << ", " << rnti << ", " << cellId);
     return cellId;

@@ -36,7 +36,7 @@
 namespace ns3
 {
 
-NS_LOG_COMPONENT_DEFINE("NrEnbRrc");
+NS_LOG_COMPONENT_DEFINE("NrGnbRrc");
 
 ///////////////////////////////////////////
 // CMAC SAP forwarder
@@ -54,7 +54,7 @@ class EnbRrcMemberNrEnbCmacSapUser : public NrEnbCmacSapUser
      * \param rrc ENB RRC
      * \param componentCarrierId
      */
-    EnbRrcMemberNrEnbCmacSapUser(NrEnbRrc* rrc, uint8_t componentCarrierId);
+    EnbRrcMemberNrEnbCmacSapUser(NrGnbRrc* rrc, uint8_t componentCarrierId);
 
     uint16_t AllocateTemporaryCellRnti() override;
     void NotifyLcConfigResult(uint16_t rnti, uint8_t lcid, bool success) override;
@@ -62,11 +62,11 @@ class EnbRrcMemberNrEnbCmacSapUser : public NrEnbCmacSapUser
     bool IsRandomAccessCompleted(uint16_t rnti) override;
 
   private:
-    NrEnbRrc* m_rrc;              ///< the RRC
+    NrGnbRrc* m_rrc;              ///< the RRC
     uint8_t m_componentCarrierId; ///< Component carrier ID
 };
 
-EnbRrcMemberNrEnbCmacSapUser::EnbRrcMemberNrEnbCmacSapUser(NrEnbRrc* rrc,
+EnbRrcMemberNrEnbCmacSapUser::EnbRrcMemberNrEnbCmacSapUser(NrGnbRrc* rrc,
                                                            uint8_t componentCarrierId)
     : m_rrc(rrc),
       m_componentCarrierId{componentCarrierId}
@@ -133,7 +133,7 @@ NrUeManager::NrUeManager()
     NS_FATAL_ERROR("this constructor is not expected to be used");
 }
 
-NrUeManager::NrUeManager(Ptr<NrEnbRrc> rrc, uint16_t rnti, State s, uint8_t componentCarrierId)
+NrUeManager::NrUeManager(Ptr<NrGnbRrc> rrc, uint16_t rnti, State s, uint8_t componentCarrierId)
     : m_lastAllocatedDrbid(0),
       m_rnti(rnti),
       m_imsi(0),
@@ -254,7 +254,7 @@ NrUeManager::DoInitialize()
         m_rrc->m_ccmRrcSapProvider->AddLc(lcinfo, MacSapUserForRlc);
     }
 
-    NrEnbRrcSapUser::SetupUeParameters ueParams;
+    NrGnbRrcSapUser::SetupUeParameters ueParams;
     ueParams.srb0SapProvider = m_srb0->m_rlc->GetNrRlcSapProvider();
     ueParams.srb1SapProvider = m_srb1->m_pdcp->GetNrPdcpSapProvider();
     m_rrc->m_rrcSapUser->SetupUe(m_rnti, ueParams);
@@ -282,14 +282,14 @@ NrUeManager::DoInitialize()
     {
     case INITIAL_RANDOM_ACCESS:
         m_connectionRequestTimeout = Simulator::Schedule(m_rrc->m_connectionRequestTimeoutDuration,
-                                                         &NrEnbRrc::ConnectionRequestTimeout,
+                                                         &NrGnbRrc::ConnectionRequestTimeout,
                                                          m_rrc,
                                                          m_rnti);
         break;
 
     case HANDOVER_JOINING:
         m_handoverJoiningTimeout = Simulator::Schedule(m_rrc->m_handoverJoiningTimeoutDuration,
-                                                       &NrEnbRrc::HandoverJoiningTimeout,
+                                                       &NrGnbRrc::HandoverJoiningTimeout,
                                                        m_rrc,
                                                        m_rnti);
         break;
@@ -410,11 +410,11 @@ NrUeManager::SetupDataRadioBearer(NrEpsBearer bearer,
     if (m_state == HANDOVER_JOINING)
     {
         // setup TEIDs for receiving data eventually forwarded over X2-U
-        NrEnbRrc::X2uTeidInfo x2uTeidInfo;
+        NrGnbRrc::X2uTeidInfo x2uTeidInfo;
         x2uTeidInfo.rnti = m_rnti;
         x2uTeidInfo.drbid = drbid;
         auto ret = m_rrc->m_x2uTeidInfoMap.insert(
-            std::pair<uint32_t, NrEnbRrc::X2uTeidInfo>(gtpTeid, x2uTeidInfo));
+            std::pair<uint32_t, NrGnbRrc::X2uTeidInfo>(gtpTeid, x2uTeidInfo));
         NS_ASSERT_MSG(ret.second == true, "overwriting a pre-existing entry in m_x2uTeidInfoMap");
     }
 
@@ -577,7 +577,7 @@ NrUeManager::ReleaseDataRadioBearer(uint8_t drbid)
 }
 
 void
-NrEnbRrc::DoSendReleaseDataRadioBearer(uint64_t imsi, uint16_t rnti, uint8_t bearerId)
+NrGnbRrc::DoSendReleaseDataRadioBearer(uint64_t imsi, uint16_t rnti, uint8_t bearerId)
 {
     NS_LOG_FUNCTION(this << imsi << rnti << (uint16_t)bearerId);
 
@@ -710,7 +710,7 @@ NrUeManager::PrepareHandover(uint16_t cellId)
             // We skip handover preparation
             SwitchToState(HANDOVER_LEAVING);
             m_handoverLeavingTimeout = Simulator::Schedule(m_rrc->m_handoverLeavingTimeoutDuration,
-                                                           &NrEnbRrc::HandoverLeavingTimeout,
+                                                           &NrGnbRrc::HandoverLeavingTimeout,
                                                            m_rrc,
                                                            m_rnti);
             m_rrc->m_handoverStartTrace(m_imsi,
@@ -821,7 +821,7 @@ NrUeManager::RecvHandoverRequestAck(NrEpcX2SapUser::HandoverRequestAckParams par
     m_rrc->m_rrcSapUser->SendRrcConnectionReconfiguration(m_rnti, handoverCommand);
     SwitchToState(HANDOVER_LEAVING);
     m_handoverLeavingTimeout = Simulator::Schedule(m_rrc->m_handoverLeavingTimeoutDuration,
-                                                   &NrEnbRrc::HandoverLeavingTimeout,
+                                                   &NrGnbRrc::HandoverLeavingTimeout,
                                                    m_rrc,
                                                    m_rnti);
     NS_ASSERT(handoverCommand.haveMobilityControlInfo);
@@ -1110,7 +1110,7 @@ NrUeManager::SendRrcConnectionRelease()
 // methods forwarded from RRC SAP
 
 void
-NrUeManager::CompleteSetupUe(NrEnbRrcSapProvider::CompleteSetupUeParameters params)
+NrUeManager::CompleteSetupUe(NrGnbRrcSapProvider::CompleteSetupUeParameters params)
 {
     NS_LOG_FUNCTION(this);
     m_srb0->m_rlc->SetNrRlcSapUser(params.srb0SapUser);
@@ -1138,7 +1138,7 @@ NrUeManager::RecvRrcConnectionRequest(NrRrcSap::RrcConnectionRequest msg)
 
             RecordDataRadioBearersToBeStarted();
             m_connectionSetupTimeout = Simulator::Schedule(m_rrc->m_connectionSetupTimeoutDuration,
-                                                           &NrEnbRrc::ConnectionSetupTimeout,
+                                                           &NrGnbRrc::ConnectionSetupTimeout,
                                                            m_rrc,
                                                            m_rnti);
             SwitchToState(CONNECTION_SETUP);
@@ -1154,7 +1154,7 @@ NrUeManager::RecvRrcConnectionRequest(NrRrcSap::RrcConnectionRequest msg)
 
             m_connectionRejectedTimeout =
                 Simulator::Schedule(m_rrc->m_connectionRejectedTimeoutDuration,
-                                    &NrEnbRrc::ConnectionRejectedTimeout,
+                                    &NrGnbRrc::ConnectionRejectedTimeout,
                                     m_rrc,
                                     m_rnti);
             SwitchToState(CONNECTION_REJECTED);
@@ -1817,9 +1817,9 @@ NrUeManager::BuildNonCriticalExtensionConfigurationCa()
 // eNB RRC methods
 ///////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED(NrEnbRrc);
+NS_OBJECT_ENSURE_REGISTERED(NrGnbRrc);
 
-NrEnbRrc::NrEnbRrc()
+NrGnbRrc::NrGnbRrc()
     : m_x2SapProvider(nullptr),
       m_cmacSapProvider(0),
       m_handoverManagementSapProvider(nullptr),
@@ -1840,18 +1840,18 @@ NrEnbRrc::NrEnbRrc()
 {
     NS_LOG_FUNCTION(this);
     m_cmacSapUser.push_back(new EnbRrcMemberNrEnbCmacSapUser(this, 0));
-    m_handoverManagementSapUser = new MemberNrHandoverManagementSapUser<NrEnbRrc>(this);
-    m_anrSapUser = new MemberNrAnrSapUser<NrEnbRrc>(this);
-    m_ffrRrcSapUser.push_back(new MemberNrFfrRrcSapUser<NrEnbRrc>(this));
-    m_rrcSapProvider = new MemberNrEnbRrcSapProvider<NrEnbRrc>(this);
-    m_x2SapUser = new NrEpcX2SpecificEpcX2SapUser<NrEnbRrc>(this);
-    m_s1SapUser = new NrMemberEpcEnbS1SapUser<NrEnbRrc>(this);
-    m_cphySapUser.push_back(new MemberNrEnbCphySapUser<NrEnbRrc>(this));
-    m_ccmRrcSapUser = new MemberNrCcmRrcSapUser<NrEnbRrc>(this);
+    m_handoverManagementSapUser = new MemberNrHandoverManagementSapUser<NrGnbRrc>(this);
+    m_anrSapUser = new MemberNrAnrSapUser<NrGnbRrc>(this);
+    m_ffrRrcSapUser.push_back(new MemberNrFfrRrcSapUser<NrGnbRrc>(this));
+    m_rrcSapProvider = new MemberNrGnbRrcSapProvider<NrGnbRrc>(this);
+    m_x2SapUser = new NrEpcX2SpecificEpcX2SapUser<NrGnbRrc>(this);
+    m_s1SapUser = new NrMemberEpcEnbS1SapUser<NrGnbRrc>(this);
+    m_cphySapUser.push_back(new MemberNrEnbCphySapUser<NrGnbRrc>(this));
+    m_ccmRrcSapUser = new MemberNrCcmRrcSapUser<NrGnbRrc>(this);
 }
 
 void
-NrEnbRrc::ConfigureCarriers(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConf)
+NrGnbRrc::ConfigureCarriers(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConf)
 {
     NS_ASSERT_MSG(!m_carriersConfigured, "Secondary carriers can be configured only once.");
     m_componentCarrierPhyConf = ccPhyConf;
@@ -1861,21 +1861,21 @@ NrEnbRrc::ConfigureCarriers(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>
 
     for (uint16_t i = 1; i < m_numberOfComponentCarriers; i++)
     {
-        m_cphySapUser.push_back(new MemberNrEnbCphySapUser<NrEnbRrc>(this));
+        m_cphySapUser.push_back(new MemberNrEnbCphySapUser<NrGnbRrc>(this));
         m_cmacSapUser.push_back(new EnbRrcMemberNrEnbCmacSapUser(this, i));
-        m_ffrRrcSapUser.push_back(new MemberNrFfrRrcSapUser<NrEnbRrc>(this));
+        m_ffrRrcSapUser.push_back(new MemberNrFfrRrcSapUser<NrGnbRrc>(this));
     }
     m_carriersConfigured = true;
     Object::DoInitialize();
 }
 
-NrEnbRrc::~NrEnbRrc()
+NrGnbRrc::~NrGnbRrc()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-NrEnbRrc::DoDispose()
+NrGnbRrc::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     for (uint16_t i = 0; i < m_numberOfComponentCarriers; i++)
@@ -1903,28 +1903,28 @@ NrEnbRrc::DoDispose()
 }
 
 TypeId
-NrEnbRrc::GetTypeId()
+NrGnbRrc::GetTypeId()
 {
     static TypeId tid =
-        TypeId("ns3::NrEnbRrc")
+        TypeId("ns3::NrGnbRrc")
             .SetParent<Object>()
             .SetGroupName("Nr")
-            .AddConstructor<NrEnbRrc>()
+            .AddConstructor<NrGnbRrc>()
             .AddAttribute("UeMap",
                           "List of NrUeManager by C-RNTI.",
                           ObjectMapValue(),
-                          MakeObjectMapAccessor(&NrEnbRrc::m_ueMap),
+                          MakeObjectMapAccessor(&NrGnbRrc::m_ueMap),
                           MakeObjectMapChecker<NrUeManager>())
             .AddAttribute("DefaultTransmissionMode",
                           "The default UEs' transmission mode (0: SISO)",
                           UintegerValue(0), // default tx-mode
-                          MakeUintegerAccessor(&NrEnbRrc::m_defaultTransmissionMode),
+                          MakeUintegerAccessor(&NrGnbRrc::m_defaultTransmissionMode),
                           MakeUintegerChecker<uint8_t>())
             .AddAttribute(
                 "EpsBearerToRlcMapping",
                 "Specify which type of RLC will be used for each type of EPS bearer.",
                 EnumValue(RLC_SM_ALWAYS),
-                MakeEnumAccessor<NrEpsBearerToRlcMapping_t>(&NrEnbRrc::m_epsBearerToRlcMapping),
+                MakeEnumAccessor<NrEpsBearerToRlcMapping_t>(&NrGnbRrc::m_epsBearerToRlcMapping),
                 MakeEnumChecker(RLC_SM_ALWAYS,
                                 "RlcSmAlways",
                                 RLC_UM_ALWAYS,
@@ -1936,7 +1936,7 @@ NrEnbRrc::GetTypeId()
             .AddAttribute("SystemInformationPeriodicity",
                           "The interval for sending system information (Time value)",
                           TimeValue(MilliSeconds(80)),
-                          MakeTimeAccessor(&NrEnbRrc::m_systemInformationPeriodicity),
+                          MakeTimeAccessor(&NrGnbRrc::m_systemInformationPeriodicity),
                           MakeTimeChecker())
 
             // SRS related attributes
@@ -1944,7 +1944,7 @@ NrEnbRrc::GetTypeId()
                 "SrsPeriodicity",
                 "The SRS periodicity in milliseconds",
                 UintegerValue(40),
-                MakeUintegerAccessor(&NrEnbRrc::SetSrsPeriodicity, &NrEnbRrc::GetSrsPeriodicity),
+                MakeUintegerAccessor(&NrGnbRrc::SetSrsPeriodicity, &NrGnbRrc::GetSrsPeriodicity),
                 MakeUintegerChecker<uint32_t>())
 
             // Timeout related attributes
@@ -1955,7 +1955,7 @@ NrEnbRrc::GetTypeId()
                           "RRC CONNECTION REQUEST over UL GRANT. The value of this"
                           "timer should not be greater than T300 timer at UE RRC",
                           TimeValue(MilliSeconds(15)),
-                          MakeTimeAccessor(&NrEnbRrc::m_connectionRequestTimeoutDuration),
+                          MakeTimeAccessor(&NrGnbRrc::m_connectionRequestTimeoutDuration),
                           MakeTimeChecker(MilliSeconds(1), MilliSeconds(15)))
             .AddAttribute("ConnectionSetupTimeoutDuration",
                           "After accepting connection request, if no RRC CONNECTION "
@@ -1964,13 +1964,13 @@ NrEnbRrc::GetTypeId()
                           "of RRC CONNECTION SETUP and transmission of RRC CONNECTION "
                           "SETUP COMPLETE.",
                           TimeValue(MilliSeconds(150)),
-                          MakeTimeAccessor(&NrEnbRrc::m_connectionSetupTimeoutDuration),
+                          MakeTimeAccessor(&NrGnbRrc::m_connectionSetupTimeoutDuration),
                           MakeTimeChecker())
             .AddAttribute("ConnectionRejectedTimeoutDuration",
                           "Time to wait between sending a RRC CONNECTION REJECT and "
                           "destroying the UE context",
                           TimeValue(MilliSeconds(30)),
-                          MakeTimeAccessor(&NrEnbRrc::m_connectionRejectedTimeoutDuration),
+                          MakeTimeAccessor(&NrGnbRrc::m_connectionRejectedTimeoutDuration),
                           MakeTimeChecker())
             .AddAttribute("HandoverJoiningTimeoutDuration",
                           "After accepting a handover request, if no RRC CONNECTION "
@@ -1980,14 +1980,14 @@ NrEnbRrc::GetTypeId()
                           "Command, non-contention-based random access and reception "
                           "of the RRC CONNECTION RECONFIGURATION COMPLETE message.",
                           TimeValue(MilliSeconds(200)),
-                          MakeTimeAccessor(&NrEnbRrc::m_handoverJoiningTimeoutDuration),
+                          MakeTimeAccessor(&NrGnbRrc::m_handoverJoiningTimeoutDuration),
                           MakeTimeChecker())
             .AddAttribute("HandoverLeavingTimeoutDuration",
                           "After issuing a Handover Command, if neither RRC "
                           "CONNECTION RE-ESTABLISHMENT nor X2 UE Context Release has "
                           "been previously received, the UE context is destroyed.",
                           TimeValue(MilliSeconds(500)),
-                          MakeTimeAccessor(&NrEnbRrc::m_handoverLeavingTimeoutDuration),
+                          MakeTimeAccessor(&NrGnbRrc::m_handoverLeavingTimeoutDuration),
                           MakeTimeChecker())
 
             // Cell selection related attribute
@@ -2001,24 +2001,24 @@ NrEnbRrc::GetTypeId()
                           "initial cell selection and EPC-enabled simulation.",
                           TypeId::ATTR_GET | TypeId::ATTR_CONSTRUCT,
                           IntegerValue(-70),
-                          MakeIntegerAccessor(&NrEnbRrc::m_qRxLevMin),
+                          MakeIntegerAccessor(&NrGnbRrc::m_qRxLevMin),
                           MakeIntegerChecker<int8_t>(-70, -22))
             .AddAttribute("NumberOfComponentCarriers",
                           "Number of Component Carriers",
                           UintegerValue(1),
-                          MakeIntegerAccessor(&NrEnbRrc::m_numberOfComponentCarriers),
+                          MakeIntegerAccessor(&NrGnbRrc::m_numberOfComponentCarriers),
                           MakeIntegerChecker<int16_t>(nr::MIN_NO_CC, nr::MAX_NO_CC))
 
             // Handover related attributes
             .AddAttribute("AdmitHandoverRequest",
                           "Whether to admit an X2 handover request from another eNB",
                           BooleanValue(true),
-                          MakeBooleanAccessor(&NrEnbRrc::m_admitHandoverRequest),
+                          MakeBooleanAccessor(&NrGnbRrc::m_admitHandoverRequest),
                           MakeBooleanChecker())
             .AddAttribute("AdmitRrcConnectionRequest",
                           "Whether to admit a connection request from a UE",
                           BooleanValue(true),
-                          MakeBooleanAccessor(&NrEnbRrc::m_admitRrcConnectionRequest),
+                          MakeBooleanAccessor(&NrGnbRrc::m_admitRrcConnectionRequest),
                           MakeBooleanChecker())
 
             // UE measurements related attributes
@@ -2028,7 +2028,7 @@ NrEnbRrc::GetTypeId()
                           "if set to 0, no layer 3 filtering is applicable",
                           // i.e. the variable k in 3GPP TS 36.331 section 5.5.3.2
                           UintegerValue(4),
-                          MakeUintegerAccessor(&NrEnbRrc::m_rsrpFilterCoefficient),
+                          MakeUintegerAccessor(&NrGnbRrc::m_rsrpFilterCoefficient),
                           MakeUintegerChecker<uint8_t>(0))
             .AddAttribute("RsrqFilterCoefficient",
                           "Determines the strength of smoothing effect induced by "
@@ -2036,89 +2036,89 @@ NrEnbRrc::GetTypeId()
                           "if set to 0, no layer 3 filtering is applicable",
                           // i.e. the variable k in 3GPP TS 36.331 section 5.5.3.2
                           UintegerValue(4),
-                          MakeUintegerAccessor(&NrEnbRrc::m_rsrqFilterCoefficient),
+                          MakeUintegerAccessor(&NrGnbRrc::m_rsrqFilterCoefficient),
                           MakeUintegerChecker<uint8_t>(0))
 
             // Trace sources
             .AddTraceSource("NewUeContext",
                             "Fired upon creation of a new UE context.",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_newUeContextTrace),
-                            "ns3::NrEnbRrc::NewUeContextTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_newUeContextTrace),
+                            "ns3::NrGnbRrc::NewUeContextTracedCallback")
             .AddTraceSource("ConnectionEstablished",
                             "Fired upon successful RRC connection establishment.",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_connectionEstablishedTrace),
-                            "ns3::NrEnbRrc::ConnectionHandoverTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_connectionEstablishedTrace),
+                            "ns3::NrGnbRrc::ConnectionHandoverTracedCallback")
             .AddTraceSource("ConnectionReconfiguration",
                             "trace fired upon RRC connection reconfiguration",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_connectionReconfigurationTrace),
-                            "ns3::NrEnbRrc::ConnectionHandoverTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_connectionReconfigurationTrace),
+                            "ns3::NrGnbRrc::ConnectionHandoverTracedCallback")
             .AddTraceSource("HandoverStart",
                             "trace fired upon start of a handover procedure",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_handoverStartTrace),
-                            "ns3::NrEnbRrc::HandoverStartTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_handoverStartTrace),
+                            "ns3::NrGnbRrc::HandoverStartTracedCallback")
             .AddTraceSource("HandoverEndOk",
                             "trace fired upon successful termination of a handover procedure",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_handoverEndOkTrace),
-                            "ns3::NrEnbRrc::ConnectionHandoverTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_handoverEndOkTrace),
+                            "ns3::NrGnbRrc::ConnectionHandoverTracedCallback")
             .AddTraceSource("RecvMeasurementReport",
                             "trace fired when measurement report is received",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_recvMeasurementReportTrace),
-                            "ns3::NrEnbRrc::ReceiveReportTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_recvMeasurementReportTrace),
+                            "ns3::NrGnbRrc::ReceiveReportTracedCallback")
             .AddTraceSource("NotifyConnectionRelease",
                             "trace fired when an UE is released",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_connectionReleaseTrace),
-                            "ns3::NrEnbRrc::ConnectionHandoverTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_connectionReleaseTrace),
+                            "ns3::NrGnbRrc::ConnectionHandoverTracedCallback")
             .AddTraceSource("RrcTimeout",
                             "trace fired when a timer expires",
-                            MakeTraceSourceAccessor(&NrEnbRrc::m_rrcTimeoutTrace),
-                            "ns3::NrEnbRrc::TimerExpiryTracedCallback")
+                            MakeTraceSourceAccessor(&NrGnbRrc::m_rrcTimeoutTrace),
+                            "ns3::NrGnbRrc::TimerExpiryTracedCallback")
             .AddTraceSource(
                 "HandoverFailureNoPreamble",
                 "trace fired upon handover failure due to non-allocation of non-contention based "
                 "preamble at eNB for UE to handover due to max count reached",
-                MakeTraceSourceAccessor(&NrEnbRrc::m_handoverFailureNoPreambleTrace),
-                "ns3::NrEnbRrc::HandoverFailureTracedCallback")
+                MakeTraceSourceAccessor(&NrGnbRrc::m_handoverFailureNoPreambleTrace),
+                "ns3::NrGnbRrc::HandoverFailureTracedCallback")
             .AddTraceSource(
                 "HandoverFailureMaxRach",
                 "trace fired upon handover failure due to max RACH attempts from UE to target eNB",
-                MakeTraceSourceAccessor(&NrEnbRrc::m_handoverFailureMaxRachTrace),
-                "ns3::NrEnbRrc::HandoverFailureTracedCallback")
+                MakeTraceSourceAccessor(&NrGnbRrc::m_handoverFailureMaxRachTrace),
+                "ns3::NrGnbRrc::HandoverFailureTracedCallback")
             .AddTraceSource(
                 "HandoverFailureLeaving",
                 "trace fired upon handover failure due to handover leaving timeout at source eNB",
-                MakeTraceSourceAccessor(&NrEnbRrc::m_handoverFailureLeavingTrace),
-                "ns3::NrEnbRrc::HandoverFailureTracedCallback")
+                MakeTraceSourceAccessor(&NrGnbRrc::m_handoverFailureLeavingTrace),
+                "ns3::NrGnbRrc::HandoverFailureTracedCallback")
             .AddTraceSource(
                 "HandoverFailureJoining",
                 "trace fired upon handover failure due to handover joining timeout at target eNB",
-                MakeTraceSourceAccessor(&NrEnbRrc::m_handoverFailureJoiningTrace),
-                "ns3::NrEnbRrc::HandoverFailureTracedCallback");
+                MakeTraceSourceAccessor(&NrGnbRrc::m_handoverFailureJoiningTrace),
+                "ns3::NrGnbRrc::HandoverFailureTracedCallback");
     return tid;
 }
 
 void
-NrEnbRrc::SetEpcX2SapProvider(NrEpcX2SapProvider* s)
+NrGnbRrc::SetEpcX2SapProvider(NrEpcX2SapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_x2SapProvider = s;
 }
 
 NrEpcX2SapUser*
-NrEnbRrc::GetEpcX2SapUser()
+NrGnbRrc::GetEpcX2SapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_x2SapUser;
 }
 
 void
-NrEnbRrc::SetNrEnbCmacSapProvider(NrEnbCmacSapProvider* s)
+NrGnbRrc::SetNrEnbCmacSapProvider(NrEnbCmacSapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_cmacSapProvider.at(0) = s;
 }
 
 void
-NrEnbRrc::SetNrEnbCmacSapProvider(NrEnbCmacSapProvider* s, uint8_t pos)
+NrGnbRrc::SetNrEnbCmacSapProvider(NrEnbCmacSapProvider* s, uint8_t pos)
 {
     NS_LOG_FUNCTION(this << s);
     if (m_cmacSapProvider.size() > pos)
@@ -2133,63 +2133,63 @@ NrEnbRrc::SetNrEnbCmacSapProvider(NrEnbCmacSapProvider* s, uint8_t pos)
 }
 
 NrEnbCmacSapUser*
-NrEnbRrc::GetNrEnbCmacSapUser()
+NrGnbRrc::GetNrEnbCmacSapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_cmacSapUser.at(0);
 }
 
 NrEnbCmacSapUser*
-NrEnbRrc::GetNrEnbCmacSapUser(uint8_t pos)
+NrGnbRrc::GetNrEnbCmacSapUser(uint8_t pos)
 {
     NS_LOG_FUNCTION(this);
     return m_cmacSapUser.at(pos);
 }
 
 void
-NrEnbRrc::SetNrHandoverManagementSapProvider(NrHandoverManagementSapProvider* s)
+NrGnbRrc::SetNrHandoverManagementSapProvider(NrHandoverManagementSapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_handoverManagementSapProvider = s;
 }
 
 NrHandoverManagementSapUser*
-NrEnbRrc::GetNrHandoverManagementSapUser()
+NrGnbRrc::GetNrHandoverManagementSapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_handoverManagementSapUser;
 }
 
 void
-NrEnbRrc::SetNrCcmRrcSapProvider(NrCcmRrcSapProvider* s)
+NrGnbRrc::SetNrCcmRrcSapProvider(NrCcmRrcSapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_ccmRrcSapProvider = s;
 }
 
 NrCcmRrcSapUser*
-NrEnbRrc::GetNrCcmRrcSapUser()
+NrGnbRrc::GetNrCcmRrcSapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_ccmRrcSapUser;
 }
 
 void
-NrEnbRrc::SetNrAnrSapProvider(NrAnrSapProvider* s)
+NrGnbRrc::SetNrAnrSapProvider(NrAnrSapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_anrSapProvider = s;
 }
 
 NrAnrSapUser*
-NrEnbRrc::GetNrAnrSapUser()
+NrGnbRrc::GetNrAnrSapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_anrSapUser;
 }
 
 void
-NrEnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s)
+NrGnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     if (!m_ffrRrcSapProvider.empty())
@@ -2203,7 +2203,7 @@ NrEnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s)
 }
 
 void
-NrEnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s, uint8_t index)
+NrGnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s, uint8_t index)
 {
     NS_LOG_FUNCTION(this << s);
     if (m_ffrRrcSapProvider.size() > index)
@@ -2221,14 +2221,14 @@ NrEnbRrc::SetNrFfrRrcSapProvider(NrFfrRrcSapProvider* s, uint8_t index)
 }
 
 NrFfrRrcSapUser*
-NrEnbRrc::GetNrFfrRrcSapUser()
+NrGnbRrc::GetNrFfrRrcSapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_ffrRrcSapUser.at(0);
 }
 
 NrFfrRrcSapUser*
-NrEnbRrc::GetNrFfrRrcSapUser(uint8_t index)
+NrGnbRrc::GetNrFfrRrcSapUser(uint8_t index)
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT_MSG(index < m_numberOfComponentCarriers,
@@ -2238,40 +2238,40 @@ NrEnbRrc::GetNrFfrRrcSapUser(uint8_t index)
 }
 
 void
-NrEnbRrc::SetNrEnbRrcSapUser(NrEnbRrcSapUser* s)
+NrGnbRrc::SetNrGnbRrcSapUser(NrGnbRrcSapUser* s)
 {
     NS_LOG_FUNCTION(this << s);
     m_rrcSapUser = s;
 }
 
-NrEnbRrcSapProvider*
-NrEnbRrc::GetNrEnbRrcSapProvider()
+NrGnbRrcSapProvider*
+NrGnbRrc::GetNrGnbRrcSapProvider()
 {
     NS_LOG_FUNCTION(this);
     return m_rrcSapProvider;
 }
 
 void
-NrEnbRrc::SetNrMacSapProvider(NrMacSapProvider* s)
+NrGnbRrc::SetNrMacSapProvider(NrMacSapProvider* s)
 {
     NS_LOG_FUNCTION(this);
     m_macSapProvider = s;
 }
 
 void
-NrEnbRrc::SetS1SapProvider(NrEpcEnbS1SapProvider* s)
+NrGnbRrc::SetS1SapProvider(NrEpcEnbS1SapProvider* s)
 {
     m_s1SapProvider = s;
 }
 
 NrEpcEnbS1SapUser*
-NrEnbRrc::GetS1SapUser()
+NrGnbRrc::GetS1SapUser()
 {
     return m_s1SapUser;
 }
 
 void
-NrEnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s)
+NrGnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s)
 {
     NS_LOG_FUNCTION(this << s);
     if (!m_cphySapProvider.empty())
@@ -2285,14 +2285,14 @@ NrEnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s)
 }
 
 NrEnbCphySapUser*
-NrEnbRrc::GetNrEnbCphySapUser()
+NrGnbRrc::GetNrEnbCphySapUser()
 {
     NS_LOG_FUNCTION(this);
     return m_cphySapUser.at(0);
 }
 
 void
-NrEnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s, uint8_t pos)
+NrGnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s, uint8_t pos)
 {
     NS_LOG_FUNCTION(this << s);
     if (m_cphySapProvider.size() > pos)
@@ -2307,14 +2307,14 @@ NrEnbRrc::SetNrEnbCphySapProvider(NrEnbCphySapProvider* s, uint8_t pos)
 }
 
 NrEnbCphySapUser*
-NrEnbRrc::GetNrEnbCphySapUser(uint8_t pos)
+NrGnbRrc::GetNrEnbCphySapUser(uint8_t pos)
 {
     NS_LOG_FUNCTION(this);
     return m_cphySapUser.at(pos);
 }
 
 bool
-NrEnbRrc::HasUeManager(uint16_t rnti) const
+NrGnbRrc::HasUeManager(uint16_t rnti) const
 {
     NS_LOG_FUNCTION(this << (uint32_t)rnti);
     auto it = m_ueMap.find(rnti);
@@ -2322,7 +2322,7 @@ NrEnbRrc::HasUeManager(uint16_t rnti) const
 }
 
 Ptr<NrUeManager>
-NrEnbRrc::GetUeManager(uint16_t rnti)
+NrGnbRrc::GetUeManager(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << (uint32_t)rnti);
     NS_ASSERT(0 != rnti);
@@ -2332,7 +2332,7 @@ NrEnbRrc::GetUeManager(uint16_t rnti)
 }
 
 std::vector<uint8_t>
-NrEnbRrc::AddUeMeasReportConfig(NrRrcSap::ReportConfigEutra config)
+NrGnbRrc::AddUeMeasReportConfig(NrRrcSap::ReportConfigEutra config)
 {
     NS_LOG_FUNCTION(this);
 
@@ -2437,7 +2437,7 @@ NrEnbRrc::AddUeMeasReportConfig(NrRrcSap::ReportConfigEutra config)
 }
 
 void
-NrEnbRrc::ConfigureCell(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConf)
+NrGnbRrc::ConfigureCell(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> ccPhyConf)
 {
     auto it = ccPhyConf.begin();
     NS_ASSERT(it != ccPhyConf.end());
@@ -2523,13 +2523,13 @@ NrEnbRrc::ConfigureCell(std::map<uint8_t, Ptr<NrComponentCarrierBaseStation>> cc
      * regularly transmitted every 80 ms by default (set the
      * SystemInformationPeriodicity attribute to configure this).
      */
-    Simulator::Schedule(MilliSeconds(16), &NrEnbRrc::SendSystemInformation, this);
+    Simulator::Schedule(MilliSeconds(16), &NrGnbRrc::SendSystemInformation, this);
 
     m_configured = true;
 }
 
 void
-NrEnbRrc::SetCellId(uint16_t cellId)
+NrGnbRrc::SetCellId(uint16_t cellId)
 {
     // update SIB1
     m_sib1.at(0).cellAccessRelatedInfo.cellIdentity = cellId;
@@ -2537,7 +2537,7 @@ NrEnbRrc::SetCellId(uint16_t cellId)
 }
 
 void
-NrEnbRrc::SetCellId(uint16_t cellId, uint8_t ccIndex)
+NrGnbRrc::SetCellId(uint16_t cellId, uint8_t ccIndex)
 {
     // update SIB1
     m_sib1.at(ccIndex).cellAccessRelatedInfo.cellIdentity = cellId;
@@ -2545,7 +2545,7 @@ NrEnbRrc::SetCellId(uint16_t cellId, uint8_t ccIndex)
 }
 
 uint8_t
-NrEnbRrc::CellToComponentCarrierId(uint16_t cellId)
+NrGnbRrc::CellToComponentCarrierId(uint16_t cellId)
 {
     NS_LOG_FUNCTION(this << cellId);
     for (auto& it : m_componentCarrierPhyConf)
@@ -2559,14 +2559,14 @@ NrEnbRrc::CellToComponentCarrierId(uint16_t cellId)
 }
 
 uint16_t
-NrEnbRrc::ComponentCarrierToCellId(uint8_t componentCarrierId)
+NrGnbRrc::ComponentCarrierToCellId(uint8_t componentCarrierId)
 {
     NS_LOG_FUNCTION(this << +componentCarrierId);
     return m_componentCarrierPhyConf.at(componentCarrierId)->GetCellId();
 }
 
 bool
-NrEnbRrc::HasCellId(uint16_t cellId) const
+NrGnbRrc::HasCellId(uint16_t cellId) const
 {
     for (auto& it : m_componentCarrierPhyConf)
     {
@@ -2579,7 +2579,7 @@ NrEnbRrc::HasCellId(uint16_t cellId) const
 }
 
 bool
-NrEnbRrc::SendData(Ptr<Packet> packet)
+NrGnbRrc::SendData(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
     NrEpsBearerTag tag;
@@ -2596,13 +2596,13 @@ NrEnbRrc::SendData(Ptr<Packet> packet)
 }
 
 void
-NrEnbRrc::SetForwardUpCallback(Callback<void, Ptr<Packet>> cb)
+NrGnbRrc::SetForwardUpCallback(Callback<void, Ptr<Packet>> cb)
 {
     m_forwardUpCallback = cb;
 }
 
 void
-NrEnbRrc::ConnectionRequestTimeout(uint16_t rnti)
+NrGnbRrc::ConnectionRequestTimeout(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     NS_ASSERT_MSG(GetUeManager(rnti)->GetState() == NrUeManager::INITIAL_RANDOM_ACCESS,
@@ -2616,7 +2616,7 @@ NrEnbRrc::ConnectionRequestTimeout(uint16_t rnti)
 }
 
 void
-NrEnbRrc::ConnectionSetupTimeout(uint16_t rnti)
+NrGnbRrc::ConnectionSetupTimeout(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     NS_ASSERT_MSG(GetUeManager(rnti)->GetState() == NrUeManager::CONNECTION_SETUP,
@@ -2630,7 +2630,7 @@ NrEnbRrc::ConnectionSetupTimeout(uint16_t rnti)
 }
 
 void
-NrEnbRrc::ConnectionRejectedTimeout(uint16_t rnti)
+NrGnbRrc::ConnectionRejectedTimeout(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     NS_ASSERT_MSG(GetUeManager(rnti)->GetState() == NrUeManager::CONNECTION_REJECTED,
@@ -2644,7 +2644,7 @@ NrEnbRrc::ConnectionRejectedTimeout(uint16_t rnti)
 }
 
 void
-NrEnbRrc::HandoverJoiningTimeout(uint16_t rnti)
+NrGnbRrc::HandoverJoiningTimeout(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     NS_ASSERT_MSG(GetUeManager(rnti)->GetState() == NrUeManager::HANDOVER_JOINING,
@@ -2672,7 +2672,7 @@ NrEnbRrc::HandoverJoiningTimeout(uint16_t rnti)
 }
 
 void
-NrEnbRrc::HandoverLeavingTimeout(uint16_t rnti)
+NrGnbRrc::HandoverLeavingTimeout(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
     NS_ASSERT_MSG(GetUeManager(rnti)->GetState() == NrUeManager::HANDOVER_LEAVING,
@@ -2698,7 +2698,7 @@ NrEnbRrc::HandoverLeavingTimeout(uint16_t rnti)
 }
 
 void
-NrEnbRrc::SendHandoverRequest(uint16_t rnti, uint16_t cellId)
+NrGnbRrc::SendHandoverRequest(uint16_t rnti, uint16_t cellId)
 {
     NS_LOG_FUNCTION(this << rnti << cellId);
     NS_LOG_LOGIC("Request to send HANDOVER REQUEST");
@@ -2709,21 +2709,21 @@ NrEnbRrc::SendHandoverRequest(uint16_t rnti, uint16_t cellId)
 }
 
 void
-NrEnbRrc::DoCompleteSetupUe(uint16_t rnti, NrEnbRrcSapProvider::CompleteSetupUeParameters params)
+NrGnbRrc::DoCompleteSetupUe(uint16_t rnti, NrGnbRrcSapProvider::CompleteSetupUeParameters params)
 {
     NS_LOG_FUNCTION(this << rnti);
     GetUeManager(rnti)->CompleteSetupUe(params);
 }
 
 void
-NrEnbRrc::DoRecvRrcConnectionRequest(uint16_t rnti, NrRrcSap::RrcConnectionRequest msg)
+NrGnbRrc::DoRecvRrcConnectionRequest(uint16_t rnti, NrRrcSap::RrcConnectionRequest msg)
 {
     NS_LOG_FUNCTION(this << rnti);
     GetUeManager(rnti)->RecvRrcConnectionRequest(msg);
 }
 
 void
-NrEnbRrc::DoRecvRrcConnectionSetupCompleted(uint16_t rnti,
+NrGnbRrc::DoRecvRrcConnectionSetupCompleted(uint16_t rnti,
                                             NrRrcSap::RrcConnectionSetupCompleted msg)
 {
     NS_LOG_FUNCTION(this << rnti);
@@ -2731,7 +2731,7 @@ NrEnbRrc::DoRecvRrcConnectionSetupCompleted(uint16_t rnti,
 }
 
 void
-NrEnbRrc::DoRecvRrcConnectionReconfigurationCompleted(
+NrGnbRrc::DoRecvRrcConnectionReconfigurationCompleted(
     uint16_t rnti,
     NrRrcSap::RrcConnectionReconfigurationCompleted msg)
 {
@@ -2740,7 +2740,7 @@ NrEnbRrc::DoRecvRrcConnectionReconfigurationCompleted(
 }
 
 void
-NrEnbRrc::DoRecvRrcConnectionReestablishmentRequest(
+NrGnbRrc::DoRecvRrcConnectionReestablishmentRequest(
     uint16_t rnti,
     NrRrcSap::RrcConnectionReestablishmentRequest msg)
 {
@@ -2749,7 +2749,7 @@ NrEnbRrc::DoRecvRrcConnectionReestablishmentRequest(
 }
 
 void
-NrEnbRrc::DoRecvRrcConnectionReestablishmentComplete(
+NrGnbRrc::DoRecvRrcConnectionReestablishmentComplete(
     uint16_t rnti,
     NrRrcSap::RrcConnectionReestablishmentComplete msg)
 {
@@ -2758,14 +2758,14 @@ NrEnbRrc::DoRecvRrcConnectionReestablishmentComplete(
 }
 
 void
-NrEnbRrc::DoRecvMeasurementReport(uint16_t rnti, NrRrcSap::MeasurementReport msg)
+NrGnbRrc::DoRecvMeasurementReport(uint16_t rnti, NrRrcSap::MeasurementReport msg)
 {
     NS_LOG_FUNCTION(this << rnti);
     GetUeManager(rnti)->RecvMeasurementReport(msg);
 }
 
 void
-NrEnbRrc::DoInitialContextSetupRequest(NrEpcEnbS1SapUser::InitialContextSetupRequestParameters msg)
+NrGnbRrc::DoInitialContextSetupRequest(NrEpcEnbS1SapUser::InitialContextSetupRequestParameters msg)
 {
     NS_LOG_FUNCTION(this);
     Ptr<NrUeManager> ueManager = GetUeManager(msg.rnti);
@@ -2773,7 +2773,7 @@ NrEnbRrc::DoInitialContextSetupRequest(NrEpcEnbS1SapUser::InitialContextSetupReq
 }
 
 void
-NrEnbRrc::DoRecvIdealUeContextRemoveRequest(uint16_t rnti)
+NrGnbRrc::DoRecvIdealUeContextRemoveRequest(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << rnti);
 
@@ -2805,7 +2805,7 @@ NrEnbRrc::DoRecvIdealUeContextRemoveRequest(uint16_t rnti)
 }
 
 void
-NrEnbRrc::DoDataRadioBearerSetupRequest(
+NrGnbRrc::DoDataRadioBearerSetupRequest(
     NrEpcEnbS1SapUser::DataRadioBearerSetupRequestParameters request)
 {
     NS_LOG_FUNCTION(this);
@@ -2817,7 +2817,7 @@ NrEnbRrc::DoDataRadioBearerSetupRequest(
 }
 
 void
-NrEnbRrc::DoPathSwitchRequestAcknowledge(
+NrGnbRrc::DoPathSwitchRequestAcknowledge(
     NrEpcEnbS1SapUser::PathSwitchRequestAcknowledgeParameters params)
 {
     NS_LOG_FUNCTION(this);
@@ -2826,7 +2826,7 @@ NrEnbRrc::DoPathSwitchRequestAcknowledge(
 }
 
 void
-NrEnbRrc::DoRecvHandoverRequest(NrEpcX2SapUser::HandoverRequestParams req)
+NrGnbRrc::DoRecvHandoverRequest(NrEpcX2SapUser::HandoverRequestParams req)
 {
     NS_LOG_FUNCTION(this);
 
@@ -2930,7 +2930,7 @@ NrEnbRrc::DoRecvHandoverRequest(NrEpcX2SapUser::HandoverRequestParams req)
 }
 
 void
-NrEnbRrc::DoRecvHandoverRequestAck(NrEpcX2SapUser::HandoverRequestAckParams params)
+NrGnbRrc::DoRecvHandoverRequestAck(NrEpcX2SapUser::HandoverRequestAckParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -2947,7 +2947,7 @@ NrEnbRrc::DoRecvHandoverRequestAck(NrEpcX2SapUser::HandoverRequestAckParams para
 }
 
 void
-NrEnbRrc::DoRecvHandoverPreparationFailure(NrEpcX2SapUser::HandoverPreparationFailureParams params)
+NrGnbRrc::DoRecvHandoverPreparationFailure(NrEpcX2SapUser::HandoverPreparationFailureParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -2970,7 +2970,7 @@ NrEnbRrc::DoRecvHandoverPreparationFailure(NrEpcX2SapUser::HandoverPreparationFa
 }
 
 void
-NrEnbRrc::DoRecvSnStatusTransfer(NrEpcX2SapUser::SnStatusTransferParams params)
+NrGnbRrc::DoRecvSnStatusTransfer(NrEpcX2SapUser::SnStatusTransferParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -2992,7 +2992,7 @@ NrEnbRrc::DoRecvSnStatusTransfer(NrEpcX2SapUser::SnStatusTransferParams params)
 }
 
 void
-NrEnbRrc::DoRecvUeContextRelease(NrEpcX2SapUser::UeContextReleaseParams params)
+NrGnbRrc::DoRecvUeContextRelease(NrEpcX2SapUser::UeContextReleaseParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3012,7 +3012,7 @@ NrEnbRrc::DoRecvUeContextRelease(NrEpcX2SapUser::UeContextReleaseParams params)
 }
 
 void
-NrEnbRrc::DoRecvLoadInformation(NrEpcX2SapUser::LoadInformationParams params)
+NrGnbRrc::DoRecvLoadInformation(NrEpcX2SapUser::LoadInformationParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3025,7 +3025,7 @@ NrEnbRrc::DoRecvLoadInformation(NrEpcX2SapUser::LoadInformationParams params)
 }
 
 void
-NrEnbRrc::DoRecvResourceStatusUpdate(NrEpcX2SapUser::ResourceStatusUpdateParams params)
+NrGnbRrc::DoRecvResourceStatusUpdate(NrEpcX2SapUser::ResourceStatusUpdateParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3038,7 +3038,7 @@ NrEnbRrc::DoRecvResourceStatusUpdate(NrEpcX2SapUser::ResourceStatusUpdateParams 
 }
 
 void
-NrEnbRrc::DoRecvUeData(NrEpcX2SapUser::UeDataParams params)
+NrGnbRrc::DoRecvUeData(NrEpcX2SapUser::UeDataParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3061,7 +3061,7 @@ NrEnbRrc::DoRecvUeData(NrEpcX2SapUser::UeDataParams params)
 }
 
 void
-NrEnbRrc::DoRecvHandoverCancel(NrEpcX2SapUser::HandoverCancelParams params)
+NrGnbRrc::DoRecvHandoverCancel(NrEpcX2SapUser::HandoverCancelParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3083,7 +3083,7 @@ NrEnbRrc::DoRecvHandoverCancel(NrEpcX2SapUser::HandoverCancelParams params)
 }
 
 uint16_t
-NrEnbRrc::DoAllocateTemporaryCellRnti(uint8_t componentCarrierId)
+NrGnbRrc::DoAllocateTemporaryCellRnti(uint8_t componentCarrierId)
 {
     NS_LOG_FUNCTION(this << +componentCarrierId);
     // if no SRS index is available, then do not create a new UE context.
@@ -3096,21 +3096,21 @@ NrEnbRrc::DoAllocateTemporaryCellRnti(uint8_t componentCarrierId)
 }
 
 void
-NrEnbRrc::DoRrcConfigurationUpdateInd(NrEnbCmacSapUser::UeConfig cmacParams)
+NrGnbRrc::DoRrcConfigurationUpdateInd(NrEnbCmacSapUser::UeConfig cmacParams)
 {
     Ptr<NrUeManager> ueManager = GetUeManager(cmacParams.m_rnti);
     ueManager->CmacUeConfigUpdateInd(cmacParams);
 }
 
 void
-NrEnbRrc::DoNotifyLcConfigResult(uint16_t rnti, uint8_t lcid, bool success)
+NrGnbRrc::DoNotifyLcConfigResult(uint16_t rnti, uint8_t lcid, bool success)
 {
     NS_LOG_FUNCTION(this << (uint32_t)rnti);
     NS_FATAL_ERROR("not implemented");
 }
 
 std::vector<uint8_t>
-NrEnbRrc::DoAddUeMeasReportConfigForHandover(NrRrcSap::ReportConfigEutra reportConfig)
+NrGnbRrc::DoAddUeMeasReportConfigForHandover(NrRrcSap::ReportConfigEutra reportConfig)
 {
     NS_LOG_FUNCTION(this);
     std::vector<uint8_t> measIds = AddUeMeasReportConfig(reportConfig);
@@ -3119,7 +3119,7 @@ NrEnbRrc::DoAddUeMeasReportConfigForHandover(NrRrcSap::ReportConfigEutra reportC
 }
 
 uint8_t
-NrEnbRrc::DoAddUeMeasReportConfigForComponentCarrier(NrRrcSap::ReportConfigEutra reportConfig)
+NrGnbRrc::DoAddUeMeasReportConfigForComponentCarrier(NrRrcSap::ReportConfigEutra reportConfig)
 {
     NS_LOG_FUNCTION(this);
     uint8_t measId = AddUeMeasReportConfig(reportConfig).at(0);
@@ -3128,13 +3128,13 @@ NrEnbRrc::DoAddUeMeasReportConfigForComponentCarrier(NrRrcSap::ReportConfigEutra
 }
 
 void
-NrEnbRrc::DoSetNumberOfComponentCarriers(uint16_t numberOfComponentCarriers)
+NrGnbRrc::DoSetNumberOfComponentCarriers(uint16_t numberOfComponentCarriers)
 {
     m_numberOfComponentCarriers = numberOfComponentCarriers;
 }
 
 void
-NrEnbRrc::DoTriggerHandover(uint16_t rnti, uint16_t targetCellId)
+NrGnbRrc::DoTriggerHandover(uint16_t rnti, uint16_t targetCellId)
 {
     NS_LOG_FUNCTION(this << rnti << targetCellId);
 
@@ -3176,7 +3176,7 @@ NrEnbRrc::DoTriggerHandover(uint16_t rnti, uint16_t targetCellId)
 }
 
 uint8_t
-NrEnbRrc::DoAddUeMeasReportConfigForAnr(NrRrcSap::ReportConfigEutra reportConfig)
+NrGnbRrc::DoAddUeMeasReportConfigForAnr(NrRrcSap::ReportConfigEutra reportConfig)
 {
     NS_LOG_FUNCTION(this);
     uint8_t measId = AddUeMeasReportConfig(reportConfig).at(0);
@@ -3185,7 +3185,7 @@ NrEnbRrc::DoAddUeMeasReportConfigForAnr(NrRrcSap::ReportConfigEutra reportConfig
 }
 
 uint8_t
-NrEnbRrc::DoAddUeMeasReportConfigForFfr(NrRrcSap::ReportConfigEutra reportConfig)
+NrGnbRrc::DoAddUeMeasReportConfigForFfr(NrRrcSap::ReportConfigEutra reportConfig)
 {
     NS_LOG_FUNCTION(this);
     uint8_t measId = AddUeMeasReportConfig(reportConfig).at(0);
@@ -3194,7 +3194,7 @@ NrEnbRrc::DoAddUeMeasReportConfigForFfr(NrRrcSap::ReportConfigEutra reportConfig
 }
 
 void
-NrEnbRrc::DoSetPdschConfigDedicated(uint16_t rnti,
+NrGnbRrc::DoSetPdschConfigDedicated(uint16_t rnti,
                                     NrRrcSap::PdschConfigDedicated pdschConfigDedicated)
 {
     NS_LOG_FUNCTION(this);
@@ -3203,7 +3203,7 @@ NrEnbRrc::DoSetPdschConfigDedicated(uint16_t rnti,
 }
 
 void
-NrEnbRrc::DoSendLoadInformation(NrEpcX2Sap::LoadInformationParams params)
+NrGnbRrc::DoSendLoadInformation(NrEpcX2Sap::LoadInformationParams params)
 {
     NS_LOG_FUNCTION(this);
 
@@ -3211,7 +3211,7 @@ NrEnbRrc::DoSendLoadInformation(NrEpcX2Sap::LoadInformationParams params)
 }
 
 uint16_t
-NrEnbRrc::AddUe(NrUeManager::State state, uint8_t componentCarrierId)
+NrGnbRrc::AddUe(NrUeManager::State state, uint8_t componentCarrierId)
 {
     NS_LOG_FUNCTION(this);
     bool found = false;
@@ -3239,7 +3239,7 @@ NrEnbRrc::AddUe(NrUeManager::State state, uint8_t componentCarrierId)
 }
 
 void
-NrEnbRrc::RemoveUe(uint16_t rnti)
+NrGnbRrc::RemoveUe(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << (uint32_t)rnti);
     auto it = m_ueMap.find(rnti);
@@ -3273,7 +3273,7 @@ NrEnbRrc::RemoveUe(uint16_t rnti)
 }
 
 TypeId
-NrEnbRrc::GetRlcType(NrEpsBearer bearer)
+NrGnbRrc::GetRlcType(NrEpsBearer bearer)
 {
     switch (m_epsBearerToRlcMapping)
     {
@@ -3302,7 +3302,7 @@ NrEnbRrc::GetRlcType(NrEpsBearer bearer)
 }
 
 void
-NrEnbRrc::AddX2Neighbour(uint16_t cellId)
+NrGnbRrc::AddX2Neighbour(uint16_t cellId)
 {
     NS_LOG_FUNCTION(this << cellId);
 
@@ -3313,7 +3313,7 @@ NrEnbRrc::AddX2Neighbour(uint16_t cellId)
 }
 
 void
-NrEnbRrc::SetCsgId(uint32_t csgId, bool csgIndication)
+NrGnbRrc::SetCsgId(uint32_t csgId, bool csgIndication)
 {
     NS_LOG_FUNCTION(this << csgId << csgIndication);
     for (std::size_t componentCarrierId = 0; componentCarrierId < m_sib1.size();
@@ -3347,7 +3347,7 @@ static const uint16_t g_srsCiLow[SRS_ENTRIES] = {0, 0, 2, 7, 17, 37, 77, 157, 31
 static const uint16_t g_srsCiHigh[SRS_ENTRIES] = {0, 1, 6, 16, 36, 76, 156, 316, 636};
 
 void
-NrEnbRrc::SetSrsPeriodicity(uint32_t p)
+NrGnbRrc::SetSrsPeriodicity(uint32_t p)
 {
     NS_LOG_FUNCTION(this << p);
     for (uint32_t id = 1; id < SRS_ENTRIES; ++id)
@@ -3369,7 +3369,7 @@ NrEnbRrc::SetSrsPeriodicity(uint32_t p)
 }
 
 uint32_t
-NrEnbRrc::GetSrsPeriodicity() const
+NrGnbRrc::GetSrsPeriodicity() const
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_srsCurrentPeriodicityId > 0);
@@ -3378,7 +3378,7 @@ NrEnbRrc::GetSrsPeriodicity() const
 }
 
 uint16_t
-NrEnbRrc::GetNewSrsConfigurationIndex()
+NrGnbRrc::GetNewSrsConfigurationIndex()
 {
     NS_LOG_FUNCTION(this << m_ueSrsConfigurationIndexSet.size());
     // SRS
@@ -3392,7 +3392,7 @@ NrEnbRrc::GetNewSrsConfigurationIndex()
                        << m_ueSrsConfigurationIndexSet.size() + 1
                        << ") for current SRS periodicity "
                        << g_srsPeriodicity[m_srsCurrentPeriodicityId]
-                       << ", consider increasing the value of ns3::NrEnbRrc::SrsPeriodicity");
+                       << ", consider increasing the value of ns3::NrGnbRrc::SrsPeriodicity");
     }
 
     if (m_ueSrsConfigurationIndexSet.empty())
@@ -3435,7 +3435,7 @@ NrEnbRrc::GetNewSrsConfigurationIndex()
 }
 
 void
-NrEnbRrc::RemoveSrsConfigurationIndex(uint16_t srcCi)
+NrGnbRrc::RemoveSrsConfigurationIndex(uint16_t srcCi)
 {
     NS_LOG_FUNCTION(this << srcCi);
     auto it = m_ueSrsConfigurationIndexSet.find(srcCi);
@@ -3445,7 +3445,7 @@ NrEnbRrc::RemoveSrsConfigurationIndex(uint16_t srcCi)
 }
 
 bool
-NrEnbRrc::IsMaxSrsReached()
+NrGnbRrc::IsMaxSrsReached()
 {
     NS_ASSERT(m_srsCurrentPeriodicityId > 0);
     NS_ASSERT(m_srsCurrentPeriodicityId < SRS_ENTRIES);
@@ -3455,7 +3455,7 @@ NrEnbRrc::IsMaxSrsReached()
 }
 
 uint8_t
-NrEnbRrc::GetLogicalChannelGroup(NrEpsBearer bearer)
+NrGnbRrc::GetLogicalChannelGroup(NrEpsBearer bearer)
 {
     if (bearer.GetResourceType() > 0) // 1, 2 for GBR and DC-GBR
     {
@@ -3468,13 +3468,13 @@ NrEnbRrc::GetLogicalChannelGroup(NrEpsBearer bearer)
 }
 
 uint8_t
-NrEnbRrc::GetLogicalChannelPriority(NrEpsBearer bearer)
+NrGnbRrc::GetLogicalChannelPriority(NrEpsBearer bearer)
 {
     return bearer.qci;
 }
 
 void
-NrEnbRrc::SendSystemInformation()
+NrGnbRrc::SendSystemInformation()
 {
     // NS_LOG_FUNCTION (this);
 
@@ -3505,11 +3505,11 @@ NrEnbRrc::SendSystemInformation()
      * For simplicity, we use the same periodicity for all SIBs. Note that in real
      * systems the periodicy of each SIBs could be different.
      */
-    Simulator::Schedule(m_systemInformationPeriodicity, &NrEnbRrc::SendSystemInformation, this);
+    Simulator::Schedule(m_systemInformationPeriodicity, &NrGnbRrc::SendSystemInformation, this);
 }
 
 bool
-NrEnbRrc::IsRandomAccessCompleted(uint16_t rnti)
+NrGnbRrc::IsRandomAccessCompleted(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this << (uint32_t)rnti);
     Ptr<NrUeManager> ueManager = GetUeManager(rnti);

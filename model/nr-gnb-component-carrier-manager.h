@@ -48,7 +48,7 @@ class NrCcmMacSapProvider;
  * instance takes the role of the "user" part. The following code skeleton
  * establishes the connection between both instances:
  *
- * Ptr<NrEnbRrc> rrc = ...;
+ * Ptr<NrGnbRrc> rrc = ...;
  * Ptr<NrComponentCarrierManager> ccmEnb = ...;
  * rrc->SetNrCcmRrcSapProvider (ccmEnb->GetNrCcmRrcSapProvider ());
  * ccmEnb->SetNrCcmRrcSapUser (rrc->GetNrCcmRrcSapUser ())
@@ -77,7 +77,7 @@ class NrEnbComponentCarrierManager : public Object
      * \brief Set the "user" part of the NrComponentCarrier Management SAP interface that
      *        this NrComponentCarrier algorithm instance will interact with.
      * \param s a reference to the "user" part of the interface, typically a
-     *          member of an NrEnbRrc instance
+     *          member of an NrGnbRrc instance
      */
     virtual void SetNrCcmRrcSapUser(NrCcmRrcSapUser* s);
 
@@ -167,7 +167,7 @@ class NrEnbComponentCarrierManager : public Object
                                       //!< this eNb.
     // pointer to RRC object for direct function calls, e.g. when CCM needs to obtain
     // a pointer to RLC object of a specific flow
-    Ptr<NrEnbRrc> m_rrc; //!< A pointer to the RRC instance of this eNb.
+    Ptr<NrGnbRrc> m_rrc; //!< A pointer to the RRC instance of this eNb.
 
     /*
      * This interface is used to receive API calls from the RLC instance that through

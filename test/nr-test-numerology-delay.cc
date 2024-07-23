@@ -155,10 +155,10 @@ NrTestRxPdcpPDUCallback(NrTestNumerologyDelayCase1* testcase,
 void
 ConnectRlcPdcpTraces(NrTestNumerologyDelayCase1* testcase)
 {
-    Config::Connect("/NodeList/1/DeviceList/*/NrEnbRrc/UeMap/1/DataRadioBearerMap/1/NrRlc/TxPDU",
+    Config::Connect("/NodeList/1/DeviceList/*/NrGnbRrc/UeMap/1/DataRadioBearerMap/1/NrRlc/TxPDU",
                     MakeBoundCallback(&NrTestTxRlcPDUCallback, testcase));
 
-    Config::Connect("/NodeList/1/DeviceList/*/NrEnbRrc/UeMap/1/DataRadioBearerMap/1/NrPdcp/TxPDU",
+    Config::Connect("/NodeList/1/DeviceList/*/NrGnbRrc/UeMap/1/DataRadioBearerMap/1/NrPdcp/TxPDU",
                     MakeBoundCallback(&NrTestTxPdcpPDUCallback, testcase));
 
     Config::Connect("/NodeList/0/DeviceList/*/NrUeRrc/DataRadioBearerMap/1/NrRlc/RxPDU",
