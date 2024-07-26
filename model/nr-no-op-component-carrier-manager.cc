@@ -258,7 +258,7 @@ NrNoOpComponentCarrierManager::DoReleaseDataRadioBearer(uint16_t rnti, uint8_t l
     NS_ASSERT_MSG(lcIt != rntiIt->second.m_ueAttached.end(), "Logical Channel not found");
     rntiIt->second.m_ueAttached.erase(lcIt);
 
-    auto rlcInstancesIt = rntiIt->second.m_rlcLcInstantiated.find(rnti);
+    auto rlcInstancesIt = rntiIt->second.m_rlcLcInstantiated.find(lcid);
     NS_ASSERT_MSG(rlcInstancesIt != rntiIt->second.m_rlcLcInstantiated.end(),
                   "Logical Channel not found");
     rntiIt->second.m_rlcLcInstantiated.erase(rlcInstancesIt);
