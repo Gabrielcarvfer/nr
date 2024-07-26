@@ -758,7 +758,6 @@ NrUeMeasurementsPiecewiseTestCase1::DoRun()
     NS_LOG_INFO(this << " " << GetName());
 
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
-    nrHelper->SetAttribute("PathlossModel", StringValue("ns3::FriisSpectrumPropagationLossModel"));
     nrHelper->SetAttribute("UseIdealRrc", BooleanValue(true));
 
     // Disable Uplink Power Control
@@ -1461,7 +1460,6 @@ NrUeMeasurementsPiecewiseTestCase2::DoRun()
     NS_LOG_INFO(this << " " << GetName());
 
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
-    nrHelper->SetAttribute("PathlossModel", StringValue("ns3::FriisSpectrumPropagationLossModel"));
     nrHelper->SetAttribute("UseIdealRrc", BooleanValue(true));
 
     // Disable Uplink Power Control
@@ -1779,7 +1777,6 @@ NrUeMeasurementsPiecewiseTestCase3::DoRun()
     NS_LOG_INFO(this << " " << GetName());
 
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
-    nrHelper->SetAttribute("PathlossModel", StringValue("ns3::FriisSpectrumPropagationLossModel"));
     nrHelper->SetAttribute("UseIdealRrc", BooleanValue(true));
 
     // Disable Uplink Power Control
@@ -2348,7 +2345,6 @@ NrUeMeasurementsHandoverTestCase::DoRun()
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
     Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
     nrHelper->SetEpcHelper(epcHelper);
-    nrHelper->SetAttribute("PathlossModel", StringValue("ns3::FriisSpectrumPropagationLossModel"));
     nrHelper->SetAttribute("UseIdealRrc", BooleanValue(true));
 
     // Disable Uplink Power Control

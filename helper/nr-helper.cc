@@ -132,7 +132,7 @@ NrHelper::GetTypeId()
                           "The type of handover algorithm to be used for gNBs. "
                           "The allowed values for this attributes are the type names "
                           "of any class inheriting from ns3::LteHandoverAlgorithm.",
-                          StringValue("ns3::NoOpHandoverAlgorithm"),
+                          StringValue("ns3::NrNoOpHandoverAlgorithm"),
                           MakeStringAccessor(&NrHelper::SetHandoverAlgorithmType,
                                              &NrHelper::GetHandoverAlgorithmType),
                           MakeStringChecker());

@@ -22,7 +22,7 @@
 #include <ns3/bulk-send-helper.h>
 #include <ns3/core-module.h>
 #include <ns3/internet-module.h>
-#include <ns3/lte-module.h>
+#include <ns3/nr-module.h>
 #include <ns3/mobility-module.h>
 #include <ns3/network-module.h>
 #include <ns3/packet-sink-helper.h>
@@ -32,7 +32,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("LteX2HandoverMeasuresTest");
+NS_LOG_COMPONENT_DEFINE("NrX2HandoverMeasuresTest");
 
 /**
  * \ingroup lte-test
@@ -72,7 +72,7 @@ struct CheckPointEvent
  * \brief Test different X2 handover measures and algorithms, e.g. A2A4RsrqHandoverAlgorithm and
  * A3RsrpHandoverAlgorithm. Test defines different handover parameters and scenario configurations.
  */
-class LteX2HandoverMeasuresTestCase : public TestCase
+class NrX2HandoverMeasuresTestCase : public TestCase
 {
   public:
     /**
@@ -90,7 +90,7 @@ class LteX2HandoverMeasuresTestCase : public TestCase
      * \param admitHo true if Ho is admitted, false if it is not admitted
      * \param useIdealRrc true if ideal RRC is to be used, false if real RRC is to be used
      */
-    LteX2HandoverMeasuresTestCase(uint32_t nEnbs,
+    NrX2HandoverMeasuresTestCase(uint32_t nEnbs,
                                   uint32_t nUes,
                                   uint32_t nDedicatedBearers,
                                   std::list<CheckPointEvent> checkPointEventList,
@@ -144,8 +144,8 @@ class LteX2HandoverMeasuresTestCase : public TestCase
     std::string m_handoverAlgorithmType;              ///< handover algorithm type
     bool m_admitHo;                                   ///< whether to configure to admit handover
     bool m_useIdealRrc;                               ///< whether to use ideal RRC
-    Ptr<LteHelper> m_lteHelper;                       ///< LTE helper
-    Ptr<PointToPointEpcHelper> m_epcHelper;           ///< EPC helper
+    Ptr<NrHelper> m_lteHelper;                       ///< LTE helper
+    Ptr<NrPointToPointEpcHelper> m_epcHelper;           ///< EPC helper
 
     /**
      * \ingroup lte-test
@@ -192,7 +192,7 @@ class LteX2HandoverMeasuresTestCase : public TestCase
 };
 
 std::string
-LteX2HandoverMeasuresTestCase::BuildNameString(uint32_t nEnbs,
+NrX2HandoverMeasuresTestCase::BuildNameString(uint32_t nEnbs,
                                                uint32_t nUes,
                                                uint32_t nDedicatedBearers,
                                                std::string checkPointEventListName,
@@ -217,7 +217,7 @@ LteX2HandoverMeasuresTestCase::BuildNameString(uint32_t nEnbs,
     return oss.str();
 }
 
-LteX2HandoverMeasuresTestCase::LteX2HandoverMeasuresTestCase(
+NrX2HandoverMeasuresTestCase::NrX2HandoverMeasuresTestCase(
     uint32_t nEnbs,
     uint32_t nUes,
     uint32_t nDedicatedBearers,
@@ -256,7 +256,7 @@ LteX2HandoverMeasuresTestCase::LteX2HandoverMeasuresTestCase(
 }
 
 void
-LteX2HandoverMeasuresTestCase::DoRun()
+NrX2HandoverMeasuresTestCase::DoRun()
 {
     NS_LOG_FUNCTION(this << BuildNameString(m_nEnbs,
                                             m_nUes,
@@ -272,18 +272,16 @@ LteX2HandoverMeasuresTestCase::DoRun()
     Config::SetDefault("ns3::UdpClient::Interval", TimeValue(m_udpClientInterval));
     Config::SetDefault("ns3::UdpClient::MaxPackets", UintegerValue(1000000));
     Config::SetDefault("ns3::UdpClient::PacketSize", UintegerValue(m_udpClientPktSize));
-    Config::SetDefault("ns3::LteEnbRrc::HandoverJoiningTimeoutDuration",
+    Config::SetDefault("ns3::NrGnbRrc::HandoverJoiningTimeoutDuration",
                        TimeValue(MilliSeconds(200)));
-    Config::SetDefault("ns3::LteEnbPhy::TxPower", DoubleValue(20));
+    Config::SetDefault("ns3::NrGnbPhy::TxPower", DoubleValue(20));
 
     // Disable Uplink Power Control
-    Config::SetDefault("ns3::LteUePhy::EnableUplinkPowerControl", BooleanValue(false));
+    Config::SetDefault("ns3::NrUePhy::EnableUplinkPowerControl", BooleanValue(false));
 
     int64_t stream = 1;
 
     m_lteHelper = CreateObject<LteHelper>();
-    m_lteHelper->SetAttribute("PathlossModel",
-                              StringValue("ns3::FriisSpectrumPropagationLossModel"));
     m_lteHelper->SetAttribute("UseIdealRrc", BooleanValue(m_useIdealRrc));
     m_lteHelper->SetSchedulerType(m_schedulerType);
 
@@ -348,7 +346,7 @@ LteX2HandoverMeasuresTestCase::DoRun()
     stream += m_lteHelper->AssignStreams(enbDevices, stream);
     for (auto it = enbDevices.Begin(); it != enbDevices.End(); ++it)
     {
-        Ptr<LteEnbRrc> enbRrc = (*it)->GetObject<LteEnbNetDevice>()->GetRrc();
+        Ptr<NrGnbRrc> enbRrc = (*it)->GetObject<NrGnbNetDevice>()->GetRrc();
         enbRrc->SetAttribute("AdmitHandoverRequest", BooleanValue(m_admitHo));
     }
 
@@ -546,7 +544,7 @@ LteX2HandoverMeasuresTestCase::DoRun()
     {
         NS_LOG_FUNCTION(maxRrcConnectionEstablishmentDuration);
         Simulator::Schedule(maxRrcConnectionEstablishmentDuration,
-                            &LteX2HandoverMeasuresTestCase::CheckConnected,
+                            &NrX2HandoverMeasuresTestCase::CheckConnected,
                             this,
                             *it,
                             enbDevices.Get(0));
@@ -564,19 +562,19 @@ LteX2HandoverMeasuresTestCase::DoRun()
              checkPointTime += checkPointEventIt->checkInterval)
         {
             Simulator::Schedule(checkPointTime,
-                                &LteX2HandoverMeasuresTestCase::CheckConnected,
+                                &NrX2HandoverMeasuresTestCase::CheckConnected,
                                 this,
                                 ueDevices.Get(checkPointEventIt->ueDeviceIndex),
                                 enbDevices.Get(checkPointEventIt->enbDeviceIndex));
 
             Simulator::Schedule(checkPointTime,
-                                &LteX2HandoverMeasuresTestCase::SaveStats,
+                                &NrX2HandoverMeasuresTestCase::SaveStats,
                                 this,
                                 checkPointEventIt->ueDeviceIndex);
 
             Time checkStats = checkPointTime + m_statsDuration;
             Simulator::Schedule(checkStats,
-                                &LteX2HandoverMeasuresTestCase::CheckStats,
+                                &NrX2HandoverMeasuresTestCase::CheckStats,
                                 this,
                                 checkPointEventIt->ueDeviceIndex);
 
@@ -593,16 +591,16 @@ LteX2HandoverMeasuresTestCase::DoRun()
 }
 
 void
-LteX2HandoverMeasuresTestCase::CheckConnected(Ptr<NetDevice> ueDevice, Ptr<NetDevice> enbDevice)
+NrX2HandoverMeasuresTestCase::CheckConnected(Ptr<NetDevice> ueDevice, Ptr<NetDevice> enbDevice)
 {
     NS_LOG_FUNCTION(ueDevice << enbDevice);
 
-    Ptr<LteUeNetDevice> ueLteDevice = ueDevice->GetObject<LteUeNetDevice>();
-    Ptr<LteUeRrc> ueRrc = ueLteDevice->GetRrc();
-    NS_TEST_ASSERT_MSG_EQ(ueRrc->GetState(), LteUeRrc::CONNECTED_NORMALLY, "Wrong LteUeRrc state!");
+    Ptr<NrUeNetDevice> ueLteDevice = ueDevice->GetObject<NrUeNetDevice>();
+    Ptr<NrUeRrc> ueRrc = ueLteDevice->GetRrc();
+    NS_TEST_ASSERT_MSG_EQ(ueRrc->GetState(), NrUeRrc::CONNECTED_NORMALLY, "Wrong NrUeRrc state!");
 
-    Ptr<LteEnbNetDevice> enbLteDevice = enbDevice->GetObject<LteEnbNetDevice>();
-    Ptr<LteEnbRrc> enbRrc = enbLteDevice->GetRrc();
+    Ptr<NrGnbNetDevice> enbLteDevice = enbDevice->GetObject<NrGnbNetDevice>();
+    Ptr<NrGnbRrc> enbRrc = enbLteDevice->GetRrc();
     uint16_t rnti = ueRrc->GetRnti();
     Ptr<UeManager> ueManager = enbRrc->GetUeManager(rnti);
     NS_TEST_ASSERT_MSG_NE(ueManager, nullptr, "RNTI " << rnti << " not found in eNB");
@@ -676,7 +674,7 @@ LteX2HandoverMeasuresTestCase::CheckConnected(Ptr<NetDevice> ueDevice, Ptr<NetDe
 }
 
 void
-LteX2HandoverMeasuresTestCase::SaveStats(uint32_t ueIndex)
+NrX2HandoverMeasuresTestCase::SaveStats(uint32_t ueIndex)
 {
     NS_LOG_FUNCTION(ueIndex);
     for (auto it = m_ueDataVector.at(ueIndex).bearerDataList.begin();
@@ -695,7 +693,7 @@ LteX2HandoverMeasuresTestCase::SaveStats(uint32_t ueIndex)
 }
 
 void
-LteX2HandoverMeasuresTestCase::CheckStats(uint32_t ueIndex)
+NrX2HandoverMeasuresTestCase::CheckStats(uint32_t ueIndex)
 {
     NS_LOG_FUNCTION(ueIndex);
     uint32_t b = 1;
@@ -742,13 +740,13 @@ LteX2HandoverMeasuresTestCase::CheckStats(uint32_t ueIndex)
  *
  * \brief Lte X2 Handover Measures Test Suite
  */
-class LteX2HandoverMeasuresTestSuite : public TestSuite
+class NrX2HandoverMeasuresTestSuite : public TestSuite
 {
   public:
-    LteX2HandoverMeasuresTestSuite();
+    NrX2HandoverMeasuresTestSuite();
 };
 
-LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
+NrX2HandoverMeasuresTestSuite::NrX2HandoverMeasuresTestSuite()
     : TestSuite("lte-x2-handover-measures", Type::SYSTEM)
 {
     Time checkInterval = Seconds(1);
@@ -779,7 +777,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
     for (auto useIdealRrc : {true, false})
     {
         // nEnbs, nUes, nDBearers, celist, name, useUdp, sched, ho, admitHo, idealRrc
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       0,
                                                       cel1,
@@ -790,7 +788,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       1,
                                                       cel1,
@@ -801,7 +799,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::QUICK);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       2,
                                                       cel1,
@@ -812,7 +810,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       0,
                                                       cel2,
@@ -823,7 +821,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       1,
                                                       cel2,
@@ -834,7 +832,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       2,
                                                       cel2,
@@ -845,7 +843,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::EXTENSIVE);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       0,
                                                       cel3,
@@ -856,7 +854,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::EXTENSIVE);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       1,
                                                       cel3,
@@ -867,7 +865,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       2,
                                                       cel3,
@@ -884,7 +882,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
     for (auto useIdealRrc : {true, false})
     {
         // nEnbs, nUes, nDBearers, celist, name, useUdp, sched, admitHo, idealRrc
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       0,
                                                       cel1,
@@ -895,7 +893,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::EXTENSIVE);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       0,
                                                       cel2,
@@ -906,7 +904,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       0,
                                                       cel3,
@@ -924,7 +922,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
     for (auto useIdealRrc : {true, false})
     {
         // nEnbs, nUes, nDBearers, celist, name, useUdp, sched, admitHo, idealRrc
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       0,
                                                       cel1,
@@ -935,7 +933,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::EXTENSIVE);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       0,
                                                       cel2,
@@ -946,7 +944,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       0,
                                                       cel3,
@@ -963,7 +961,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
     for (auto useIdealRrc : {true, false})
     {
         // nEnbs, nUes, nDBearers, celist, name, useUdp, sched, admitHo, idealRrc
-        AddTestCase(new LteX2HandoverMeasuresTestCase(2,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(2,
                                                       1,
                                                       0,
                                                       cel1,
@@ -974,7 +972,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::QUICK);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(3,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(3,
                                                       1,
                                                       0,
                                                       cel2,
@@ -985,7 +983,7 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                                                       true,
                                                       useIdealRrc),
                     TestCase::Duration::TAKES_FOREVER);
-        AddTestCase(new LteX2HandoverMeasuresTestCase(4,
+        AddTestCase(new NrX2HandoverMeasuresTestCase(4,
                                                       1,
                                                       0,
                                                       cel3,
@@ -998,10 +996,10 @@ LteX2HandoverMeasuresTestSuite::LteX2HandoverMeasuresTestSuite()
                     TestCase::Duration::EXTENSIVE);
     }
 
-} // end of LteX2HandoverMeasuresTestSuite ()
+} // end of NrX2HandoverMeasuresTestSuite ()
 
 /**
  * \ingroup lte-test
  * Static variable for test initialization
  */
-static LteX2HandoverMeasuresTestSuite g_lteX2HandoverMeasuresTestSuiteInstance;
+static NrX2HandoverMeasuresTestSuite g_NrX2HandoverMeasuresTestSuiteInstance;
