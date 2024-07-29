@@ -775,8 +775,8 @@ NrX2HandoverTestSuite::NrX2HandoverTestSuite()
     // };
 
     std::vector<std::string> schedulers{
-        "ns3::RrFfMacScheduler",
-        "ns3::PfFfMacScheduler",
+        "ns3::NrMacSchedulerTdmaRR",
+        "ns3::NrMacSchedulerTdmaPF",
     };
 
     for (auto schedIt = schedulers.begin(); schedIt != schedulers.end(); ++schedIt)

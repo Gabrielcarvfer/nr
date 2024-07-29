@@ -798,7 +798,7 @@ NrUeMeasurementsPiecewiseTestCase1::DoRun()
     // Create Devices and install them in the Nodes (eNB and UE)
     NetDeviceContainer nrDevs;
     NetDeviceContainer ueDevs;
-    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::RrFfMacScheduler"));
+    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::NrMacSchedulerTdmaRR"));
     nrDevs = nrHelper->InstallGnbDevice(nrNodes, bandwidthAndBWPPair.second);
     ueDevs = nrHelper->InstallUeDevice(ueNodes, bandwidthAndBWPPair.second);
     nrHelper->UpdateDeviceConfigs(nrDevs);
@@ -1500,7 +1500,7 @@ NrUeMeasurementsPiecewiseTestCase2::DoRun()
     // Create Devices and install them in the Nodes (eNB and UE)
     NetDeviceContainer nrDevs;
     NetDeviceContainer ueDevs;
-    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::RrFfMacScheduler"));
+    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::NrMacSchedulerTdmaRR"));
     nrDevs = nrHelper->InstallGnbDevice(nrNodes, bandwidthAndBWPPair.second);
     ueDevs = nrHelper->InstallUeDevice(ueNodes, bandwidthAndBWPPair.second);
     nrHelper->UpdateDeviceConfigs(nrDevs);
@@ -1820,7 +1820,7 @@ NrUeMeasurementsPiecewiseTestCase3::DoRun()
     // Create Devices and install them in the Nodes (eNB and UE)
     NetDeviceContainer nrDevs;
     NetDeviceContainer ueDevs;
-    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::RrFfMacScheduler"));
+    nrHelper->SetSchedulerTypeId(TypeId::LookupByName("ns3::NrMacSchedulerTdmaRR"));
     nrDevs = nrHelper->InstallGnbDevice(nrNodes, bandwidthAndBWPPair.second);
     ueDevs = nrHelper->InstallUeDevice(ueNodes, bandwidthAndBWPPair.second);
     nrHelper->UpdateDeviceConfigs(nrDevs);
