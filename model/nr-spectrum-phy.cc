@@ -1289,9 +1289,11 @@ NrSpectrumPhy::CheckTransportBlockCorruptionStatus()
         }
 
         const NrErrorModel::NrErrorModelHistory& harqInfoList =
-            m_harqPhyModule->GetHarqProcessInfoDlUl(tbInfo.m_expected.m_isDownlink,
-                                                    rnti,
-                                                    tbInfo.m_expected.m_harqProcessId);
+            m_harqPhyModule
+                ? m_harqPhyModule->GetHarqProcessInfoDlUl(tbInfo.m_expected.m_isDownlink,
+                                                          rnti,
+                                                          tbInfo.m_expected.m_harqProcessId)
+                : NrErrorModel::NrErrorModelHistory();
 
         NS_ABORT_MSG_IF(!m_errorModelType.IsChildOf(NrErrorModel::GetTypeId()),
                         "The error model must be a child of NrErrorModel");
@@ -1492,7 +1494,7 @@ NrSpectrumPhy::ProcessReceivedPacketBurst()
             }
 
             // send HARQ feedback (if not already done for this TB)
-            if (!tbInfo.m_harqFeedbackSent)
+            if (!tbInfo.m_harqFeedbackSent && m_harqPhyModule)
             {
                 tbInfo.m_harqFeedbackSent = true;
                 if (tbInfo.m_expected.m_isDownlink) // UPLINK TB
