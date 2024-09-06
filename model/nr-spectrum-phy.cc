@@ -1289,11 +1289,9 @@ NrSpectrumPhy::CheckTransportBlockCorruptionStatus()
         }
 
         const NrErrorModel::NrErrorModelHistory& harqInfoList =
-            m_harqPhyModule
-                ? m_harqPhyModule->GetHarqProcessInfoDlUl(tbInfo.m_expected.m_isDownlink,
-                                                          rnti,
-                                                          tbInfo.m_expected.m_harqProcessId)
-                : NrErrorModel::NrErrorModelHistory();
+            m_harqPhyModule->GetHarqProcessInfoDlUl(tbInfo.m_expected.m_isDownlink,
+                                                    rnti,
+                                                    tbInfo.m_expected.m_harqProcessId);
 
         NS_ABORT_MSG_IF(!m_errorModelType.IsChildOf(NrErrorModel::GetTypeId()),
                         "The error model must be a child of NrErrorModel");
@@ -1371,10 +1369,7 @@ NrSpectrumPhy::SendUlHarqFeedback(uint16_t rnti, TransportBlockInfo& tbInfo)
     }
 
     // Send the feedback
-    if (!m_phyUlHarqFeedbackCallback.IsNull())
-    {
-        m_phyUlHarqFeedbackCallback(harqUlInfo);
-    }
+    m_phyUlHarqFeedbackCallback(harqUlInfo);
 
     // Arrange the history
     if (!tbInfo.m_isCorrupted || tbInfo.m_expected.m_rv == 3)
@@ -1408,10 +1403,7 @@ NrSpectrumPhy::SendDlHarqFeedback(uint16_t rnti, TransportBlockInfo& tbInfo)
     }
 
     // Send the feedback
-    if (!m_phyDlHarqFeedbackCallback.IsNull())
-    {
-        m_phyDlHarqFeedbackCallback(harqDlInfo);
-    }
+    m_phyDlHarqFeedbackCallback(harqDlInfo);
 
     // Arrange the history
     if (!tbInfo.m_isCorrupted || tbInfo.m_expected.m_rv == 3)
@@ -1494,7 +1486,7 @@ NrSpectrumPhy::ProcessReceivedPacketBurst()
             }
 
             // send HARQ feedback (if not already done for this TB)
-            if (!tbInfo.m_harqFeedbackSent && m_harqPhyModule)
+            if (!tbInfo.m_harqFeedbackSent)
             {
                 tbInfo.m_harqFeedbackSent = true;
                 if (tbInfo.m_expected.m_isDownlink) // UPLINK TB

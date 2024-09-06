@@ -352,18 +352,6 @@ class NrHelper : public Object
     void SetBeamformingHelper(Ptr<BeamformingHelperBase> beamformingHelper);
 
     /**
-     * \brief SetHarqEnabled
-     * \param harqEnabled
-     *
-     * We never really tested this function, so please be careful when using it.
-     */
-    void SetHarqEnabled(bool harqEnabled);
-    /**
-     * \brief GetHarqEnabled
-     * \return the value of HarqEnabled variable
-     */
-    bool GetHarqEnabled() const;
-    /**
      * \brief SetSnrTest
      * \param snrTest
      *
@@ -979,7 +967,6 @@ class NrHelper : public Object
     Ptr<EpcHelper> m_epcHelper{nullptr};                     //!< Ptr to the EPC helper (optional)
     Ptr<BeamformingHelperBase> m_beamformingHelper{nullptr}; //!< Ptr to the beamforming helper
 
-    bool m_harqEnabled{false};
     bool m_snrTest{false};
 
     Ptr<NrPhyRxTrace> m_phyStats; //!< Pointer to the PhyRx stats
