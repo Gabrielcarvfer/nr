@@ -37,7 +37,7 @@ workflow:
     - CXX=$COMPILER CXXFLAGS="$FLAGS" ./ns3 configure -d $MODE -GNinja --enable-examples --enable-tests --enable-asserts --filter-module-examples-and-tests="nr;lte" $EXTRAS
     - cmake --version
     - ccache -z
-    - ./ns3 build
+    - ./ns3 build $TARGET
     - if [ "$MODE" != "debug" ] && [ "`./utils/ccache-miss-rate.py`" != "0" ]; then
         ./test.py --no-build --verbose-failed;
       fi

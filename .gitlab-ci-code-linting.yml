@@ -136,3 +136,34 @@ emacs-line:
       fi
   timeout: 1h
   interruptible: true
+
+# Coverage
+coverage:
+  stage: code-linting
+  image: archlinux
+  extends: .base-build
+  only:
+    variables:
+      - $RELEASE == "weekly"
+  before_script:
+    # add the core-debug repo to pacman.conf
+    - printf "\n%s\n%s\n" "[core-debug]" "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+    - pacman-key --init
+    - pacman -Syu --noconfirm
+      base-devel cmake ninja ccache valgrind
+      python python-pip python-distutils-extra binutils lcov
+      boost gsl gtk3 openmpi eigen
+      glibc-debug
+      openssh git
+    - pip install lcov_cobertura --break-system-packages
+  variables:
+    MODE: debug
+    EXTRAS: --enable-gcov --disable-asserts --disable-logs
+    TARGET: coverage_cobertura
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: ns-3-dev/build/coverage/cobertura.xml
+  tags:
+    - CTTC
