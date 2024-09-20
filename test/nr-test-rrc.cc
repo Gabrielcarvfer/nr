@@ -796,7 +796,7 @@ NrRrcTestSuite::NrRrcTestSuite()
 
     NS_LOG_FUNCTION(this);
 
-    for (auto useIdealRrc : {/*false,*/ true}) // todo: fix RRC real
+    for (auto useIdealRrc : {false, true})
     {
         // <----- all times in ms ----------------->
 
