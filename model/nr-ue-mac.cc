@@ -349,11 +349,7 @@ void
 NrUeMac::DoTransmitPdu(NrMacSapProvider::TransmitPduParameters params)
 {
     NS_LOG_FUNCTION(this);
-    if (m_ulDci == nullptr)
-    {
-        return;
-    }
-    NS_ASSERT(m_ulDci);
+    NS_ABORT_MSG_IF(!m_ulDci, "Can't transmit PDU without UlDci");
     NS_ASSERT(m_ulDci->m_harqProcess == params.harqProcessId);
 
     m_miUlHarqProcessesPacket.at(params.harqProcessId).m_lcidList.push_back(params.lcid);
@@ -624,6 +620,13 @@ NrUeMac::RecvRaResponse(NrBuildRarListElement_s raResponse)
                          << ", setting T-C-RNTI = " << raResponse.ulMsg3Dci->m_rnti
                          << " at: " << Simulator::Now().As(Time::MS));
     m_rnti = raResponse.ulMsg3Dci->m_rnti;
+
+    // Save data for MSG3
+    m_ulDciSfnsf = m_currentSlot;
+    m_ulDciSfnsf.Add(raResponse.k2Delay);
+    m_ulDciTotalUsed = 0;
+    m_ulDci = raResponse.ulMsg3Dci;
+
     m_cmacSapUser->SetTemporaryCellRnti(m_rnti);
     // in principle we should wait for contention resolution,
     // but in the current NR model when two or more identical
