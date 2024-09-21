@@ -1014,7 +1014,11 @@ NrGnbMac::DoReceiveControlMessage(Ptr<NrControlMessage> msg)
         Ptr<NrDlCqiMessage> cqi = DynamicCast<NrDlCqiMessage>(msg);
         DlCqiInfo cqiElement = cqi->GetDlCqi();
         NS_ASSERT(cqiElement.m_rnti != 0);
-        m_dlCqiReceived.push_back(cqiElement);
+        // Ignore CQIs of disconnected UEs
+        if (m_rlcAttached.find(cqiElement.m_rnti) != m_rlcAttached.end())
+        {
+            m_dlCqiReceived.push_back(cqiElement);
+        }
         break;
     }
     case (NrControlMessage::DL_HARQ): {
