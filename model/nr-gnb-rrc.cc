@@ -207,7 +207,7 @@ NrUeManager::DoInitialize()
         NrMacSapUser* nrMacSapUser =
             m_rrc->m_ccmRrcSapProvider->ConfigureSignalBearer(lcinfo, rlc->GetNrMacSapUser());
         // Signal Channel are only on Primary Carrier
-        m_rrc->m_cmacSapProvider.at(m_componentCarrierId)->AddLc(lcinfo, nrMacSapUser);
+        m_rrc->m_cmacSapProvider.at(m_componentCarrierId)->AddLc(lcinfo, nrMacSapUser, true);
         m_rrc->m_ccmRrcSapProvider->AddLc(lcinfo, nrMacSapUser);
     }
 

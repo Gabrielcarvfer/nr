@@ -389,7 +389,7 @@ NrRadioLinkFailureTestCase::DoRun()
                             gnbDevs);
     }
 
-    Simulator::Schedule(Seconds(0.59),
+    Simulator::Schedule(Seconds(0.4),
                         &NrRadioLinkFailureTestCase::JumpAway,
                         this,
                         m_ueJumpAwayPosition);

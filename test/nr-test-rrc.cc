@@ -263,6 +263,7 @@ NrRrcConnectionEstablishmentTestCase::DoRun()
 {
     NS_LOG_FUNCTION(this << GetName());
     Config::Reset();
+    Config::SetDefault("ns3::NrUePhy::EnableRlfDetection", BooleanValue(false));
 
     if (m_nUes < 25)
     {
