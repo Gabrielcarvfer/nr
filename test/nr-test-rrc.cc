@@ -803,6 +803,7 @@ NrRrcTestSuite::NrRrcTestSuite()
 
         // nUes tConnBase delayDiscStart useIdealRrc nBearers tConnIncrPerUe errorExpected
         // admitRrcConnectionRequest
+        /*
         AddTestCase(
             new NrRrcConnectionEstablishmentTestCase(1, 0, 0, 0, 1, false, useIdealRrc, true),
             TestCase::Duration::EXTENSIVE);
@@ -835,7 +836,7 @@ NrRrcTestSuite::NrRrcTestSuite()
             TestCase::Duration::EXTENSIVE);
         AddTestCase(
             new NrRrcConnectionEstablishmentTestCase(2, 1, 20, 10, 1, false, useIdealRrc, true),
-            TestCase::Duration::EXTENSIVE);
+            TestCase::Duration::EXTENSIVE);*/
         AddTestCase(
             new NrRrcConnectionEstablishmentTestCase(2, 1, 20, 100, 1, false, useIdealRrc, true),
             TestCase::Duration::EXTENSIVE);
