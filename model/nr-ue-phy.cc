@@ -1064,11 +1064,11 @@ NrUePhy::UlData(const std::shared_ptr<DciInfoElementTdma>& dci)
         {
             NS_FATAL_ERROR("The UE " << dci->m_rnti << " has been scheduled without data");
         }
-        // else
-        //{
-        //     NS_LOG_WARN("Not sending MSG3. Probably in RRC IDEAL mode.");
-        //     return varTtiDuration;
-        // }
+        else
+        {
+            NS_LOG_WARN("Not sending MSG3. Probably in RRC IDEAL mode.");
+            return varTtiDuration;
+        }
     }
     m_reportUlTbSize(m_netDevice->GetObject<NrUeNetDevice>()->GetImsi(), dci->m_tbSize);
 
